@@ -1,5 +1,5 @@
 import numpy as np
-from ase.build import minimize_rotation_and_translation
+from ase.build.rotate import minimize_rotation_and_translation, rotation_matrix_from_points
 from sklearn.decomposition import PCA
 
 from qmlearn.utils.utils import matrix_deviation
@@ -7,11 +7,13 @@ from qmlearn.utils.utils import matrix_deviation
 class Engine(object):
     def __init__(self, mol = None, method = 'rks', basis = '6-31g', xc = None, **kwargs):
         self.options = locals()
+        self.options.update(kwargs)
         #-----------------------------------------------------------------------
         self._vext = None
         self._kop = None
         self._gamma = None
         self._ovlp = None
+        self._eri = None
         self.init()
 
     def init(self, *args, **kwargs):
@@ -42,12 +44,12 @@ class Engine(object):
 
     def calc_ncharge(self, gamma, ovlp = None):
         if ovlp is None : ovlp = self.ovlp
-        ncharge = np.trace(gamma @ ovlp)
+        ncharge = np.einsum('ji,ij->', gamma, ovlp)
         return ncharge
 
     def calc_ke(self, gamma, kop = None):
         if kop is None : kop = self.kop
-        ke = np.trace(gamma @ kop)
+        ke = np.einsum('ji,ij->', gamma, kop)
         return ke
 
     def calc_idempotency(self, gamma, ovlp=None, kind=1):
@@ -87,3 +89,16 @@ def atoms2newdirection(atoms, a=(0,0,1), b=(1,0,0)):
     deg= np.rad2deg(np.arccos(np.clip(np.dot(a,b),-1.0,1.0)))
     atoms.rotate(deg,c)
     return atoms
+
+def minimize_rmsd_operation(target, atoms):
+    pos_t = target.get_positions()
+    c_t = np.mean(pos_t, axis=0)
+    pos_t = pos_t - c_t
+
+    pos = atoms.get_positions()
+    c = np.mean(pos, axis=0)
+    pos = pos - c
+
+    rotate = rotation_matrix_from_points(pos.T, pos_t.T).T
+    translate = c_t - np.dot(c, rotate)
+    return(rotate, translate)

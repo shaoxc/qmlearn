@@ -1,16 +1,16 @@
-from ase.io.trajectory import Trajectory
-
 from qmlearn.drivers.core import atoms_rmsd, atoms2bestplane
+from qmlearn.io import read_images
 
-def get_train_atoms(mdtraj=None, nsamples=10, skip = 500, tol=0.02, direction = None, refatoms = None):
-    traj = Trajectory(mdtraj)
-    nsteps = len(traj)
-    j = skip
+def get_train_atoms(traj=None, nsamples=10, skip = 0, tol=0.02, direction = None, refatoms = None):
+    images = read_images(traj)
+    nsteps = len(images)
+    print('nsteps', nsteps, traj)
+    j = skip - 1
     data=[]
     for i in range(nsamples):
-        k=j
+        k=j+1
         for j in range(k, nsteps):
-            atoms = traj[j]
+            atoms = images[j]
             new = True
             rmsd=0.0
             transform = True
@@ -34,5 +34,4 @@ def get_train_atoms(mdtraj=None, nsamples=10, skip = 500, tol=0.02, direction = 
         print(f"WARN : Only get {len(data)} samples at {j} step. Maybe you can reduce the 'tol'.", flush = True)
     else :
         print(f'Get {len(data)} samples at {j} step.', flush = True)
-    traj.close()
     return data

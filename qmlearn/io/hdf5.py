@@ -1,14 +1,15 @@
 import fnmatch
-
 import numpy as np
 from ase import Atoms
-import h5py
 
 from qmlearn.drivers.mol import QMMol
 
 class DBHDF5(object):
+
     def __init__(self, filename, mode = 'a', qmmol = None):
-        self.fh = h5py.File(filename, 'a')
+        import h5py
+        self.h5py = h5py
+        self.fh = self.h5py.File(filename, 'a')
         self._qmmol = qmmol
         self._group = None
 
@@ -97,7 +98,10 @@ class DBHDF5(object):
                 self._read_dict(v, dicts[k])
             else :
                 dicts[k] = self._encode(v)
-        qmmol = QMMol(**dicts)
+        try:
+            qmmol = QMMol(**dicts)
+        except Exception :
+            qmmol = dicts
         return qmmol
 
     def write_properties(self, properties = None, prefix = 'train', name = None, **kwargs):
@@ -163,7 +167,7 @@ class DBHDF5(object):
         return d
 
     def _write_atoms(self, g, atoms):
-        dt = h5py.string_dtype(encoding='utf-8')
+        dt = self.h5py.string_dtype(encoding='utf-8')
         g["symbols"] = np.array(atoms.get_chemical_symbols(), dtype = dt)
         g["positions"] = atoms.positions
         g["cell"] = atoms.cell

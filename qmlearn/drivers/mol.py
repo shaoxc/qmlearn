@@ -1,7 +1,7 @@
-# import numpy as np
+import numpy as np
 from ase import Atoms, io
 
-from qmlearn.drivers.core import atoms_rmsd
+from qmlearn.drivers.core import minimize_rmsd_operation
 
 qm_engines = {
         'pyscf' : None
@@ -15,11 +15,14 @@ class QMMol(object):
             'calc_ke',
             'calc_dipole',
             'calc_quadrupole',
-            'calc_idempotency'
+            'calc_forces',
+            'calc_idempotency',
+            'vext',
+            'ovlp',
             ]
 
     def __init__(self, atoms = None, engine_name = 'pyscf', method = 'rks', basis = '6-31g',
-            xc = None, occs=None, refatoms = None, engine_options = {}, **kwargs):
+            xc = None, occs=None, refatoms = None, engine_options = {}, charge = None, **kwargs):
         # Save all the kwargs for duplicate
         self.init_kwargs = locals()
         self.init()
@@ -36,6 +39,10 @@ class QMMol(object):
         method=self.init_kwargs.get('method', None)
         xc=self.init_kwargs.get('xc', None)
         basis=self.init_kwargs.get('basis', None)
+        charge=self.init_kwargs.get('charge', None)
+        #-----------------------------------------------------------------------
+        self.op_rotate = np.eye(3)
+        self.op_translate = np.zeros(3)
         #-----------------------------------------------------------------------
         if not isinstance(atoms, Atoms):
             try:
@@ -52,11 +59,9 @@ class QMMol(object):
                 except Exception as e:
                     raise e
             if refatoms is not atoms :
-                self.rmsd, atoms = atoms_rmsd(refatoms, atoms, keep = False)
-            else :
-                self.rmsd = 0.0
-        else :
-            self.rmsd = None
+                self.op_rotate, self.op_translate = minimize_rmsd_operation(refatoms, atoms)
+                atoms.set_positions(np.dot(atoms.positions,self.op_rotate)+self.op_translate)
+        self.op_rotate_inv = np.linalg.inv(self.op_rotate)
         #-----------------------------------------------------------------------
         if engine is None :
             if engine_name == 'pyscf' :
@@ -64,11 +69,26 @@ class QMMol(object):
                 engine_options['mol'] = atoms
                 engine_options['method'] = method
                 engine_options['basis'] = basis
-                if isinstance(xc, str) :
+                engine_options['charge'] = charge
+                if isinstance(xc, (str, type(None))) :
                     engine_options['xc'] = xc
                 elif isinstance(xc, (list, tuple, set)):
                     engine_options['xc'] = ','.join(xc)
+                else :
+                    raise AttributeError(f"Not support this '{xc}'")
                 engine = EnginePyscf(**engine_options)
+            elif engine_name == 'psi4' :
+                from qmlearn.drivers.psi4 import EnginePsi4
+                engine_options['mol'] = atoms
+                engine_options['method'] = method
+                engine_options['basis'] = basis
+                if isinstance(xc, (str, type(None))) :
+                    engine_options['xc'] = xc
+                else :
+                    raise AttributeError(f"Not support this '{xc}'")
+                engine = EnginePsi4(**engine_options)
+            else :
+                raise AttributeError(f"Sorry, not support '{engine_name}' now")
         #-----------------------------------------------------------------------
         self.refatoms = refatoms
         self.engine = engine
@@ -98,18 +118,6 @@ class QMMol(object):
 
     def run(self, **kwargs):
         self.engine.run(**kwargs)
-
-    @property
-    def ncharge0(self):
-        return self.engine.ncharge0
-
-    @property
-    def vext(self):
-        return self.engine.vext
-
-    @property
-    def ovlp(self):
-        return self.engine.ovlp
 
     def __getattr__(self, attr):
         if attr in dir(self):

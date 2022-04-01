@@ -3,7 +3,7 @@
 by learning quantum density matrices in the AO basis
 
 # Contributors
- - Xuecheng Shao, Lukas Paetow and Michele Pavanello @ [PRG](https://sites.rutgers.edu/prg/) at [Rutgers University-Newark](http://sasn.rutgers.edu).
+ - Xuecheng Shao, Lukas Paetow, Md Rajib Khan Musa and Michele Pavanello @ [PRG](https://sites.rutgers.edu/prg/) at [Rutgers University-Newark](http://sasn.rutgers.edu).
  - Mark E Tuckerman @ [Tuckerman Research Group](https://wp.nyu.edu/tuckerman_group/) at [NYU](https://cas.nyu.edu/)
 
  # Some info

@@ -6,33 +6,17 @@ class FixBondLComb:
     This is similar to ASE FixBondLengths, but with linear combination of bond lengths.
     sum_i(bond_length_i * coefs_i) = constant
     """
-    def __init__(self, pairs = None, coefs = None, dt = None, tol=1e-6, target=None, maxiter = 1000, scale = 2.0):
-        self.pairs = np.array(pairs)
-        if coefs is not None :
-            self.coefs = np.array(coefs)
-        else :
-            self.coefs = np.ones(len(self.pairs))
+    def __init__(self, pairs, dt = None, tol=1e-6, target=None, maxiter = 1000, scale = 2.0, atoms = None):
+        self.pairs = np.asarray([x[:2] for x in pairs])
+        self.coefs = np.asarray([x[2] if len(x) > 2 else 1.0 for x in pairs])
         self.tol = tol
         self.maxiter = maxiter
         self.target = target
         self.scale = scale
         self.lm = 0.0
         self._dt = dt
+        self.atoms = atoms
         self.bm_nsteps = -1
-        self.iter = 0
-
-    def copy(self):
-        kwargs = {
-                'pairs' : self.pairs,
-                'coefs' : self.coefs,
-                'dt' : self.dt,
-                'tol' : self.tol,
-                'target' : self.target,
-                'maxiter' : self.maxiter,
-                'scale' : self.scale,
-                }
-        obj = self.__class__(**kwargs)
-        return obj
 
     @property
     def dt(self):
@@ -53,6 +37,7 @@ class FixBondLComb:
 
         if self.target is None:
             self.target = self.get_prims(atoms, atoms.positions)
+        if self.atoms is None : self.atoms = atoms
 
         bmat0 = self.get_jacobian(atoms, atoms.positions)
         lm = 0.0
@@ -71,8 +56,7 @@ class FixBondLComb:
         #-----------------------------------------------------------------------
         self.bm_nsteps = i
         self.bm_xi = value
-        self.bm_lambda = 2.0*lm/(self.dt**2)
-        self.iter += 1
+        self.bm_lambda = lm
         #-----------------------------------------------------------------------
         # Due to ASE use Velocity Verlet integration
         p = atoms.get_momenta() + lmd/self.dt
@@ -85,6 +69,7 @@ class FixBondLComb:
 
         if self.target is None:
             self.target = self.get_prims(atoms, atoms.positions)
+        if self.atoms is None : self.atoms = atoms
 
         bmat = self.get_jacobian(atoms, atoms.positions)
         for i in range(self.maxiter):
@@ -118,7 +103,7 @@ class FixBondLComb:
     def get_jacobian(self, atoms, pos, jacobian = None):
         n = 2 # bond
         vectors = [pos[j] - pos[i] for i, j in self.pairs]
-        derivs = get_distances_derivatives(vectors, cell=atoms.cell, pbc=atoms.pbc)
+        derivs = get_distances_derivatives(vectors, cell=self.atoms.cell, pbc=self.atoms.pbc)
         if jacobian is None : jacobian = np.zeros_like(pos)
         for i, ip in enumerate(self.pairs):
             for j in range(n):
@@ -127,9 +112,9 @@ class FixBondLComb:
 
     def output(self, write = True):
         if self.bm_nsteps < 0 : return ''
-        fstr = f'bm_nsteps_pos({self.iter}) converged at {self.bm_nsteps} step.\n'
-        fstr+= f'bm_xi_pos({self.iter}) : {self.bm_xi} {self.target}\n'
-        fstr+= f'bm_lambda_pos({self.iter}) : {self.bm_lambda}'
+        fstr = f'bm_pos converged at {self.bm_nsteps} step.\n'
+        fstr+= f'bm_xi_pos : {self.bm_xi} {self.target}\n'
+        fstr+= f'bm_lambda_pos : {self.bm_lambda}'
         if write :
             print(fstr, flush = True)
         return fstr
@@ -137,3 +122,4 @@ class FixBondLComb:
         # bmat = self.get_jacobian(atoms, atoms.positions)
         # zet = np.sum(bmat*bmat/masses)
         # # 'lambda', '|z|^(-1/2)', 'kTG'
+

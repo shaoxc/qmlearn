@@ -1,9 +1,11 @@
 import os
 import numpy as np
 from scipy.linalg import eig
+from scipy.spatial.transform import Rotation
 from ase import Atoms, io
 from pyscf.pbc.tools.pyscf_ase import atoms_from_ase
 from pyscf import gto, dft, scf, mp, fci, ci
+from pyscf.symm import Dmatrix
 
 from qmlearn.drivers.core import Engine
 
@@ -196,6 +198,10 @@ class EnginePyscf(Engine):
         mo = self.mf.mo_coeff[:,:nocc] @ vr.T
         return mo
 
+    def rotation2rotmat(self, rotation, mol = None):
+        mol = mol or self.mol
+        return rotation2rotmat(rotation, mol)
+
 def gamma2gamma(*args, **kwargs):
     gamma = None
     for v in args :
@@ -218,3 +224,21 @@ def gamma2rdm1e(mf, *args, **kwargs):
     f = mf.get_fock(dm = gamma)
     dm1e = sinv@f@gamma
     return dm1e
+
+def rotation2rotmat(rotation, mol):
+    alpha, beta, gamma = Rotation.from_matrix(rotation).as_euler('zyz')*-1.0
+    angl = []
+    for ib in range(mol.nbas):
+        l = mol.bas_angular(ib)
+        nc = mol.bas_nctr(ib)
+        for n in range(nc): angl.append(l)
+    angl=np.asarray(angl)
+    dims = angl*2+1
+    aol = np.empty(len(dims)+1, dtype=np.int32)
+    aol[0] = 0
+    dims.cumsum(dtype=np.int32, out=aol[1:])
+    rotmat = np.eye(mol.nao)
+    for i in range(len(angl)):
+        r = Dmatrix.Dmatrix(angl[i], alpha, beta, gamma, reorder_p=True)
+        rotmat[aol[i]:aol[i+1],aol[i]:aol[i+1]]=r
+    return rotmat

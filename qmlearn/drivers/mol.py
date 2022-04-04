@@ -17,6 +17,7 @@ class QMMol(object):
             'calc_quadrupole',
             'calc_forces',
             'calc_idempotency',
+            'rotation2rotmat',
             'vext',
             'ovlp',
             ]
@@ -90,7 +91,7 @@ class QMMol(object):
             else :
                 raise AttributeError(f"Sorry, not support '{engine_name}' now")
         #-----------------------------------------------------------------------
-        self.refatoms = refatoms
+        self.refatoms = refatoms or atoms
         self.engine = engine
         self.occs = occs
         self.atoms = atoms
@@ -104,11 +105,10 @@ class QMMol(object):
 
     def duplicate(self, atoms, **kwargs):
         for k, v in self.init_kwargs.items():
-            if k == 'self' :
+            if k == 'self' or k in kwargs :
                 continue
             elif k == 'atoms' :
                 kwargs[k] = atoms
-                continue
             else :
                 kwargs[k] = v
         if kwargs['refatoms'] is None :

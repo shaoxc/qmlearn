@@ -2,7 +2,7 @@
 *Quantum Machine Learning*
 by learning quantum density matrices in the AO basis
 
-![alt text](./Docs/figure3.png)
+![QM-Learn code and workflow](./Docs/figure3.png)
 
 # Contributors
  - Xuecheng Shao, Lukas Paetow, Md Rajib Khan Musa and Michele Pavanello @ [PRG](https://sites.rutgers.edu/prg/) at [Rutgers University-Newark](http://sasn.rutgers.edu).
@@ -10,4 +10,4 @@ by learning quantum density matrices in the AO basis
 
  # Some info
 
- Code entirely in Python leveraging [PySCF](https://pyscf.org/) for generating AO integrals [Libcint](https://github.com/sunqm/libcint) and DFT targets. Regressions are carried out with [scikit-learn](https://scikit-learn.org/stable/).
+ Code entirely in Python leveraging [PySCF](https://pyscf.org/) and [Psi4Numpy](https://github.com/psi4/psi4numpy) for generating GTO integrals and DFT targets. Regressions are carried out with [scikit-learn](https://scikit-learn.org/stable/) or other ML tools.

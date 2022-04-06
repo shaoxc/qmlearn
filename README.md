@@ -2,7 +2,7 @@
 *Quantum Machine Learning*
 by learning quantum density matrices in the AO basis
 
-![alt text](https://gitlab.com/pavanello-research-group/qmlearn/Docs/figure3.png)
+![alt text](https://gitlab.com/pavanello-research-group/qmlearn/-/blob/main/Docs/figure3.png)
 
 # Contributors
  - Xuecheng Shao, Lukas Paetow, Md Rajib Khan Musa and Michele Pavanello @ [PRG](https://sites.rutgers.edu/prg/) at [Rutgers University-Newark](http://sasn.rutgers.edu).

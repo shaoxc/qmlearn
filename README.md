@@ -1,6 +1,6 @@
 # QMLearn
 *Quantum Machine Learning*
-by learning quantum density matrices in the AO basis
+by learning one-body reduced density matrices in the AO basis.
 
 ![QM-Learn code and workflow](./Docs/figure3.png)
 

@@ -28,3 +28,26 @@ def matrix_deviation(mat1, mat2):
     diff = np.abs(mat1 - mat2)
     errorsum = np.sum(diff)
     return errorsum
+
+def array2blocks(arr, sections):
+    blocks={}
+    ix=0
+    ns=len(sections)
+    for i in range(ns):
+        iy=0
+        for j in range(ns):
+            indices = np.s_[ix:ix+sections[i],iy:iy+sections[j]]
+            blocks[(i,j)] = arr[indices]
+            iy=iy+sections[j]
+        ix=ix+sections[i]
+    return blocks
+
+def blocks2array(blocks, indices):
+    new_blocks=[]
+    for i in indices:
+        la=[]
+        for j in indices:
+            la.append(blocks[(i,j)])
+        new_blocks.append(la)
+    arr = np.block(new_blocks)
+    return arr

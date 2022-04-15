@@ -2,6 +2,7 @@ import numpy as np
 from ase import Atoms, io
 
 from qmlearn.drivers.core import minimize_rmsd_operation
+from qmlearn.utils import array2blocks, blocks2array
 
 qm_engines = {
         'pyscf' : None
@@ -18,12 +19,16 @@ class QMMol(object):
             'calc_forces',
             'calc_idempotency',
             'rotation2rotmat',
+            'get_atom_naos',
             'vext',
             'ovlp',
+            'nao',
             ]
 
     def __init__(self, atoms = None, engine_name = 'pyscf', method = 'rks', basis = '6-31g',
-            xc = None, occs=None, refatoms = None, engine_options = {}, charge = None, **kwargs):
+            xc = None, occs=None, refatoms = None, engine_options = {}, charge = None, engine = None,
+            stereo = True, rotate_method = 'kabsch', reorder_method = 'hungarian', use_reflection = True,
+            **kwargs):
         # Save all the kwargs for duplicate
         self.init_kwargs = locals()
         self.init()
@@ -41,9 +46,17 @@ class QMMol(object):
         xc=self.init_kwargs.get('xc', None)
         basis=self.init_kwargs.get('basis', None)
         charge=self.init_kwargs.get('charge', None)
+        #
+        stereo=self.init_kwargs.get('stereo', True)
+        rotate_method=self.init_kwargs.get('rotate_method', None)
+        reorder_method=self.init_kwargs.get('reorder_method', None)
+        use_reflection=self.init_kwargs.get('use_reflection', True)
         #-----------------------------------------------------------------------
         self.op_rotate = np.eye(3)
         self.op_translate = np.zeros(3)
+        self.op_indices = None
+        self._rotmat = None
+        self._atom_naos = None
         #-----------------------------------------------------------------------
         if not isinstance(atoms, Atoms):
             try:
@@ -51,6 +64,7 @@ class QMMol(object):
             except Exception as e:
                 raise e
 
+        atoms_init = atoms
         if refatoms is not None :
             if hasattr(refatoms, 'atoms'):
                 refatoms = refatoms.atoms
@@ -60,9 +74,16 @@ class QMMol(object):
                 except Exception as e:
                     raise e
             if refatoms is not atoms :
-                self.op_rotate, self.op_translate = minimize_rmsd_operation(refatoms, atoms)
+                self.op_rotate, self.op_translate, self.op_indices = minimize_rmsd_operation(refatoms, atoms,
+                        stereo = stereo, rotate_method = rotate_method,
+                        reorder_method = reorder_method, use_reflection = use_reflection)
+                atoms = atoms[self.op_indices]
                 atoms.set_positions(np.dot(atoms.positions,self.op_rotate)+self.op_translate)
-        self.op_rotate_inv = np.linalg.inv(self.op_rotate)
+        self.atoms_init = atoms_init
+        # self.op_rotate_inv = np.linalg.inv(self.op_rotate)
+        self.op_rotate_inv = np.ascontiguousarray(self.op_rotate.T)
+        if self.op_indices is None : self.op_indices = np.arange(len(atoms))
+        self.op_indices_inv = np.argsort(self.op_indices)
         #-----------------------------------------------------------------------
         if engine is None :
             if engine_name == 'pyscf' :
@@ -128,3 +149,39 @@ class QMMol(object):
             return getattr(self.engine, attr)
         else :
             raise AttributeError(f"'{self.__class__.__name__}' object has no attribute '{attr}'.")
+
+    @property
+    def rotmat(self):
+        if self._rotmat is None :
+            self._rotmat = self.rotation2rotmat(self.op_rotate)
+        return self._rotmat
+
+    @property
+    def atom_naos(self):
+        if self._atom_naos is None :
+            self._atom_naos = self.get_atom_naos()
+        return self._atom_naos
+
+    def convert_back(self, y, prop = 'gamma', rotate = True, reorder = True, **kwargs):
+        nao = self.nao
+        #
+        if np.allclose(self.op_rotate, self.op_rotate_inv) : rotate = False
+        if np.all(self.op_indices[:-1] < self.op_indices[1:]) : reorder = False
+        #
+        # print('rotate', rotate, reorder)
+        if 'gamma' in prop :
+            if y.ndim == 1 : y = y.reshape((nao, nao))
+            if rotate : y = self.rotmat.T@y@self.rotmat
+            if reorder :
+                naos = self.atom_naos
+                blocks = array2blocks(y, sections = naos)
+                y = blocks2array(blocks, indices = self.op_indices_inv)
+        elif 'force' in prop :
+            if y.ndim == 1 : y = y.reshape((-1, 3))
+            if rotate : y = np.dot(y, self.op_rotate_inv)
+            if reorder :
+                y = y[self.op_indices_inv]
+        else :
+            # others just return it self
+            pass
+        return y

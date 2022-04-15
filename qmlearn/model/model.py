@@ -1,6 +1,6 @@
 import numpy as np
 from ase import Atoms
-from scipy.linalg import eig
+import scipy.linalg as sla
 # from sklearn.linear_model import LinearRegression
 from sklearn.kernel_ridge import KernelRidge
 
@@ -8,14 +8,12 @@ from qmlearn.drivers.mol import QMMol
 
 
 class QMModel(object):
-    def __init__(self, model = None, mmodels = None, method='gamma', ncharge=None, nspin = 1, occs = None, refqmmol = None, **kwargs):
+    def __init__(self, mmodels = None, method='gamma', ncharge=None, nspin = 1, occs = None, refqmmol = None, **kwargs):
         self._method = method
         self.mmodels = mmodels or {}
-        if self.method not in self.mmodels :
-            self.mmodels[self.method] = model
         #
-        if self.model is None :
-            self.model = KernelRidge(alpha=0.1,kernel='linear')
+        if self.method not in self.mmodels :
+            self.mmodels[self.method] = KernelRidge(alpha=0.1,kernel='linear')
         # for orbital
         self.nspin = nspin
         self.ncharge = ncharge
@@ -26,7 +24,7 @@ class QMModel(object):
             elif self.nspin == 2 :
                 self.occs = np.ones(self.ncharge)
         #
-        self.refqmmol = refqmmol
+        self._refqmmol = refqmmol
         self.qmmol = None
 
     @property
@@ -38,11 +36,25 @@ class QMModel(object):
         self.mmodels[self.method] = value
 
     @property
+    def refqmmol(self):
+        if self._refqmmol is None :
+            raise AttributeError("Please set the 'refqmmol' before the predict.")
+        return self._refqmmol
+
+    @refqmmol.setter
+    def refqmmol(self, value):
+        self._refqmmol = value
+
+    @property
     def method(self):
+        if self._method.lower() != 'gamma' :
+            raise AttributeError("Only support 'gamma' method now.")
         return self._method
 
-    def fit(self, X, y, model = None):
-        if model is None : model = self.model
+    def fit(self, X, y, model = None, method = None):
+        if model is None :
+            method = method or self.method
+            model = self.mmodels[method]
         #
         if isinstance(X[0], np.ndarray):
             if X[0].ndim > 1 :
@@ -54,24 +66,27 @@ class QMModel(object):
         model.fit(X, y)
         return model
 
-    def predict(self, x, model = None, nsamples=1):
+    def predict(self, x, model = None, method = None, **kwargs):
         #
-        if nsamples == 1 :
-            x = [self.translate_input(x).ravel()]
-        if model is None : model = self.model
+        x = [self.translate_input(x, **kwargs).ravel()]
+        if model is None :
+            method = method or self.method
+            model = self.mmodels[method]
         #
-        y = model.predict(x)
-        if nsamples == 1 : y = y[0]
+        y = model.predict(x)[0]
         #
         return y
 
-    def translate_input(self, x):
+    def convert_back(self, y, prop = 'gamma', qmmol = None, **kwargs):
+        qmmol = qmmol or self.qmmol
+        y = qmmol.convert_back(y, prop = prop, **kwargs)
+        return y
+
+    def translate_input(self, x, **kwargs):
         if isinstance(x, np.ndarray) :
             out = x
         elif isinstance(x, Atoms) :
-            if self.refqmmol is None :
-                raise AttributeError("Please change the input or set the 'refqmmol' before the predict.")
-            x = self.refqmmol.duplicate(x)
+            x = self.refqmmol.duplicate(x, **kwargs)
         elif isinstance(x, QMMol):
             pass
         else :
@@ -84,9 +99,112 @@ class QMModel(object):
 
     def orth_orb(self, s, orb):
         s_new = np.einsum('mi,nj,mn->ij', orb, orb, s)
-        w,vr=eig(s_new)
+        w,vr=sla.eig(s_new)
         w=1./np.real(np.sqrt(w))
         s_moh=vr@np.diag(w)@vr.T
         oorb = np.einsum('ij,mj->mi',s_moh,orb)
         s_new = np.einsum('mi,nj,mn->ij', oorb, oorb, s)
         return oorb
+
+
+class MQMModel(QMModel):
+    def __init__(self, mmodels = None, method='gamma', ncharge=None, nspin = 1, occs = None, refqmmol = None,
+            fragments = None, qmmodels = None, **kwargs):
+        super().__init__(mmodels=mmodels, method=method, ncharge=ncharge, nspin=nspin, occs=occs, refqmmol=refqmmol, **kwargs)
+        self._fragments = fragments
+        self._qmmodels = qmmodels
+
+    @property
+    def qmmodels(self):
+        if self._qmmodels is None :
+            raise AttributeError("Please set the 'qmmodels' before the predict.")
+        return self._qmmodels
+
+    @qmmodels.setter
+    def qmmodels(self, value):
+        self._qmmodels = value
+
+    @property
+    def fragments(self):
+        if self._fragments is None :
+            raise AttributeError("Please set the 'fragments' before the predict.")
+        return self._fragments
+
+    @fragments.setter
+    def fragments(self, value):
+        self._fragments = value
+
+    def translate_input(self, x, rotate = True, **kwargs):
+        if isinstance(x, np.ndarray) :
+            out = x
+        elif isinstance(x, Atoms) :
+            x = self.refqmmol.duplicate(x, **kwargs)
+        elif isinstance(x, QMMol):
+            pass
+        else :
+            raise AttributeError("Please check the input.")
+
+        if isinstance(x, QMMol):
+            self.qmmol = x
+            out = self.qmmol.vext
+            block = self.get_block_vext(x, rotate = rotate)
+            out = out - sla.block_diag(*block)
+        return out
+
+    def get_block_vext(self, qmmol, rotate = True, **kwargs):
+        if isinstance(qmmol, Atoms) :
+            qmmol = self.refqmmol.duplicate(qmmol, **kwargs)
+        self.sub_qmmols = []
+        block = []
+        for i, index in enumerate(self.fragments):
+            a = self.qmmodels[i].refqmmol.duplicate(qmmol.atoms[index], **kwargs)
+            self.sub_qmmols.append(a)
+            if rotate :
+                v = a.rotmat.T@a.vext@a.rotmat
+            else :
+                v = a.vext
+            block.append(v)
+        return block
+
+    def predict(self, x, method = None, rotate=True, **kwargs):
+        x = self.translate_input(x, rotate = rotate, **kwargs).ravel()
+        method = method or self.method
+        model = self.mmodels[method]
+        y = model.predict([x])[0]
+        block = self.predict_block(x, method=method, rotate=rotate)
+        if 'gamma' in method :
+            y_frags = sla.block_diag(*block)
+        elif 'force' in method :
+            y_frags = np.vstack(block)
+        elif len(y) == 1 :
+            y_frags = np.sum(y_frags)
+        else :
+            raise AttributeError("'MQMModel' only for 'energy', 'force' and 'gamma' now.")
+        if len(y) > 1 : y = np.asarray(y).reshape(y_frags)
+        y = y + y_frags
+        return y
+
+    def predict_block(self, x, method=None, rotate=True, **kwargs):
+        # This one just to make sure the 'sub_qmmols' were calculated.
+        x = self.translate_input(x, rotate = rotate, **kwargs).ravel()
+        method = method or self.method
+        block = []
+        for i, mol in enumerate(self.sub_qmmols) :
+            if method == 'gamma' :
+                x0 = mol.vext
+            else :
+                x0 = mol.gamma
+            y0 = self.qmmodels[i].predict(x0, method=method)
+            if np.size(y0) == np.size(x0) :
+                y0 = y0.reshape(x0.shape)
+                if method == 'gamma' : # save the gamma
+                    mol.gamma = y0
+                if rotate :
+                    y0 = mol.rotmat.T@y0@mol.rotmat
+
+            if 'force' in method :
+                y0 = y0.reshape((-1, 3))
+                if rotate :
+                    y0 = np.dot(y0, mol.op_rotate_inv)
+            block.append(y0)
+        return block

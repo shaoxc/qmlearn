@@ -29,6 +29,7 @@ class QMLCalculator(Calculator):
         self._refqmmol = value
 
     def calculate(self, atoms=None, properties=['energy'], system_changes=all_changes):
+        properties=['energy', 'forces']
         Calculator.calculate(self,atoms=atoms,properties=properties,system_changes=system_changes)
         atoms = atoms or self.atoms
         self.results['stress'] = np.zeros(6)
@@ -47,7 +48,7 @@ class QMLCalculator(Calculator):
         gamma = self.qmmodel.predict(qmmol).reshape(shape)
         m2 = self.second_learn.get('gamma', None)
         if m2 :
-            gamma2 = self.qmmodel.predict(gamma, model=self.qmmodel.mmodels[m2]).reshape(shape)
+            gamma2 = self.qmmodel.predict(gamma, method = m2).reshape(shape)
         else :
             gamma2 = gamma
 
@@ -55,7 +56,7 @@ class QMLCalculator(Calculator):
         if 'energy' :
             m2 = self.second_learn.get('energy', None)
             if m2 :
-                energy = self.qmmodel.predict(gamma, model=self.qmmodel.mmodels[m2])
+                energy = self.qmmodel.predict(gamma, method=m2)
                 self.results['energy'] = energy * Ha
             else :
                 energy = qmmol.calc_etotal(gamma2)
@@ -64,17 +65,22 @@ class QMLCalculator(Calculator):
         if 'forces' in properties:
             m2 = self.second_learn.get('forces', None)
             if m2 :
-                forces = self.qmmodel.predict(gamma, model=self.qmmodel.mmodels[m2]).reshape((-1, 3))
+                forces = self.qmmodel.predict(gamma, method=m2).reshape((-1, 3))
             else :
                 forces = qmmol.calc_forces(gamma2).reshape((-1, 3))
             forces = np.dot(forces, qmmol.op_rotate_inv)
-            self.results['forces'] = forces * Ha/Bohr
+            self.results['forces'] = forces[qmmol.op_indices_inv] * Ha/Bohr
+            #
+            # forces_shift = np.mean(self.results['forces'], axis = 0)
+            # print('Forces shift :', forces_shift, flush = True)
+            # self.results['forces'] -= forces_shift
+            #
 
         if True :
         # if 'dipole' in properties :
             m2 = self.second_learn.get('dipole', None)
             if m2 :
-                dipole = self.qmmodel.predict(gamma, model=self.qmmodel.mmodels[m2])
+                dipole = self.qmmodel.predict(gamma, method=m2)
             else :
                 dipole = qmmol.calc_dipole(gamma2)
             dipole = np.dot(dipole, qmmol.op_rotate_inv)
@@ -89,6 +95,7 @@ class QMLCalculator(Calculator):
         self.results['gamma'] = qmmol.engine.gamma
         if 'forces' in properties:
             forces = qmmol.engine.forces
+            print('ff', forces)
             # forces = np.dot(forces, qmmol.op_rotate_inv)
             self.results['forces'] = forces * Ha/Bohr
 

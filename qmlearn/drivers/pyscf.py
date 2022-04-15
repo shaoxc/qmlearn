@@ -105,6 +105,10 @@ class EnginePyscf(Engine):
     def nelectron(self):
         return self.mol.nelectron
 
+    @property
+    def nao(self):
+        return self.mol.nao
+
     def calc_gamma(self, orb=None, occs=None):
         if orb is None : orb = self.orb
         if occs is None : orb = self.occs
@@ -202,6 +206,10 @@ class EnginePyscf(Engine):
         mol = mol or self.mol
         return rotation2rotmat(rotation, mol)
 
+    def get_atom_naos(self, mol = None):
+        mol = mol or self.mol
+        return get_atom_naos(mol)
+
 def gamma2gamma(*args, **kwargs):
     gamma = None
     for v in args :
@@ -242,3 +250,23 @@ def rotation2rotmat(rotation, mol):
         r = Dmatrix.Dmatrix(angl[i], alpha, beta, gamma, reorder_p=True)
         rotmat[aol[i]:aol[i+1],aol[i]:aol[i+1]]=r
     return rotmat
+
+def get_atom_naos(mol):
+    angl = []
+    atomids = []
+    for ib in range(mol.nbas):
+        l = mol.bas_angular(ib)
+        nc = mol.bas_nctr(ib)
+        ia = mol.bas_atom(ib)
+        for n in range(nc):
+            angl.append(l)
+            atomids.append(ia)
+    atomids = np.asarray(atomids)
+    angl = np.asarray(angl)
+    dims = angl*2+1
+    naos = []
+    for ia in range(mol.natm) :
+        n = np.sum(dims[atomids == ia])
+        naos.append(n)
+    naos = np.asarray(naos)
+    return naos

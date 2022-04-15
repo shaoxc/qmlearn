@@ -189,3 +189,9 @@ class DBHDF5(object):
 
     def close(self):
         self.fh.close()
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self):
+        self.close()

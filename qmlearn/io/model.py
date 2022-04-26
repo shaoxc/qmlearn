@@ -11,7 +11,7 @@ def db2qmmodel(filename, names = '*', mmodels = None):
         names['qmmol'] = db.get_names(prefix + '/qmmol*')[0]
         names['atoms'] = db.get_names(prefix + '/train_atoms*')[0]
         names['properties'] = db.get_names(prefix + '/train_prop*')[0]
-        print(f'Guess DB name : {names}', flush = True)
+        print(f'Guess DB names : {names}', flush = True)
     refqmmol = db.read_qmmol(names['qmmol'])
     train_atoms = db.read_images(names['atoms'])
     properties = db.read_properties(names['properties'])
@@ -26,7 +26,6 @@ def db2qmmodel(filename, names = '*', mmodels = None):
             'd_gamma': LinearRegression(),
             'd_energy': LinearRegression(),
             'd_forces': LinearRegression(),
-            'd_dipole': LinearRegression(),
         }
         print(f'Guess mmodels: {mmodels}', flush = True)
     model = QMModel(mmodels=mmodels, refqmmol = refqmmol)
@@ -39,12 +38,12 @@ def db2qmmodel(filename, names = '*', mmodels = None):
             # Do not rotate the molecule
             gamma = model.predict(mol, refatoms=mol).reshape(shape)
             gammas.append(gamma)
-        model.fit(gammas, properties['gamma'], model=model.mmodels['d_gamma'])
         y = gammas
+        model.fit(y, properties['gamma'], method = 'd_gamma')
     for k in mmodels :
         if not k.startswith('d_') or k in ['d_gamma'] : continue
         key = k[2:]
         if key not in properties :
-            raise AttributeError(f"{key} not in the database")
+            print(f"!WARN : '{key}' not in the database", flush = True)
         model.fit(y, properties[key], method = k)
     return model

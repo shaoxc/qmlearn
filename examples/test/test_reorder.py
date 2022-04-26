@@ -9,9 +9,8 @@ from qmlearn.drivers.mol import QMMol
 class Reorder(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.energy = -76.09381930374022
         atoms = ase.build.molecule('H2O')
-        atoms.positions[0] +=0.05
+        atoms.positions[0] += 0.05
         basis = 'cc-pvTZ'
         xc = 'lda,vwn_rpa'
         method = 'rks'

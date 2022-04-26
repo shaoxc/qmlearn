@@ -134,7 +134,7 @@ class MQMModel(QMModel):
     def fragments(self, value):
         self._fragments = value
 
-    def translate_input(self, x, rotate = True, **kwargs):
+    def translate_input(self, x, convert = True, **kwargs):
         if isinstance(x, np.ndarray) :
             out = x
         elif isinstance(x, Atoms) :
@@ -147,11 +147,11 @@ class MQMModel(QMModel):
         if isinstance(x, QMMol):
             self.qmmol = x
             out = self.qmmol.vext
-            block = self.get_block_vext(x, rotate = rotate)
+            block = self.get_block_vext(x, convert = convert)
             out = out - sla.block_diag(*block)
         return out
 
-    def get_block_vext(self, qmmol, rotate = True, **kwargs):
+    def get_block_vext(self, qmmol, convert = True, **kwargs):
         if isinstance(qmmol, Atoms) :
             qmmol = self.refqmmol.duplicate(qmmol, **kwargs)
         self.sub_qmmols = []
@@ -159,34 +159,39 @@ class MQMModel(QMModel):
         for i, index in enumerate(self.fragments):
             a = self.qmmodels[i].refqmmol.duplicate(qmmol.atoms[index], **kwargs)
             self.sub_qmmols.append(a)
-            if rotate :
-                v = a.rotmat.T@a.vext@a.rotmat
+            if convert :
+                v = a.convert_back(a.vext, prop = 'gamma')
             else :
                 v = a.vext
             block.append(v)
         return block
 
-    def predict(self, x, method = None, rotate=True, **kwargs):
-        x = self.translate_input(x, rotate = rotate, **kwargs).ravel()
+    def predict(self, x, method = None, convert=True, split=True, **kwargs):
+        x = self.translate_input(x, convert = convert, **kwargs).ravel()
         method = method or self.method
         model = self.mmodels[method]
         y = model.predict([x])[0]
-        block = self.predict_block(x, method=method, rotate=rotate)
+        y = np.asarray(y)
+        block = self.predict_block(method=method, convert=convert)
         if 'gamma' in method :
             y_frags = sla.block_diag(*block)
         elif 'force' in method :
             y_frags = np.vstack(block)
-        elif len(y) == 1 :
-            y_frags = np.sum(y_frags)
+        elif y.size == 1 :
+            y_frags = np.sum(block)
         else :
             raise AttributeError("'MQMModel' only for 'energy', 'force' and 'gamma' now.")
-        if len(y) > 1 : y = np.asarray(y).reshape(y_frags)
-        y = y + y_frags
-        return y
+        if y.size > 1 : y = y.reshape(y_frags.shape)
 
-    def predict_block(self, x, method=None, rotate=True, **kwargs):
-        # This one just to make sure the 'sub_qmmols' were calculated.
-        x = self.translate_input(x, rotate = rotate, **kwargs).ravel()
+        if split:
+            return y_frags, y
+        else:
+            return y + y_frags
+
+    def predict_block(self, x=None, method=None, convert =True, **kwargs):
+        if x is not None :
+            # This one just to make sure the 'sub_qmmols' were calculated.
+            x = self.translate_input(x, convert = convert, **kwargs).ravel()
         method = method or self.method
         block = []
         for i, mol in enumerate(self.sub_qmmols) :
@@ -199,12 +204,7 @@ class MQMModel(QMModel):
                 y0 = y0.reshape(x0.shape)
                 if method == 'gamma' : # save the gamma
                     mol.gamma = y0
-                if rotate :
-                    y0 = mol.rotmat.T@y0@mol.rotmat
-
-            if 'force' in method :
-                y0 = y0.reshape((-1, 3))
-                if rotate :
-                    y0 = np.dot(y0, mol.op_rotate_inv)
+            if convert :
+                y0 = mol.convert_back(y0, prop = method)
             block.append(y0)
         return block

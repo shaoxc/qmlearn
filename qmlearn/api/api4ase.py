@@ -4,15 +4,17 @@ from ase.units import Ha, Bohr
 
 
 class QMLCalculator(Calculator):
-    implemented_properties = ['energy', 'forces', 'dipole', 'stress']
+    implemented_properties = ['energy', 'forces', 'dipole', 'stress', 'gamma']
 
     def __init__(self, qmmodel = None, second_learn = {}, method = 'gamma',
-            label='QMLearn', atoms=None, directory='.', refqmmol = None, **kwargs):
+            label='QMLearn', atoms=None, directory='.', refqmmol = None, properties = ('energy'),
+            **kwargs):
         Calculator.__init__(self, label = label, atoms = atoms, directory = directory, **kwargs)
         self.qmmodel = qmmodel
         self.second_learn = second_learn
         self.method = method
         self._refqmmol = refqmmol
+        self._properties = properties
 
     @property
     def refqmmol(self):
@@ -28,8 +30,18 @@ class QMLCalculator(Calculator):
     def refqmmol(self, value):
         self._refqmmol = value
 
-    def calculate(self, atoms=None, properties=['energy'], system_changes=all_changes):
-        properties=['energy', 'forces']
+    @property
+    def properties(self):
+        if not isinstance(self._properties, set):
+            self._properties = set(self._properties)
+        return self._properties
+
+    @properties.setter
+    def properties(self, value):
+        self._properties = value
+
+    def calculate(self, atoms=None, properties=('energy'), system_changes=all_changes):
+        properties = set(properties) | self.properties
         Calculator.calculate(self,atoms=atoms,properties=properties,system_changes=system_changes)
         atoms = atoms or self.atoms
         self.results['stress'] = np.zeros(6)
@@ -52,8 +64,7 @@ class QMLCalculator(Calculator):
         else :
             gamma2 = gamma
 
-        # if 'energy' in properties :
-        if 'energy' :
+        if 'energy' in properties :
             m2 = self.second_learn.get('energy', None)
             if m2 :
                 energy = self.qmmodel.predict(gamma, method=m2)
@@ -65,19 +76,16 @@ class QMLCalculator(Calculator):
         if 'forces' in properties:
             m2 = self.second_learn.get('forces', None)
             if m2 :
-                forces = self.qmmodel.predict(gamma, method=m2).reshape((-1, 3))
+                forces = self.qmmodel.predict(gamma, method=m2)
             else :
-                forces = qmmol.calc_forces(gamma2).reshape((-1, 3))
-            forces = np.dot(forces, qmmol.op_rotate_inv)
-            self.results['forces'] = forces[qmmol.op_indices_inv] * Ha/Bohr
-            #
+                forces = qmmol.calc_forces(gamma2)
+            forces = self.qmmodel.convert_back(forces, prop='forces')
+            self.results['forces'] = forces * Ha/Bohr
             # forces_shift = np.mean(self.results['forces'], axis = 0)
             # print('Forces shift :', forces_shift, flush = True)
             # self.results['forces'] -= forces_shift
-            #
 
-        if True :
-        # if 'dipole' in properties :
+        if 'dipole' in properties :
             m2 = self.second_learn.get('dipole', None)
             if m2 :
                 dipole = self.qmmodel.predict(gamma, method=m2)
@@ -85,21 +93,26 @@ class QMLCalculator(Calculator):
                 dipole = qmmol.calc_dipole(gamma2)
             dipole = np.dot(dipole, qmmol.op_rotate_inv)
             self.results['dipole'] = dipole * Bohr
-        # print('energy', self.results['energy'], flush = True)
-        self.results['gamma'] = gamma
 
-    def calc_with_engine(self, qmmol, properties = ['energy']):
-        qmmol.engine.run()
-        energy = qmmol.engine.etotal
-        self.results['energy'] = energy * Ha
-        self.results['gamma'] = qmmol.engine.gamma
+        if 'stress' in properties:
+            self.results['stress'] = np.zeros(6)
+
+        if 'gamma' in properties :
+            gamma = self.qmmodel.convert_back(gamma2, prop='gamma')
+            self.results['gamma'] = gamma
+
+    def calc_with_engine(self, qmmol, properties = ('energy')):
+        qmmol.engine.run(properties = properties)
+        if 'energy' in properties :
+            energy = qmmol.engine.etotal
+            self.results['energy'] = energy * Ha
         if 'forces' in properties:
             forces = qmmol.engine.forces
-            print('ff', forces)
-            # forces = np.dot(forces, qmmol.op_rotate_inv)
             self.results['forces'] = forces * Ha/Bohr
-
-        if True :
-        # if 'dipole' in properties :
+        if 'stress' in properties:
+            self.results['stress'] = np.zeros(6)
+        if 'dipole' in properties :
             dipole = qmmol.calc_dipole(qmmol.engine.gamma)
             self.results['dipole'] = dipole * Bohr
+        if 'gamma' in properties :
+            self.results['gamma'] = qmmol.engine.gamma

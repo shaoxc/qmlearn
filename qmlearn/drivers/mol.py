@@ -65,6 +65,7 @@ class QMMol(object):
                 raise e
 
         atoms_init = atoms
+        atoms_change = None
         if refatoms is not None :
             if hasattr(refatoms, 'atoms'):
                 refatoms = refatoms.atoms
@@ -79,6 +80,11 @@ class QMMol(object):
                         reorder_method = reorder_method, use_reflection = use_reflection)
                 atoms = atoms[self.op_indices]
                 atoms.set_positions(np.dot(atoms.positions,self.op_rotate)+self.op_translate)
+                atoms_change = atoms
+        if atoms_change is None :
+            atoms = atoms.copy()
+        else :
+            atoms = atoms_change
         self.atoms_init = atoms_init
         # self.op_rotate_inv = np.linalg.inv(self.op_rotate)
         self.op_rotate_inv = np.ascontiguousarray(self.op_rotate.T)
@@ -176,7 +182,7 @@ class QMMol(object):
                 naos = self.atom_naos
                 blocks = array2blocks(y, sections = naos)
                 y = blocks2array(blocks, indices = self.op_indices_inv)
-        elif 'force' in prop :
+        elif 'forces' in prop :
             if y.ndim == 1 : y = y.reshape((-1, 3))
             if rotate : y = np.dot(y, self.op_rotate_inv)
             if reorder :

@@ -22,6 +22,7 @@ methods_pyscf = {
 class EnginePyscf(Engine):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
+        self.init()
 
     def init(self, **kwargs):
         mol = self.options.get('mol', None)
@@ -65,23 +66,44 @@ class EnginePyscf(Engine):
             mol = gto.M(atom = atom, basis=basis, charge = charge)
         return mol
 
-    def run(self, ao_repr = True, **kwargs):
-        # (dft.uks.UKS, dft.rks.RKS, scf.uhf.UHF, scf.hf.RHF))
-        self.mf.run()
-        self.occs = self.mf.get_occ()
-        #
-        if '+' in self.method :
-            mf2 = methods_pyscf[self.method.split('+')[1]](self.mf)
-            mf2.verbose = self.mf.verbose
-            self.mf2 = mf2.run()
-            mf = self.mf2
-        else :
-            mf = self.mf
+    def run(self, properties = ('energy', 'forces'), ao_repr = True, **kwargs):
+        if 'energy' in properties or self._gamma is None :
+            # (dft.uks.UKS, dft.rks.RKS, scf.uhf.UHF, scf.hf.RHF))
+            self.mf.run()
+            self.occs = self.mf.get_occ()
+            #
+            if '+' in self.method :
+                mf2 = methods_pyscf[self.method.split('+')[1]](self.mf)
+                mf2.verbose = self.mf.verbose
+                self.mf2 = mf2.run()
+                mf = self.mf2
+            else :
+                mf = self.mf
 
-        self.orb = mf.mo_coeff
-        self.gamma = mf.make_rdm1(ao_repr = ao_repr, **kwargs)
-        self.etotal = mf.e_tot
-        self.forces = self.run_forces()
+            self._orb = mf.mo_coeff
+            self._gamma = mf.make_rdm1(ao_repr = ao_repr, **kwargs)
+            self._etotal = mf.e_tot
+
+        if 'forces' in properties :
+            self._forces = self.run_forces()
+
+    @property
+    def gamma(self):
+        if self._gamma is None:
+            self.run(properties = ('energy'))
+        return self._gamma
+
+    @property
+    def etotal(self):
+        if self._etotal is None:
+            self.run(properties = ('energy'))
+        return self._etotal
+
+    @property
+    def forces(self):
+        if self._forces is None:
+            self.run(properties = ('forces'))
+        return self._forces
 
     @property
     def vext(self):

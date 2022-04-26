@@ -20,18 +20,32 @@ class Engine(object):
         self.options.update(kwargs)
         #-----------------------------------------------------------------------
         self._vext = None
-        self._kop = None
         self._gamma = None
+        self._etotal = None
+        self._forces = None
+        #
+        self._kop = None
         self._ovlp = None
         self._eri = None
-        self.init()
+        self._orb = None
 
     def init(self, *args, **kwargs):
         pass
 
     def run(self, *args, **kwargs):
-        self.orb = None
-        self.gamma = None
+        pass
+
+    @property
+    def gamma(self):
+        pass
+
+    @property
+    def etotal(self):
+        pass
+
+    @property
+    def forces(self):
+        pass
 
     @property
     def vext(self):
@@ -78,18 +92,29 @@ def atoms_rmsd(target, atoms, transform = True, **kwargs) :
         op_rotate, op_translate, op_indices = minimize_rmsd_operation(target, atoms, **kwargs)
         positions = np.dot(atoms.positions,op_rotate)+op_translate
         atoms = atoms[op_indices]
-        atoms.set_positions(positions)
+        atoms.set_positions(positions[op_indices])
     rmsd = rmsd_coords(target.positions, atoms.positions)
     return rmsd, atoms
 
-def rmsd_coords(target, pos, weights = None):
-    diff = pos - target
+def rmsd_coords(target, pos, **kwargs):
+    return diff_coords(target, pos, diff_method='rmsd', **kwargs)
+
+def diff_coords(target, pos = None, weights = None, diff_method = 'rmsd'):
+    if pos is None :
+        diff = target
+    else :
+        diff = pos - target
     if weights is not None :
         weights = np.asarray(weights)
         if weights.ndim == 1 and len(weights) > 1 :
             weights = weights[:, None]
         diff *= weights
-    rmsd = np.sqrt(np.sum(diff*diff)/len(diff))
+    if diff_method in ['msd', 'mse'] : # mean squared deviation (MSD) or mean squared error (MSE)
+        rmsd = np.sum(diff*diff)/len(diff)
+    elif diff_method in ['rmsd', 'rmse'] : # root-MSD or root-MSE
+        rmsd = np.sqrt(np.sum(diff*diff)/len(diff))
+    elif diff_method == 'mae' : # mean absolute error (MAE)
+        rmsd = np.sum(np.abs(diff))/len(diff)
     return rmsd
 
 def atoms2bestplane(atoms, direction = None):
@@ -119,18 +144,22 @@ def atoms2newdirection(atoms, a=(0,0,1), b=(1,0,0)):
 
 def minimize_rmsd_operation(target, atoms, stereo = True, rotate_method = 'kabsch',
         reorder_method = 'hungarian', use_reflection = True, alpha = 0.2):
+
+    # return _minimize_rmsd_operation_v0(target, atoms)
     pos_t = target.get_positions()
     c_t = np.mean(pos_t, axis=0)
+    # c_t = target.get_center_of_mass()
     pos_t = pos_t - c_t
 
     pos = atoms.get_positions()
     c = np.mean(pos, axis=0)
+    # c = atoms.get_center_of_mass()
     pos = pos - c
     #-----------------------------------------------------------------------
     atoms1 = target.copy()
     atoms1.positions[:] = pos_t
     atoms2 = atoms.copy()
-    axes1 = np.abs(get_atoms_axes(atoms1))
+    # axes1 = np.abs(get_atoms_axes(atoms1))
     #-----------------------------------------------------------------------
     if use_reflection :
         srot=np.zeros((48,3,3))
@@ -144,7 +173,7 @@ def minimize_rmsd_operation(target, atoms, stereo = True, rotate_method = 'kabsc
         srot=[np.eye(3)]
     #-----------------------------------------------------------------------
     rmsd_final_min = np.inf
-    for rot in srot :
+    for ia, rot in enumerate(srot):
         if stereo and np.linalg.det(rot) < 0.0 : continue
         atoms2.set_positions(np.dot(pos, rot))
         atoms2.set_chemical_symbols(atoms.get_chemical_symbols())
@@ -153,14 +182,18 @@ def minimize_rmsd_operation(target, atoms, stereo = True, rotate_method = 'kabsc
         atoms2 = atoms2[indices]
         rotate = get_match_rotate(atoms1, atoms2, rotate_method = rotate_method)
         atoms2.positions[:] = np.dot(atoms2.positions[:], rotate)
-        rmsd = rmsd_coords(atoms1.positions, atoms2.positions)
-        axes2 = np.abs(get_atoms_axes(atoms2))
-        rmsd += rmsd_coords(axes1, axes2)*alpha
+        rmsd = diff_coords(atoms1.positions, atoms2.positions, diff_method = 'mae')
+        # if rmsd < 0.3 :
+            # print('r0', rmsd, ia, rmsd_final_min)
+            # atoms2.write('try_' + str(ia) + '.xyz')
+        # axes2 = np.abs(get_atoms_axes(atoms2))
+        # rmsd += rmsd_coords(axes1, axes2)*alpha
         if rmsd < rmsd_final_min :
             rmsd_final_min = rmsd
             rmsd_final_rotate = rotate
             rmsd_final_reflection = rot
             rmsd_final_indices = indices
+        # print('rmsd', rmsd, rmsd_final_min)
     rotate = np.dot(rmsd_final_reflection, rmsd_final_rotate)
     translate = c_t - np.dot(c, rotate)
     # print('rmsd_final_min', rmsd_final_min)

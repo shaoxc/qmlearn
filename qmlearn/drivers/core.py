@@ -21,6 +21,7 @@ class Engine(object):
         #-----------------------------------------------------------------------
         self._vext = None
         self._gamma = None
+        self._gammat= None
         self._etotal = None
         self._forces = None
         #
@@ -37,6 +38,10 @@ class Engine(object):
 
     @property
     def gamma(self):
+        pass
+
+    @property
+    def gammat(self):
         pass
 
     @property
@@ -65,6 +70,9 @@ class Engine(object):
 
     def calc_gamma(self, orb=None, occs=None):
         pass
+
+    #def calc_etotal2(self, gammati=None, gamma1=None, orb=None, occs=None, **kwargs)
+    #   pass
 
     def calc_ncharge(self, gamma, ovlp = None):
         if ovlp is None : ovlp = self.ovlp

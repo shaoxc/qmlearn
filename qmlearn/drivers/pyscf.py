@@ -4,8 +4,9 @@ from scipy.linalg import eig
 from scipy.spatial.transform import Rotation
 from ase import Atoms, io
 from pyscf.pbc.tools.pyscf_ase import atoms_from_ase
-from pyscf import gto, dft, scf, mp, fci, ci
+from pyscf import gto, dft, scf, mp, fci, ci, ao2mo
 from pyscf.symm import Dmatrix
+from functools import reduce
 
 from qmlearn.drivers.core import Engine
 
@@ -71,6 +72,7 @@ class EnginePyscf(Engine):
             # (dft.uks.UKS, dft.rks.RKS, scf.uhf.UHF, scf.hf.RHF))
             self.mf.run()
             self.occs = self.mf.get_occ()
+            mf0=self.mf.run()
             #
             if '+' in self.method :
                 mf2 = methods_pyscf[self.method.split('+')[1]](self.mf)
@@ -80,9 +82,19 @@ class EnginePyscf(Engine):
             else :
                 mf = self.mf
 
-            self._orb = mf.mo_coeff
-            self._gamma = mf.make_rdm1(ao_repr = ao_repr, **kwargs)
-            self._etotal = mf.e_tot
+            if '+' in self.method and self.method.split('+')[1] == 'fci':
+               cisolver = mf
+               e, ci = cisolver.kernel()  #To get 2RDM, gammat. You need the cisolver.make_rdm12 function.
+               rdm_1, rdm_2 = cisolver.make_rdm12(fcivec=ci,norb=np.shape(mf0.get_occ())[0],nelec=self.mol.nelec)
+               self._gamma, self._gammat = fci.rdm.reorder_rdm(rdm1=rdm_1,rdm2=rdm_2) #Call reorder_rdm to transform to the normal rdm2a
+               #self._gamma, self._gammat = cisolver.make_rdm12(fcivec=ci,norb=np.shape(mf0.get_occ())[0],nelec=self.mol.nelec)
+               h1=mf0.get_hcore()
+               self._orb = mf0.mo_coeff
+               self._etotal = cisolver.e_tot
+            else :
+               self._orb = mf.mo_coeff
+               self._gamma = mf.make_rdm1(ao_repr = ao_repr, **kwargs)
+               self._etotal = mf.e_tot
 
         if 'forces' in properties :
             self._forces = self.run_forces()
@@ -92,6 +104,12 @@ class EnginePyscf(Engine):
         if self._gamma is None:
             self.run(properties = ('energy'))
         return self._gamma
+
+    @property
+    def gammat(self):
+        if self._gammat is None:
+            self.run(properties = ('energy'))
+        return self._gammat
 
     @property
     def etotal(self):
@@ -139,7 +157,26 @@ class EnginePyscf(Engine):
         return gamma
 
     def calc_etotal(self, gamma, **kwargs):
-        etotal = self.mf.energy_tot(gamma, **kwargs)
+        etotal = self.mf.energy_tot(gamma, **kwargs)  #nuc + energy_elec(e1+coul) 
+        return etotal
+
+    def calc_etotal2(self, gammat, gamma1=None, orb=None, occs=None, **kwargs):
+    #    def calc_etotal2(self, gammat=None, **kwargs):
+        
+        self.mf.run() #HF to get orb and occ
+        orb = self.mf.mo_coeff
+        occs = self.mf.get_occ()
+        
+        nmo = len(occs)   
+        h1e = reduce(np.dot,(orb.T, self.mf.get_hcore(), orb))
+        h2e = ao2mo.kernel(self.mf._eri, orb)
+        h2e = ao2mo.restore(1, h2e, nmo)
+        
+        etotal = (np.einsum('ij,ji', h1e, gamma1) + np.einsum('ijkl,ijkl', h2e, gammat) * .5)
+        #etotal = (self.mf.energy_elec(gamma1) + np.einsum('ijkl,ijkl', h2e, gammat) * .5)
+        #etotal = (np.einsum('ijkl,ijkl', h2e, gammat) * .5)
+        etotal += self.mol.energy_nuc()
+        
         return etotal
 
     def calc_dipole(self, gamma, **kwargs):
@@ -148,9 +185,13 @@ class EnginePyscf(Engine):
 
     def run_forces(self, **kwargs):
         if '+' in self.method :
-            mf = self.mf2
+            if self.method.split('+')[1] == 'fci':  #With FCI method Forces can't be obtained from FCI object. I approximated using RHF object. 
+               mf = self.mf
+            else:
+               mf = self.mf2
         else :
             mf = self.mf
+
         gf = mf.nuc_grad_method()
         gf.verbose = mf.verbose
         gf.grid_response = True

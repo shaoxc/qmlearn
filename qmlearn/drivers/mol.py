@@ -13,6 +13,7 @@ class QMMol(object):
             'calc_gamma',
             'calc_ncharge',
             'calc_etotal',
+            'calc_etotal2',
             'calc_ke',
             'calc_dipole',
             'calc_quadrupole',

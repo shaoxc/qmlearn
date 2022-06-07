@@ -14,7 +14,6 @@
         <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
         <script src="_static/jquery.js"></script>
         <script src="_static/underscore.js"></script>
-        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="_static/doctools.js"></script>
         <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script src="_static/js/theme.js"></script>
@@ -85,22 +84,22 @@
            <div itemprop="articleBody">
              
   <section id="qmlearn-model-package">
-<h1>qmlearn.model package<a class="headerlink" href="#qmlearn-model-package" title="Permalink to this heading"></a></h1>
+<h1>qmlearn.model package<a class="headerlink" href="#qmlearn-model-package" title="Permalink to this headline"></a></h1>
 <section id="submodules">
-<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this heading"></a></h2>
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline"></a></h2>
 </section>
 <section id="module-qmlearn.model.build">
-<span id="qmlearn-model-build-module"></span><h2>qmlearn.model.build module<a class="headerlink" href="#module-qmlearn.model.build" title="Permalink to this heading"></a></h2>
+<span id="qmlearn-model-build-module"></span><h2>qmlearn.model.build module<a class="headerlink" href="#module-qmlearn.model.build" title="Permalink to this headline"></a></h2>
 </section>
 <section id="module-qmlearn.model.model">
-<span id="qmlearn-model-model-module"></span><h2>qmlearn.model.model module<a class="headerlink" href="#module-qmlearn.model.model" title="Permalink to this heading"></a></h2>
+<span id="qmlearn-model-model-module"></span><h2>qmlearn.model.model module<a class="headerlink" href="#module-qmlearn.model.model" title="Permalink to this headline"></a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="qmlearn.model.model.MQMModel">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">qmlearn.model.model.</span></span><span class="sig-name descname"><span class="pre">MQMModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mmodels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'gamma'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ncharge</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nspin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">occs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">refqmmol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fragments</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qmmodels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qmlearn/model/model.html#MQMModel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qmlearn.model.model.MQMModel" title="Permalink to this definition"></a></dt>
-<dd><p>Bases: <a class="reference internal" href="#qmlearn.model.model.QMModel" title="qmlearn.model.model.QMModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">QMModel</span></code></a></p>
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">qmlearn.model.model.</span></span><span class="sig-name descname"><span class="pre">MQMModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mmodels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'gamma'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ncharge</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nspin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">occs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">refqmmol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fragments</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qmmodels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qmlearn/model/model.html#MQMModel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qmlearn.model.model.MQMModel" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#qmlearn.model.model.QMModel" title="qmlearn.model.model.QMModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">qmlearn.model.model.QMModel</span></code></a></p>
 <dl class="py property">
 <dt class="sig sig-object py" id="qmlearn.model.model.MQMModel.fragments">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">fragments</span></span><a class="headerlink" href="#qmlearn.model.model.MQMModel.fragments" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">fragments</span></span><a class="headerlink" href="#qmlearn.model.model.MQMModel.fragments" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -133,7 +132,7 @@
 
 <dl class="py property">
 <dt class="sig sig-object py" id="qmlearn.model.model.MQMModel.qmmodels">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">qmmodels</span></span><a class="headerlink" href="#qmlearn.model.model.MQMModel.qmmodels" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">qmmodels</span></span><a class="headerlink" href="#qmlearn.model.model.MQMModel.qmmodels" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -145,7 +144,7 @@
 
 <dl class="py class">
 <dt class="sig sig-object py" id="qmlearn.model.model.QMModel">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">qmlearn.model.model.</span></span><span class="sig-name descname"><span class="pre">QMModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mmodels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'gamma'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ncharge</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nspin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">occs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">refqmmol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qmlearn/model/model.html#QMModel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qmlearn.model.model.QMModel" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">qmlearn.model.model.</span></span><span class="sig-name descname"><span class="pre">QMModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mmodels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'gamma'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ncharge</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nspin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">occs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">refqmmol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qmlearn/model/model.html#QMModel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qmlearn.model.model.QMModel" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>QMModel class is wrapper around sklearn regression model classes. It provide mthod to
 fit and predict based on provided training and testing data</p>
@@ -196,12 +195,12 @@ mmodels dictionary.</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="qmlearn.model.model.QMModel.method">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">method</span></span><a class="headerlink" href="#qmlearn.model.model.QMModel.method" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">method</span></span><a class="headerlink" href="#qmlearn.model.model.QMModel.method" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="qmlearn.model.model.QMModel.model">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">model</span></span><a class="headerlink" href="#qmlearn.model.model.QMModel.model" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">model</span></span><a class="headerlink" href="#qmlearn.model.model.QMModel.model" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -229,7 +228,7 @@ mmodels dictionary.</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="qmlearn.model.model.QMModel.refqmmol">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">refqmmol</span></span><a class="headerlink" href="#qmlearn.model.model.QMModel.refqmmol" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">refqmmol</span></span><a class="headerlink" href="#qmlearn.model.model.QMModel.refqmmol" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -241,7 +240,7 @@ mmodels dictionary.</p>
 
 </section>
 <section id="module-qmlearn.model">
-<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-qmlearn.model" title="Permalink to this heading"></a></h2>
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-qmlearn.model" title="Permalink to this headline"></a></h2>
 </section>
 </section>
 

@@ -8,6 +8,36 @@ from qmlearn.drivers.mol import QMMol
 
 
 class QMModel(object):
+    """ QMModel class is wrapper around sklearn regression model classes. It provide mthod to
+    fit and predict based on provided training and testing data    
+
+    Parameters
+    ----------
+    mmodels : dict, optional
+        set of machine learning algorithms used for training , If not provided
+        by default Kernel Ridge Rigression (KRR) will be used to learn :math:`{\gmmma}` from :math:`V_{ext}` and 
+        linear regression to learn :math:`{\delta}E`, and :math:`{\delta}{\gamma}`
+        
+
+    method : {'gamma'}, str
+        determine which property to learn from external potentials :math:`V_{ext}` . as of now only 
+        :math:`{\gamma}` can be learned from :math:`V_{ext}`. And then all other properties
+        calculated from :math:`{\gamma}`
+    
+    ncharge: int, optional
+        charge of the atoms
+    
+    nspin: int, optional
+        ??
+    
+    refqmmol: QMMol object
+        Refernce QMMol object
+    
+
+        
+
+
+    """
     def __init__(self, mmodels = None, method='gamma', ncharge=None, nspin = 1, occs = None, refqmmol = None, **kwargs):
         self._method = method
         self.mmodels = mmodels or {}
@@ -52,6 +82,28 @@ class QMModel(object):
         return self._method
 
     def fit(self, X, y, model = None, method = None):
+        """ Fit model 
+
+        Parameters
+        ----------
+        X : array
+            Training data
+        y : array
+            Target values
+            
+        model : QMModel obj, optional
+            Regression model (i.e., KernelRidge, LinearRegression), If not provided will take from
+            mmodels dictionary.
+        method : {'gamma', 'd_gamma', 'd_energy', 'd_forces'} 
+            'gamma' -> learn :math:`{\delta\gamma}` using :math:`V_{ext}`
+            'd_gamma' -> learn :math:`{\delta\gamma}` based on predicted :math:`{\gamma}`.
+            'd_energy' -> learn :math:`{\delta}E` based on predicted :math:`{\gamma}`
+            'd_forces' -> learn :math:`{\delta}F` based on predicted :math:`{\gamma}`
+        Returns
+        -------
+        QMModel
+            return trained QMModel object
+        """
         if model is None :
             method = method or self.method
             model = self.mmodels[method]
@@ -67,7 +119,22 @@ class QMModel(object):
         return model
 
     def predict(self, x, model = None, method = None, **kwargs):
-        #
+        """ Predict using trained QMModel 
+
+        Parameters
+        ----------
+        X : array
+            Training data
+        model : _type_, optional
+            _description_, by default None
+        method : _type_, optional
+            _description_, by default None
+
+        Returns
+        -------
+        _type_
+            _description_
+        """
         x = [self.translate_input(x, **kwargs).ravel()]
         if model is None :
             method = method or self.method

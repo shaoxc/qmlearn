@@ -13,7 +13,6 @@
         <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
         <script src="_static/jquery.js"></script>
         <script src="_static/underscore.js"></script>
-        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="_static/doctools.js"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="#" />
@@ -128,6 +127,8 @@
         <li><a href="qmlearn.drivers.html#qmlearn.drivers.pyscf.EnginePyscf.calc_etotal">(qmlearn.drivers.pyscf.EnginePyscf method)</a>
 </li>
       </ul></li>
+      <li><a href="qmlearn.drivers.html#qmlearn.drivers.pyscf.EnginePyscf.calc_etotal2">calc_etotal2() (qmlearn.drivers.pyscf.EnginePyscf method)</a>
+</li>
       <li><a href="qmlearn.drivers.html#qmlearn.drivers.psi4.EnginePsi4.calc_exc">calc_exc() (qmlearn.drivers.psi4.EnginePsi4 method)</a>
 </li>
       <li><a href="qmlearn.drivers.html#qmlearn.drivers.pyscf.EnginePyscf.calc_forces">calc_forces() (qmlearn.drivers.pyscf.EnginePyscf method)</a>
@@ -182,11 +183,13 @@
 </li>
       <li><a href="qmlearn.io.html#qmlearn.io.model.db2qmmodel">db2qmmodel() (in module qmlearn.io.model)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="qmlearn.io.html#qmlearn.io.hdf5.DBHDF5">DBHDF5 (class in qmlearn.io.hdf5)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="qmlearn.utils.html#qmlearn.utils.utils.dict_update">dict_update() (in module qmlearn.utils.utils)</a>
+</li>
+      <li><a href="qmlearn.drivers.html#qmlearn.drivers.core.diff_coords">diff_coords() (in module qmlearn.drivers.core)</a>
 </li>
       <li><a href="qmlearn.drivers.html#qmlearn.drivers.mol.QMMol.duplicate">duplicate() (qmlearn.drivers.mol.QMMol method)</a>
 </li>
@@ -208,8 +211,12 @@
 </li>
       <li><a href="qmlearn.drivers.html#qmlearn.drivers.psi4.EnginePsi4.eri">eri (qmlearn.drivers.psi4.EnginePsi4 property)</a>
 </li>
-      <li><a href="qmlearn.drivers.html#qmlearn.drivers.pyscf.EnginePyscf.etotal">etotal (qmlearn.drivers.pyscf.EnginePyscf property)</a>
+      <li><a href="qmlearn.drivers.html#qmlearn.drivers.core.Engine.etotal">etotal (qmlearn.drivers.core.Engine property)</a>
+
+      <ul>
+        <li><a href="qmlearn.drivers.html#qmlearn.drivers.pyscf.EnginePyscf.etotal">(qmlearn.drivers.pyscf.EnginePyscf property)</a>
 </li>
+      </ul></li>
   </ul></td>
 </tr></table>
 
@@ -218,10 +225,14 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="qmlearn.model.html#qmlearn.model.model.QMModel.fit">fit() (qmlearn.model.model.QMModel method)</a>
 </li>
+      <li><a href="qmlearn.drivers.html#qmlearn.drivers.core.Engine.forces">forces (qmlearn.drivers.core.Engine property)</a>
+
+      <ul>
+        <li><a href="qmlearn.drivers.html#qmlearn.drivers.pyscf.EnginePyscf.forces">(qmlearn.drivers.pyscf.EnginePyscf property)</a>
+</li>
+      </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="qmlearn.drivers.html#qmlearn.drivers.pyscf.EnginePyscf.forces">forces (qmlearn.drivers.pyscf.EnginePyscf property)</a>
-</li>
       <li><a href="qmlearn.model.html#qmlearn.model.model.MQMModel.fragments">fragments (qmlearn.model.model.MQMModel property)</a>
 </li>
   </ul></td>
@@ -230,12 +241,22 @@
 <h2 id="G">G</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="qmlearn.drivers.html#qmlearn.drivers.pyscf.EnginePyscf.gamma">gamma (qmlearn.drivers.pyscf.EnginePyscf property)</a>
+      <li><a href="qmlearn.drivers.html#qmlearn.drivers.core.Engine.gamma">gamma (qmlearn.drivers.core.Engine property)</a>
+
+      <ul>
+        <li><a href="qmlearn.drivers.html#qmlearn.drivers.pyscf.EnginePyscf.gamma">(qmlearn.drivers.pyscf.EnginePyscf property)</a>
 </li>
+      </ul></li>
       <li><a href="qmlearn.drivers.html#qmlearn.drivers.pyscf.gamma2gamma">gamma2gamma() (in module qmlearn.drivers.pyscf)</a>
 </li>
       <li><a href="qmlearn.drivers.html#qmlearn.drivers.pyscf.gamma2rdm1e">gamma2rdm1e() (in module qmlearn.drivers.pyscf)</a>
 </li>
+      <li><a href="qmlearn.drivers.html#qmlearn.drivers.core.Engine.gammat">gammat (qmlearn.drivers.core.Engine property)</a>
+
+      <ul>
+        <li><a href="qmlearn.drivers.html#qmlearn.drivers.pyscf.EnginePyscf.gammat">(qmlearn.drivers.pyscf.EnginePyscf property)</a>
+</li>
+      </ul></li>
       <li><a href="qmlearn.io.html#qmlearn.io.hdf5.DBHDF5.get_all_names">get_all_names() (qmlearn.io.hdf5.DBHDF5 method)</a>
 </li>
       <li><a href="qmlearn.drivers.html#qmlearn.drivers.pyscf.get_atom_naos">get_atom_naos() (in module qmlearn.drivers.pyscf)</a>
@@ -246,11 +267,15 @@
       </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="qmlearn.drivers.html#qmlearn.drivers.core.get_atoms_axes">get_atoms_axes() (in module qmlearn.drivers.core)</a>
+</li>
       <li><a href="qmlearn.model.html#qmlearn.model.model.MQMModel.get_block_vext">get_block_vext() (qmlearn.model.model.MQMModel method)</a>
 </li>
       <li><a href="qmlearn.io.html#qmlearn.io.core.DB.get_group">get_group() (qmlearn.io.core.DB method)</a>
 </li>
       <li><a href="qmlearn.utils.html#qmlearn.utils.utils.get_hash">get_hash() (in module qmlearn.utils.utils)</a>
+</li>
+      <li><a href="qmlearn.drivers.html#qmlearn.drivers.core.get_match_rotate">get_match_rotate() (in module qmlearn.drivers.core)</a>
 </li>
       <li><a href="qmlearn.io.html#qmlearn.io.hdf5.DBHDF5.get_names">get_names() (qmlearn.io.hdf5.DBHDF5 method)</a>
 </li>
@@ -371,7 +396,7 @@
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="qmlearn.drivers.html#qmlearn.drivers.core.Engine.ncharge">ncharge (qmlearn.drivers.core.Engine property)</a>
+      <li><a href="qmlearn.drivers.html#qmlearn.drivers.core.Engine.ncharge0">ncharge0 (qmlearn.drivers.core.Engine property)</a>
 </li>
       <li><a href="qmlearn.drivers.html#qmlearn.drivers.psi4.EnginePsi4.nelectron">nelectron (qmlearn.drivers.psi4.EnginePsi4 property)</a>
 
@@ -557,14 +582,18 @@
 </li>
       <li><a href="qmlearn.model.html#qmlearn.model.model.QMModel.refqmmol">refqmmol (qmlearn.model.model.QMModel property)</a>
 </li>
+      <li><a href="qmlearn.drivers.html#qmlearn.drivers.core.reorder_atoms_indices">reorder_atoms_indices() (in module qmlearn.drivers.core)</a>
+</li>
+      <li><a href="qmlearn.drivers.html#qmlearn.drivers.core.rmsd_coords">rmsd_coords() (in module qmlearn.drivers.core)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="qmlearn.drivers.html#qmlearn.drivers.pyscf.rotation2rotmat">rotation2rotmat() (in module qmlearn.drivers.pyscf)</a>
 
       <ul>
         <li><a href="qmlearn.drivers.html#qmlearn.drivers.pyscf.EnginePyscf.rotation2rotmat">(qmlearn.drivers.pyscf.EnginePyscf method)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="qmlearn.drivers.html#qmlearn.drivers.mol.QMMol.rotmat">rotmat (qmlearn.drivers.mol.QMMol property)</a>
 </li>
       <li><a href="qmlearn.drivers.html#qmlearn.drivers.core.Engine.run">run() (qmlearn.drivers.core.Engine method)</a>

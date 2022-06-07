@@ -15,12 +15,39 @@ from rmsd.calculate_rmsd import (
 from qmlearn.utils.utils import matrix_deviation
 
 class Engine(object):
+    r"""Abstract Base class for the External calculator.
+    Until now we have implemented: PySCF and Psi4.
+
+    Attributes
+    ----------
+
+    vext : ndarray
+        External Potential.
+    gamma : ndarray
+        1-body reduced density matrix (1-RDM).
+    gammat : ndarray
+        2-body reduced density matrix (2-RDM).
+    etotal : float
+        Total electronic energy
+    forces : ndarray
+        Atomic forces
+    ovlp : ndarray
+        Overlap Matrix.
+    kop : ndarray
+        Kinetic Energy Operator.
+    eri : ndarray
+        2-electron integrals: 8-fold or 4-fold ERIs or complex integral array with N^4 elements
+        (N is the number of orbitals).
+    orb : ndarray
+        Molecular orbital coefficients
+    """
     def __init__(self, mol = None, method = 'rks', basis = '6-31g', xc = None, **kwargs):
         self.options = locals()
         self.options.update(kwargs)
         #-----------------------------------------------------------------------
         self._vext = None
         self._gamma = None
+        self._gammat= None
         self._etotal = None
         self._forces = None
         #
@@ -37,46 +64,127 @@ class Engine(object):
 
     @property
     def gamma(self):
+        r""" 1-body reduced density matrix (1-RDM). """
+        pass
+
+    @property
+    def gammat(self):
+        r""" 2-body reduced density matrix (2-RDM). """
         pass
 
     @property
     def etotal(self):
+        r""" Total Energy. """
         pass
 
     @property
     def forces(self):
+        r""" Atomic Forces.  """
         pass
 
     @property
     def vext(self):
+        r""" External Potential. """
         pass
 
     @property
     def kop(self):
+        r""" Kinetic Energy Operator. """
         pass
 
     @property
     def ovlp(self):
+        r"""Overlap Matrix."""
         pass
 
     @property
     def ncharge0(self):
+        r""" Calculated number of electrons. """
         pass
 
     def calc_gamma(self, orb=None, occs=None):
+        r"""Calculate the 1-body reduced density matrix (1-RDM).
+
+        Parameters
+        ----------
+        orb : ndarray
+           Orbital Coefficients. Each column is one orbital
+        occs : ndarray
+            Occupancy
+
+        Returns
+        -------
+        1-RDM : ndarray
+        """
         pass
 
     def calc_ncharge(self, gamma, ovlp = None):
+        r""" Get calculated total number of electrons
+
+        Parameters
+        ----------
+        gamma : ndarray
+            1-RDM 
+        ovlp : ndarray 
+            Overlap Matrix
+
+        Returns
+        -------
+        ncharge : int
+            Calcualted number of electrons
+
+        """
         if ovlp is None : ovlp = self.ovlp
         ncharge = np.einsum('ji,ij->', gamma, ovlp)
         return ncharge
 
     def calc_ke(self, gamma, kop = None):
+        r""" Get Total kinetic energy
+
+        Parameters
+        ----------
+        gamma : ndarray
+            1-RDM
+        kop : ndarray 
+            Kinetic energy operator
+
+        Returns
+        -------
+        ke : float
+            Total kinetic energy
+
+        """
         if kop is None : kop = self.kop
         ke = np.einsum('ji,ij->', gamma, kop)
         return ke
 
     def calc_idempotency(self, gamma, ovlp=None, kind=1):
+        r""" Check idempotency of gamma  
+
+        .. math::
+           \gamma S \gamma &= 2 \gamma 
+
+        Parameters
+        ----------
+        gamma : ndarray
+            1-RDM
+        ovlp : ndarray
+            Overlap matrix
+
+        Attributes
+        ----------
+        kind :  int
+
+            | 1 : Level 1 
+            | 2 : Level 2
+            | 3 : Level 3
+
+        Returns
+        -------
+        errorsum : float
+            Sum over the Absolute difference among matrix 1 and 2.
+
+        """
         # Only for nspin=1
         if ovlp is None : ovlp = self.ovlp
         if kind==1:
@@ -88,6 +196,30 @@ class Engine(object):
         return matrix_deviation(gamma, g)
 
 def atoms_rmsd(target, atoms, transform = True, **kwargs) :
+    r""" Function to return RMSD : Root mean square deviation between atoms and target:transform atom object. And the target atom coordinates.
+
+    Parameters
+    ----------
+    target : :obj: ASE atoms object
+        Reference atoms.
+    atoms : :obj: ASE atoms object
+        Atoms to be transformed (Rotate y/o translate).
+
+    Attributes
+    ----------
+    keep : bool
+        If True keep a copy of atoms.
+    transform : bool
+        If True minimize rotation and translation between refatoms and atoms. 
+        (See ASE documentation: Minimize RMSD between atoms and target.)
+
+    Returns
+    -------
+    rmsd : float
+        RMSD betwwen reference and transform atoms.
+    atoms : :obj: ASE atoms object
+        Transformed target molecule.
+    """
     if transform :
         op_rotate, op_translate, op_indices = minimize_rmsd_operation(target, atoms, **kwargs)
         positions = np.dot(atoms.positions,op_rotate)+op_translate
@@ -97,9 +229,45 @@ def atoms_rmsd(target, atoms, transform = True, **kwargs) :
     return rmsd, atoms
 
 def rmsd_coords(target, pos, **kwargs):
+    r""" Function to return RMSD : Root mean square deviation between pos and target atomic positions.
+
+    Parameters
+    ----------
+    pos : :obj: ASE atoms object
+        Reference atoms.
+    target : :obj: ASE atoms object
+        Atoms to be transformed (Rotate y/o translate).
+
+    Returns
+    -------
+    rmsd : float
+        RMSD between pos and target atomic positions  """
     return diff_coords(target, pos, diff_method='rmsd', **kwargs)
 
 def diff_coords(target, pos = None, weights = None, diff_method = 'rmsd'):
+    r""" Function to return mean base on method error/deviation between pos and target atomic positions.
+
+    Parameters
+    ----------
+    pos : :obj: ASE atoms object
+        Reference atoms.
+    target : :obj: ASE atoms object
+        Atoms to be transformed (Rotate y/o translate).
+
+    Attributes
+    ----------
+    diff_method : str
+
+        | RMSD(root-mean-square deviation) : 'rsmd'  
+        | RMSE(root-mean-square error) : 'rmse'  
+        | MSD(mean-square deviation) : 'msd'  
+        | MSE(mean-square error) : 'mse' 
+        | MAE(mean absolute error) : 'mae'
+
+    Returns
+    -------
+    rmsd : float
+        Mean base on method error/deviation between pos and target atomic positions """
     if pos is None :
         diff = target
     else :
@@ -118,6 +286,23 @@ def diff_coords(target, pos = None, weights = None, diff_method = 'rmsd'):
     return rmsd
 
 def atoms2bestplane(atoms, direction = None):
+    r""" Apply Principal Component Analysis (PCA) to atoms and re-oriente them.
+
+    Parameters
+    ----------
+    atoms : :obj: ASE atoms object
+       Atoms coordinates 
+
+    Attributes
+    ----------
+    direction : ndarray
+        1D-vector to re-orient the atoms positions
+
+    Returns
+    -------
+    atoms : ndarray
+        Reoriented atom positions 
+    """
     pca = PCA()
     pos = pca.fit_transform(atoms.positions)
     atoms.set_positions(pos)
@@ -126,12 +311,34 @@ def atoms2bestplane(atoms, direction = None):
     return atoms
 
 def get_atoms_axes(atoms):
+    r""" Get PCA components of atomic positions.
+            
+    Parameters
+    ----------
+    atoms : :obj: ASE object
+
+    Returns
+    -------
+    axes : ndarry
+        Vector containing the PCA components of the atomic positions """
     pca = PCA(n_components=3)
     pca.fit(atoms.positions)
     axes = pca.components_
     return axes
 
 def atoms2newdirection(atoms, a=(0,0,1), b=(1,0,0)):
+    r""" Function to re-orientate the atom positions. 
+    If Vector is None, the default rotation is around X-axis.
+
+    Parameters
+    ----------
+    atoms : :obj: ASE atom object
+    
+    Returns
+    -------
+    atoms : ndarray
+        Rotated atoms coordinates
+    """
     a = np.asarray(a, dtype=float)
     b = np.asarray(b, dtype=float)
     a = np.asarray(a, dtype=float) / np.linalg.norm(a)
@@ -144,7 +351,25 @@ def atoms2newdirection(atoms, a=(0,0,1), b=(1,0,0)):
 
 def minimize_rmsd_operation(target, atoms, stereo = True, rotate_method = 'kabsch',
         reorder_method = 'hungarian', use_reflection = True, alpha = 0.2):
+    r""" Function to create Rotation Matrix and Translation Vector
+    of reference atoms with respect to initialize atoms.
 
+    Parameters
+    ----------
+    target : :obj: ASE atoms object
+        References atoms
+    atoms : :obj: ASE atoms object
+        Initialize atoms
+
+    Returns
+    -------
+    rotate : ndarray
+        Rotation Matrix
+    translate : ndarray
+        Translation Vector
+    rmsd_final_indices : ndarry
+        Reorderred atom indices 
+    """
     # return _minimize_rmsd_operation_v0(target, atoms)
     pos_t = target.get_positions()
     c_t = np.mean(pos_t, axis=0)
@@ -203,6 +428,27 @@ def minimize_rmsd_operation(target, atoms, stereo = True, rotate_method = 'kabsc
     return rotate, translate, rmsd_final_indices
 
 def get_match_rotate(target, atoms, rotate_method = 'kabsch'):
+    r""" Rotate Atoms with a customize method
+
+    Parameters
+    ----------
+    target : :obj: ASE atoms object
+        References atoms
+    atoms : :obj: ASE atoms object
+        Initialize atoms
+
+    Attributes
+    ----------
+    rotate_metod: str
+        
+        | None : 'none'
+        | Kabsch : 'kabsch'
+        | Quaternion : 'quaternion'
+
+    Returns
+    -------
+    rotate : ndarray
+        Rotated atom positions """
     if rotate_method is None or rotate_method == 'none':
         rotate = np.eye(3)
     else :
@@ -216,6 +462,19 @@ def get_match_rotate(target, atoms, rotate_method = 'kabsch'):
     return rotate
 
 def reorder_atoms_indices(target, atoms, reorder_method='hungarian'):
+    r""" Reorder atoms indices
+
+    Parameters
+    ----------
+    target : :obj: ASE atoms object
+        References atoms
+    atoms : :obj: ASE atoms object
+        Initialize atoms
+
+    Returns
+    -------
+    indices : ndarray
+        Reordered atom indices """
     if reorder_method is None or reorder_method == 'none':
         indices = slice(None)
     else :

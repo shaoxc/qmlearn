@@ -5,8 +5,39 @@ from ase import Atoms
 from qmlearn.drivers.mol import QMMol
 
 class DBHDF5(object):
+    r"""
+    Class to create and manipulate database in HDF5 format
+    ...
+
+    Attributes
+    ----------
+    filename : str
+        Filename of database.
+    
+    Methods
+    -------
+    qmmol()
+        getter and setter for qmmol attribute 
+    write_qmmol(self, qmmol = None, name = None, **kwargs)
+        write qmmol file to the database
+    get_all_names(self, fh = None, attr = None)
+        returns list of databases from database file
+    read_qmmol(self, name, **kwargs)
+        read qmmol from database file and return it.
+    write_properties(self, properties = None, prefix = 'train', name = None, **kwargs)
+        write properties (i.e. Vext, gamma, energy, forces) to the database
+    """
 
     def __init__(self, filename, mode = 'a', qmmol = None):
+        r"""
+        Attributes
+        ----------
+
+        filename : str
+            filename of database
+        mode : {'a','r','w'} str
+            mode of operation (i.e. append, read, or write) for the database
+        """
         import h5py
         self.h5py = h5py
         self.fh = self.h5py.File(filename, 'a')
@@ -15,6 +46,8 @@ class DBHDF5(object):
 
     @property
     def qmmol(self):
+        r"""Get qmmol object from database
+        """
         return self._qmmol
 
     @qmmol.setter
@@ -30,6 +63,21 @@ class DBHDF5(object):
         self._group = value
 
     def get_all_names(self, fh = None, attr = None):
+        r"""Return a list of all databases in the database file
+        
+        Attributes
+        ----------
+
+        fh : obj
+            Filehandler object for database file
+        mode : {'a','r','w'} str
+            mode of operation (i.e. append, read, or write) for the database
+        
+        Returns
+        -------
+         names : list
+            return list of all database from the database file
+        """
         class H5names:
             def __init__(self, attr=None):
                 self.names = []
@@ -52,9 +100,19 @@ class DBHDF5(object):
         return names
 
     def get_names(self, name = '*'):
-        r"""
-        Note :
+        r"""Return a list of database name based on pattern
+        
+        Attributes
+        ----------
+
+        name : str
+            pattern of database names. 
             Only support '*', '?', '[seq]' and '[!seq]' with fnmatch
+        
+        Returns
+        -------
+         names : list
+            return list of all database from the database file    
         """
         sch = ['*', '?', '[']
         if any(x in name for x in sch):
@@ -64,6 +122,17 @@ class DBHDF5(object):
         return name
 
     def write_qmmol(self, qmmol = None, name = None, **kwargs):
+        r"""Write qmmol object in the database
+        
+        Attributes
+        ----------
+
+        qmmol : obj
+            qmmol object. raise AttributeError if not defined
+        name : str
+            name of the database where qmmol will be saved. if not given it will be set to
+            `qmmol.method`/qmmol
+        """
         qmmol = qmmol or self.qmmol
         if qmmol is None :
             raise AttributeError(f"Please set 'qmmol' for {self.__class__.__name__}.")
@@ -87,6 +156,18 @@ class DBHDF5(object):
         self.group = group.parent
 
     def read_qmmol(self, name, **kwargs):
+        r"""read qmmol object from the database
+        
+        Attributes
+        ----------
+        name : str
+            name of the database file
+        
+        Returns
+        -------
+         qmmol : obj
+            return qmmol object from the database
+        """
         group = self.fh[name]
         dicts = {}
         for k, v in group.items():
@@ -105,6 +186,20 @@ class DBHDF5(object):
         return qmmol
 
     def write_properties(self, properties = None, prefix = 'train', name = None, **kwargs):
+        r"""Write properties (i.e. gamma, energy, forces, Vext) to the database
+        
+        Attributes
+        ----------
+        properties : dict
+            Dictionary of properties calulate with Pyscf, Psi4numpy or any other 
+            external engine
+        
+        prefix : {'train', 'test'} str
+            determine wheter to write properties in the training or testing database
+        
+        name : str
+            name of the database file
+        """
         if not name :
             if self.group is None : self.write_qmmol(**kwargs)
             for k,v in properties.items():
@@ -119,9 +214,34 @@ class DBHDF5(object):
         self._write_dict(group, properties)
 
     def read_properties(self, name, **kwargs):
+        r"""read properties from database file
+        
+        Attributes
+        ----------
+        name : str
+            name of the database file
+        
+        Returns
+        -------
+         properties : dict
+            return properties as dictionary
+        """
         return self._read_dict(self.fh[name])
 
     def write_images(self, images = None, prefix = 'train', name = None, **kwargs):
+        r""" Write atomic structure in the database
+        
+        Attributes
+        ----------
+        images : list
+            List of ASE Atoms objects
+        
+        prefix : {'train', 'test'} str
+            determine wheter to write properties in the training or testing database
+        
+        name : str
+            name of the database file
+        """
         if name is None :
             if self.group is None : self.write_qmmol(**kwargs)
             nsamples = len(images)
@@ -135,6 +255,18 @@ class DBHDF5(object):
             self._write_atoms(g, atoms)
 
     def read_images(self, name = None, **kwargs):
+        r""" Read atomic structure from the database
+        
+        Attributes
+        ----------
+        name : str
+            name of the database file
+        
+        Returns
+        -------
+        images : list
+            List of ASE Atoms objects
+        """
         group = self.fh[name]
         images = []
         ids = []

@@ -18,8 +18,8 @@ sys.path.insert(0, os.path.abspath('..'))
 # -- Project information -----------------------------------------------------
 
 project = 'qmlearn'
-copyright = '2022, Jessica A. and Musa'
-author = 'Jessica A. and Musa'
+copyright = '2022, @PRG @Tuckerman Research Group'
+author = 'Xuecheng Shao, Lukas Paetow, Md Rajib Khan Musa, Jessica A. Martinez B. and Michele Pavanello @ PRG at Rutgers University-Newark. Mark E Tuckerman @ Tuckerman Research Group at NYU'
 
 # The full version, including alpha/beta/rc tags
 release = '0.8'
@@ -36,8 +36,11 @@ extensions = ["sphinx.ext.autodoc",
     "sphinx.ext.intersphinx",
     "sphinx.ext.todo",
     "numpydoc",
+    "sphinx.ext.mathjax",
+    "sphinx.ext.napoleon",
     "sphinx.ext.ifconfig",
     "sphinx.ext.viewcode",
+    "sphinx.ext.graphviz",
     "sphinx.ext.imgmath"]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -51,20 +54,35 @@ exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 
 # -- Options for HTML output -------------------------------------------------
 
-# The theme to use for HTML and HTML Help pages.  See the documentation for
-# a list of builtin themes.
-#
-# The theme to use for HTML and HTML Help pages.  See the documentation for
-# a list of builtin themes.
+#html_theme = "pydata_sphinx_theme"
+#html_theme_options = {
+#    "github_url": "https://gitlab.com/pavanello-research-group/qmlearn",
+#    "show_prev_next": False,
+#}
+#html_sidebars = {
+#    "**": [],
+#}
 
-html_theme = "pydata_sphinx_theme"
+html_theme = 'sphinx_rtd_theme'
+#html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
+html_style = 'custom.css'
+html_static_path = ['static']
+html_last_updated_fmt = '%A, %d %b %Y %H:%M:%S'
+
 html_theme_options = {
-    "github_url": "https://gitlab.com/pavanello-research-group/qmlearn",
-    "show_prev_next": False,
+    'logo_only': True,
+    'prev_next_buttons_location': 'both',
+    # 'style_nav_header_background' : '#E67E22'
+    # 'style_nav_header_background' : '#27AE60'
+    'style_nav_header_background' : '#bdc3c7'
 }
-html_sidebars = {
-    "**": [],
-}
+
+# latex_show_urls = 'inline'
+latex_show_pagerefs = True
+latex_documents = [('index', not True)]
+
+graphviz_output_format = 'svg'
+
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
@@ -72,11 +90,17 @@ html_sidebars = {
 html_static_path = []  # ['_static']
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = "project-templatedoc"
-
-# Add any paths that contain custom static files (such as style sheets) here,
-# relative to this directory. They are copied after the builtin static files,
-# so a file named "default.css" will overwrite the builtin "default.css".
-html_static_path = ['_static']
 
 mathjax_path = "https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"
+numpydoc_show_class_members = False
+
+
+#Add external links to source code
+def linkcode_resolve(domain, info):
+    print('info module', info)
+    if domain != 'py' or not info['module']:
+        return None
+
+    filename = info['module'].replace('.', '/')+'.py'
+    return "https ://gitlab.com/pavanello-research-group/qmlearn/tree/master/%s" % filename
+

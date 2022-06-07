@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>qmlearn.model.model &mdash; qmlearn 0.8 documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> qmlearn
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">qmlearn</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">qmlearn</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+      <li>qmlearn.model.model</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for qmlearn.model.model</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">ase</span> <span class="kn">import</span> <span class="n">Atoms</span>
+<span class="kn">import</span> <span class="nn">scipy.linalg</span> <span class="k">as</span> <span class="nn">sla</span>
+<span class="c1"># from sklearn.linear_model import LinearRegression</span>
+<span class="kn">from</span> <span class="nn">sklearn.kernel_ridge</span> <span class="kn">import</span> <span class="n">KernelRidge</span>
+
+<span class="kn">from</span> <span class="nn">qmlearn.drivers.mol</span> <span class="kn">import</span> <span class="n">QMMol</span>
+
+
+<div class="viewcode-block" id="QMModel"><a class="viewcode-back" href="../../../qmlearn.model.html#qmlearn.model.model.QMModel">[docs]</a><span class="k">class</span> <span class="nc">QMModel</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; QMModel class is wrapper around sklearn regression model classes. It provide mthod to</span>
+<span class="sd">    fit and predict based on provided training and testing data    </span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    mmodels : dict, optional</span>
+<span class="sd">        set of machine learning algorithms used for training , If not provided</span>
+<span class="sd">        by default Kernel Ridge Rigression (KRR) will be used to learn :math:`{\gmmma}` from :math:`V_{ext}` and </span>
+<span class="sd">        linear regression to learn :math:`{\delta}E`, and :math:`{\delta}{\gamma}`</span>
+<span class="sd">        </span>
+
+<span class="sd">    method : {&#39;gamma&#39;}, str</span>
+<span class="sd">        determine which property to learn from external potentials :math:`V_{ext}` . as of now only </span>
+<span class="sd">        :math:`{\gamma}` can be learned from :math:`V_{ext}`. And then all other properties</span>
+<span class="sd">        calculated from :math:`{\gamma}`</span>
+<span class="sd">    </span>
+<span class="sd">    ncharge: int, optional</span>
+<span class="sd">        charge of the atoms</span>
+<span class="sd">    </span>
+<span class="sd">    nspin: int, optional</span>
+<span class="sd">        ??</span>
+<span class="sd">    </span>
+<span class="sd">    refqmmol: QMMol object</span>
+<span class="sd">        Refernce QMMol object</span>
+<span class="sd">    </span>
+
+<span class="sd">        </span>
+
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mmodels</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;gamma&#39;</span><span class="p">,</span> <span class="n">ncharge</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">nspin</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">occs</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">refqmmol</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_method</span> <span class="o">=</span> <span class="n">method</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mmodels</span> <span class="o">=</span> <span class="n">mmodels</span> <span class="ow">or</span> <span class="p">{}</span>
+        <span class="c1">#</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">method</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">mmodels</span> <span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">mmodels</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">method</span><span class="p">]</span> <span class="o">=</span> <span class="n">KernelRidge</span><span class="p">(</span><span class="n">alpha</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span><span class="n">kernel</span><span class="o">=</span><span class="s1">&#39;linear&#39;</span><span class="p">)</span>
+        <span class="c1"># for orbital</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nspin</span> <span class="o">=</span> <span class="n">nspin</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ncharge</span> <span class="o">=</span> <span class="n">ncharge</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">occs</span> <span class="o">=</span> <span class="n">occs</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">occs</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">ncharge</span> <span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">nspin</span> <span class="o">==</span> <span class="mi">1</span> <span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">occs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ncharge</span><span class="o">//</span><span class="mi">2</span><span class="p">)</span><span class="o">*</span><span class="mi">2</span>
+            <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">nspin</span> <span class="o">==</span> <span class="mi">2</span> <span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">occs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ncharge</span><span class="p">)</span>
+        <span class="c1">#</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_refqmmol</span> <span class="o">=</span> <span class="n">refqmmol</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">qmmol</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">model</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">mmodels</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">method</span><span class="p">]</span>
+
+    <span class="nd">@model</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">model</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mmodels</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">method</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">refqmmol</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_refqmmol</span> <span class="ow">is</span> <span class="kc">None</span> <span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="s2">&quot;Please set the &#39;refqmmol&#39; before the predict.&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_refqmmol</span>
+
+    <span class="nd">@refqmmol</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">refqmmol</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_refqmmol</span> <span class="o">=</span> <span class="n">value</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">method</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_method</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">!=</span> <span class="s1">&#39;gamma&#39;</span> <span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="s2">&quot;Only support &#39;gamma&#39; method now.&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_method</span>
+
+<div class="viewcode-block" id="QMModel.fit"><a class="viewcode-back" href="../../../qmlearn.model.html#qmlearn.model.model.QMModel.fit">[docs]</a>    <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">model</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">method</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Fit model </span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        X : array</span>
+<span class="sd">            Training data</span>
+<span class="sd">        y : array</span>
+<span class="sd">            Target values</span>
+<span class="sd">            </span>
+<span class="sd">        model : QMModel obj, optional</span>
+<span class="sd">            Regression model (i.e., KernelRidge, LinearRegression), If not provided will take from</span>
+<span class="sd">            mmodels dictionary.</span>
+<span class="sd">        method : {&#39;gamma&#39;, &#39;d_gamma&#39;, &#39;d_energy&#39;, &#39;d_forces&#39;} </span>
+<span class="sd">            &#39;gamma&#39; -&gt; learn :math:`{\delta\gamma}` using :math:`V_{ext}`</span>
+<span class="sd">            &#39;d_gamma&#39; -&gt; learn :math:`{\delta\gamma}` based on predicted :math:`{\gamma}`.</span>
+<span class="sd">            &#39;d_energy&#39; -&gt; learn :math:`{\delta}E` based on predicted :math:`{\gamma}`</span>
+<span class="sd">            &#39;d_forces&#39; -&gt; learn :math:`{\delta}F` based on predicted :math:`{\gamma}`</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        QMModel</span>
+<span class="sd">            return trained QMModel object</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">model</span> <span class="ow">is</span> <span class="kc">None</span> <span class="p">:</span>
+            <span class="n">method</span> <span class="o">=</span> <span class="n">method</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">method</span>
+            <span class="n">model</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mmodels</span><span class="p">[</span><span class="n">method</span><span class="p">]</span>
+        <span class="c1">#</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">X</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">X</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">ndim</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="p">:</span>
+                <span class="n">X</span> <span class="o">=</span> <span class="p">[</span><span class="n">item</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">X</span><span class="p">]</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">y</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">y</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">ndim</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="p">:</span>
+                <span class="n">y</span> <span class="o">=</span> <span class="p">[</span><span class="n">item</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">y</span><span class="p">]</span>
+        <span class="c1">#</span>
+        <span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">model</span></div>
+
+<div class="viewcode-block" id="QMModel.predict"><a class="viewcode-back" href="../../../qmlearn.model.html#qmlearn.model.model.QMModel.predict">[docs]</a>    <span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">model</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">method</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Predict using trained QMModel </span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        X : array</span>
+<span class="sd">            Training data</span>
+<span class="sd">        model : _type_, optional</span>
+<span class="sd">            _description_, by default None</span>
+<span class="sd">        method : _type_, optional</span>
+<span class="sd">            _description_, by default None</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        _type_</span>
+<span class="sd">            _description_</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">translate_input</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span><span class="o">.</span><span class="n">ravel</span><span class="p">()]</span>
+        <span class="k">if</span> <span class="n">model</span> <span class="ow">is</span> <span class="kc">None</span> <span class="p">:</span>
+            <span class="n">method</span> <span class="o">=</span> <span class="n">method</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">method</span>
+            <span class="n">model</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mmodels</span><span class="p">[</span><span class="n">method</span><span class="p">]</span>
+        <span class="c1">#</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">x</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="c1">#</span>
+        <span class="k">return</span> <span class="n">y</span></div>
+
+<div class="viewcode-block" id="QMModel.convert_back"><a class="viewcode-back" href="../../../qmlearn.model.html#qmlearn.model.model.QMModel.convert_back">[docs]</a>    <span class="k">def</span> <span class="nf">convert_back</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">prop</span> <span class="o">=</span> <span class="s1">&#39;gamma&#39;</span><span class="p">,</span> <span class="n">qmmol</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">qmmol</span> <span class="o">=</span> <span class="n">qmmol</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">qmmol</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="n">qmmol</span><span class="o">.</span><span class="n">convert_back</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">prop</span> <span class="o">=</span> <span class="n">prop</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">y</span></div>
+
+<div class="viewcode-block" id="QMModel.translate_input"><a class="viewcode-back" href="../../../qmlearn.model.html#qmlearn.model.model.QMModel.translate_input">[docs]</a>    <span class="k">def</span> <span class="nf">translate_input</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="p">:</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="n">x</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">Atoms</span><span class="p">)</span> <span class="p">:</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">refqmmol</span><span class="o">.</span><span class="n">duplicate</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">QMMol</span><span class="p">):</span>
+            <span class="k">pass</span>
+        <span class="k">else</span> <span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="s2">&quot;Please check the input.&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">QMMol</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">qmmol</span> <span class="o">=</span> <span class="n">x</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">vext</span>
+        <span class="k">return</span> <span class="n">out</span></div>
+
+<div class="viewcode-block" id="QMModel.orth_orb"><a class="viewcode-back" href="../../../qmlearn.model.html#qmlearn.model.model.QMModel.orth_orb">[docs]</a>    <span class="k">def</span> <span class="nf">orth_orb</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">orb</span><span class="p">):</span>
+        <span class="n">s_new</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">einsum</span><span class="p">(</span><span class="s1">&#39;mi,nj,mn-&gt;ij&#39;</span><span class="p">,</span> <span class="n">orb</span><span class="p">,</span> <span class="n">orb</span><span class="p">,</span> <span class="n">s</span><span class="p">)</span>
+        <span class="n">w</span><span class="p">,</span><span class="n">vr</span><span class="o">=</span><span class="n">sla</span><span class="o">.</span><span class="n">eig</span><span class="p">(</span><span class="n">s_new</span><span class="p">)</span>
+        <span class="n">w</span><span class="o">=</span><span class="mf">1.</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">real</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">w</span><span class="p">))</span>
+        <span class="n">s_moh</span><span class="o">=</span><span class="n">vr</span><span class="nd">@np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">w</span><span class="p">)</span><span class="nd">@vr</span><span class="o">.</span><span class="n">T</span>
+        <span class="n">oorb</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">einsum</span><span class="p">(</span><span class="s1">&#39;ij,mj-&gt;mi&#39;</span><span class="p">,</span><span class="n">s_moh</span><span class="p">,</span><span class="n">orb</span><span class="p">)</span>
+        <span class="n">s_new</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">einsum</span><span class="p">(</span><span class="s1">&#39;mi,nj,mn-&gt;ij&#39;</span><span class="p">,</span> <span class="n">oorb</span><span class="p">,</span> <span class="n">oorb</span><span class="p">,</span> <span class="n">s</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">oorb</span></div></div>
+
+
+<div class="viewcode-block" id="MQMModel"><a class="viewcode-back" href="../../../qmlearn.model.html#qmlearn.model.model.MQMModel">[docs]</a><span class="k">class</span> <span class="nc">MQMModel</span><span class="p">(</span><span class="n">QMModel</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mmodels</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;gamma&#39;</span><span class="p">,</span> <span class="n">ncharge</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">nspin</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">occs</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">refqmmol</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="n">fragments</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">qmmodels</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">mmodels</span><span class="o">=</span><span class="n">mmodels</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="n">method</span><span class="p">,</span> <span class="n">ncharge</span><span class="o">=</span><span class="n">ncharge</span><span class="p">,</span> <span class="n">nspin</span><span class="o">=</span><span class="n">nspin</span><span class="p">,</span> <span class="n">occs</span><span class="o">=</span><span class="n">occs</span><span class="p">,</span> <span class="n">refqmmol</span><span class="o">=</span><span class="n">refqmmol</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_fragments</span> <span class="o">=</span> <span class="n">fragments</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_qmmodels</span> <span class="o">=</span> <span class="n">qmmodels</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">qmmodels</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_qmmodels</span> <span class="ow">is</span> <span class="kc">None</span> <span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="s2">&quot;Please set the &#39;qmmodels&#39; before the predict.&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_qmmodels</span>
+
+    <span class="nd">@qmmodels</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">qmmodels</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_qmmodels</span> <span class="o">=</span> <span class="n">value</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">fragments</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fragments</span> <span class="ow">is</span> <span class="kc">None</span> <span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="s2">&quot;Please set the &#39;fragments&#39; before the predict.&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fragments</span>
+
+    <span class="nd">@fragments</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">fragments</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_fragments</span> <span class="o">=</span> <span class="n">value</span>
+
+<div class="viewcode-block" id="MQMModel.translate_input"><a class="viewcode-back" href="../../../qmlearn.model.html#qmlearn.model.model.MQMModel.translate_input">[docs]</a>    <span class="k">def</span> <span class="nf">translate_input</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">convert</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="p">:</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="n">x</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">Atoms</span><span class="p">)</span> <span class="p">:</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">refqmmol</span><span class="o">.</span><span class="n">duplicate</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">QMMol</span><span class="p">):</span>
+            <span class="k">pass</span>
+        <span class="k">else</span> <span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="s2">&quot;Please check the input.&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">QMMol</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">qmmol</span> <span class="o">=</span> <span class="n">x</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">qmmol</span><span class="o">.</span><span class="n">vext</span>
+            <span class="n">block</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_block_vext</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">convert</span> <span class="o">=</span> <span class="n">convert</span><span class="p">)</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="n">out</span> <span class="o">-</span> <span class="n">sla</span><span class="o">.</span><span class="n">block_diag</span><span class="p">(</span><span class="o">*</span><span class="n">block</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">out</span></div>
+
+<div class="viewcode-block" id="MQMModel.get_block_vext"><a class="viewcode-back" href="../../../qmlearn.model.html#qmlearn.model.model.MQMModel.get_block_vext">[docs]</a>    <span class="k">def</span> <span class="nf">get_block_vext</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">qmmol</span><span class="p">,</span> <span class="n">convert</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">qmmol</span><span class="p">,</span> <span class="n">Atoms</span><span class="p">)</span> <span class="p">:</span>
+            <span class="n">qmmol</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">refqmmol</span><span class="o">.</span><span class="n">duplicate</span><span class="p">(</span><span class="n">qmmol</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sub_qmmols</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">block</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">index</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fragments</span><span class="p">):</span>
+            <span class="n">a</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">qmmodels</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">refqmmol</span><span class="o">.</span><span class="n">duplicate</span><span class="p">(</span><span class="n">qmmol</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="n">index</span><span class="p">],</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">sub_qmmols</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">convert</span> <span class="p">:</span>
+                <span class="n">v</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">convert_back</span><span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">vext</span><span class="p">,</span> <span class="n">prop</span> <span class="o">=</span> <span class="s1">&#39;gamma&#39;</span><span class="p">)</span>
+            <span class="k">else</span> <span class="p">:</span>
+                <span class="n">v</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">vext</span>
+            <span class="n">block</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">block</span></div>
+
+<div class="viewcode-block" id="MQMModel.predict"><a class="viewcode-back" href="../../../qmlearn.model.html#qmlearn.model.model.MQMModel.predict">[docs]</a>    <span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">method</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">convert</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">split</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">translate_input</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">convert</span> <span class="o">=</span> <span class="n">convert</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
+        <span class="n">method</span> <span class="o">=</span> <span class="n">method</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">method</span>
+        <span class="n">model</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mmodels</span><span class="p">[</span><span class="n">method</span><span class="p">]</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">([</span><span class="n">x</span><span class="p">])[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+        <span class="n">block</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">predict_block</span><span class="p">(</span><span class="n">method</span><span class="o">=</span><span class="n">method</span><span class="p">,</span> <span class="n">convert</span><span class="o">=</span><span class="n">convert</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s1">&#39;gamma&#39;</span> <span class="ow">in</span> <span class="n">method</span> <span class="p">:</span>
+            <span class="n">y_frags</span> <span class="o">=</span> <span class="n">sla</span><span class="o">.</span><span class="n">block_diag</span><span class="p">(</span><span class="o">*</span><span class="n">block</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="s1">&#39;force&#39;</span> <span class="ow">in</span> <span class="n">method</span> <span class="p">:</span>
+            <span class="n">y_frags</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">(</span><span class="n">block</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">y</span><span class="o">.</span><span class="n">size</span> <span class="o">==</span> <span class="mi">1</span> <span class="p">:</span>
+            <span class="n">y_frags</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">block</span><span class="p">)</span>
+        <span class="k">else</span> <span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="s2">&quot;&#39;MQMModel&#39; only for &#39;energy&#39;, &#39;force&#39; and &#39;gamma&#39; now.&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">y</span><span class="o">.</span><span class="n">size</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="p">:</span> <span class="n">y</span> <span class="o">=</span> <span class="n">y</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">y_frags</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">split</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">y_frags</span><span class="p">,</span> <span class="n">y</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">y</span> <span class="o">+</span> <span class="n">y_frags</span></div>
+
+<div class="viewcode-block" id="MQMModel.predict_block"><a class="viewcode-back" href="../../../qmlearn.model.html#qmlearn.model.model.MQMModel.predict_block">[docs]</a>    <span class="k">def</span> <span class="nf">predict_block</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">convert</span> <span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">x</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="p">:</span>
+            <span class="c1"># This one just to make sure the &#39;sub_qmmols&#39; were calculated.</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">translate_input</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">convert</span> <span class="o">=</span> <span class="n">convert</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
+        <span class="n">method</span> <span class="o">=</span> <span class="n">method</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">method</span>
+        <span class="n">block</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">mol</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sub_qmmols</span><span class="p">)</span> <span class="p">:</span>
+            <span class="k">if</span> <span class="n">method</span> <span class="o">==</span> <span class="s1">&#39;gamma&#39;</span> <span class="p">:</span>
+                <span class="n">x0</span> <span class="o">=</span> <span class="n">mol</span><span class="o">.</span><span class="n">vext</span>
+            <span class="k">else</span> <span class="p">:</span>
+                <span class="n">x0</span> <span class="o">=</span> <span class="n">mol</span><span class="o">.</span><span class="n">gamma</span>
+            <span class="n">y0</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">qmmodels</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">x0</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="n">method</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="n">y0</span><span class="p">)</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="n">x0</span><span class="p">)</span> <span class="p">:</span>
+                <span class="n">y0</span> <span class="o">=</span> <span class="n">y0</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">x0</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">method</span> <span class="o">==</span> <span class="s1">&#39;gamma&#39;</span> <span class="p">:</span> <span class="c1"># save the gamma</span>
+                    <span class="n">mol</span><span class="o">.</span><span class="n">gamma</span> <span class="o">=</span> <span class="n">y0</span>
+            <span class="k">if</span> <span class="n">convert</span> <span class="p">:</span>
+                <span class="n">y0</span> <span class="o">=</span> <span class="n">mol</span><span class="o">.</span><span class="n">convert_back</span><span class="p">(</span><span class="n">y0</span><span class="p">,</span> <span class="n">prop</span> <span class="o">=</span> <span class="n">method</span><span class="p">)</span>
+            <span class="n">block</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">y0</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">block</span></div></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Jessica and Musa.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

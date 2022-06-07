@@ -95,10 +95,10 @@ class QMModel(object):
             Regression model (i.e., KernelRidge, LinearRegression), If not provided will take from
             mmodels dictionary.
         method : {'gamma', 'd_gamma', 'd_energy', 'd_forces'} 
-            'gamma' -> learn :math:`{\delta\gamma}` using :math:`V_{ext}`
-            'd_gamma' -> learn :math:`{\delta\gamma}` based on predicted :math:`{\gamma}`.
-            'd_energy' -> learn :math:`{\delta}E` based on predicted :math:`{\gamma}`
-            'd_forces' -> learn :math:`{\delta}F` based on predicted :math:`{\gamma}`
+            | 'gamma' -> learn :math:`{\gamma}` using :math:`V_{ext}`
+            | 'd_gamma' -> learn :math:`{\delta\gamma}` based on predicted :math:`{\gamma}`.
+            | 'd_energy' -> learn :math:`{\delta}E` based on predicted :math:`{\gamma}`
+            | 'd_forces' -> learn :math:`{\delta}F` based on predicted :math:`{\gamma}`
         Returns
         -------
         QMModel
@@ -123,17 +123,19 @@ class QMModel(object):
 
         Parameters
         ----------
-        X : array
+        x : array
             Training data
-        model : _type_, optional
-            _description_, by default None
-        method : _type_, optional
-            _description_, by default None
+       
+       method : {'gamma', 'd_gamma', 'd_energy', 'd_forces'} 
+            | 'gamma' -> predict :math:`{\delta\gamma}` using :math:`V_{ext}`
+            | 'd_gamma' -> predict :math:`{\gamma}+{\delta\gamma}` based on predicted :math:`{\gamma}`.
+            | 'd_energy' -> predict :math:`E+{\delta}E` based on predicted :math:`{\gamma}`
+            | 'd_forces' -> predict :math:`F+{\delta}F` based on predicted :math:`{\gamma}`
 
         Returns
         -------
-        _type_
-            _description_
+        y : array
+            Predicted target values
         """
         x = [self.translate_input(x, **kwargs).ravel()]
         if model is None :
@@ -145,11 +147,21 @@ class QMModel(object):
         return y
 
     def convert_back(self, y, prop = 'gamma', qmmol = None, **kwargs):
+        """Convert back the predicted properties to the original reference frame of the molecule 
+
+        Returns
+        -------
+        y : array
+            Predicted target values in original refrence frame of the molecule
+        """
         qmmol = qmmol or self.qmmol
         y = qmmol.convert_back(y, prop = prop, **kwargs)
         return y
 
     def translate_input(self, x, **kwargs):
+        """Return external potential :math:`V_{ext}` from x. x could be numpy ndarray, ASE Atoms object,
+         or QMMol object   
+        """
         if isinstance(x, np.ndarray) :
             out = x
         elif isinstance(x, Atoms) :

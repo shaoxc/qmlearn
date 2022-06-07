@@ -1,0 +1,1518 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>qmlearn.drivers package &#8212; qmlearn 0.8 documentation</title>
+    
+  <!-- Loaded before other Sphinx assets -->
+  <link href="_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+<link href="_static/styles/pydata-sphinx-theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+
+    
+  <link rel="stylesheet"
+    href="_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
+
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="qmlearn.io package" href="qmlearn.io.html" />
+    <link rel="prev" title="qmlearn package" href="qmlearn.html" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="None">
+    
+
+    <!-- Google Analytics -->
+    
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="60">
+    
+    <div class="container-fluid" id="banner"></div>
+
+    
+    <nav class="navbar navbar-light navbar-expand-lg bg-light fixed-top bd-navbar" id="navbar-main"><div class="container-xl">
+
+  <div id="navbar-start">
+    
+    
+<a class="navbar-brand" href="index.html">
+<p class="title">qmlearn</p>
+</a>
+
+    
+  </div>
+
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-collapsible" aria-controls="navbar-collapsible" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  
+  <div id="navbar-collapsible" class="col-lg-9 collapse navbar-collapse">
+    <div id="navbar-center" class="mr-auto">
+      
+      <div class="navbar-center-item">
+        <ul id="navbar-main-elements" class="navbar-nav">
+    <li class="toctree-l1 current active nav-item">
+ <a class="reference internal nav-link" href="modules.html">
+  qmlearn
+ </a>
+</li>
+
+    
+</ul>
+      </div>
+      
+    </div>
+
+    <div id="navbar-end">
+      
+      <div class="navbar-end-item">
+        <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
+        <li class="nav-item">
+          <a class="nav-link" href="https://gitlab.com/pavanello-research-group/qmlearn" rel="noopener" target="_blank" title="GitHub"><span><i class="fab fa-github-square"></i></span>
+            <label class="sr-only">GitHub</label></a>
+        </li>
+      </ul>
+      </div>
+      
+    </div>
+  </div>
+</div>
+    </nav>
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+            
+            <div class="col-12 col-md-1 col-xl-2 bd-sidebar no-sidebar"></div>
+            
+          
+
+          
+          <div class="d-none d-xl-block col-xl-2 bd-toc">
+            
+              
+              <div class="toc-item">
+                
+<div class="tocsection onthispage mt-5 pt-1 pb-3">
+    <i class="fas fa-list"></i> On this page
+</div>
+
+<nav id="bd-toc-nav">
+    <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#submodules">
+   Submodules
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#module-qmlearn.drivers.core">
+   qmlearn.drivers.core module
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#module-qmlearn.drivers.mol">
+   qmlearn.drivers.mol module
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#module-qmlearn.drivers.psi4">
+   qmlearn.drivers.psi4 module
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#module-qmlearn.drivers.pyscf">
+   qmlearn.drivers.pyscf module
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#module-qmlearn.drivers">
+   Module contents
+  </a>
+ </li>
+</ul>
+
+</nav>
+              </div>
+              
+              <div class="toc-item">
+                
+              </div>
+              
+            
+          </div>
+          
+
+          
+          
+            
+          
+          <main class="col-12 col-md-11 col-xl-8 py-md-5 pl-md-5 pr-md-4 bd-content" role="main">
+              
+              <div>
+                
+  <section id="qmlearn-drivers-package">
+<h1>qmlearn.drivers package<a class="headerlink" href="#qmlearn-drivers-package" title="Permalink to this headline">#</a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">#</a></h2>
+</section>
+<section id="module-qmlearn.drivers.core">
+<span id="qmlearn-drivers-core-module"></span><h2>qmlearn.drivers.core module<a class="headerlink" href="#module-qmlearn.drivers.core" title="Permalink to this headline">#</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="qmlearn.drivers.core.Engine">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">qmlearn.drivers.core.</span></span><span class="sig-name descname"><span class="pre">Engine</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'rks'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">basis</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'6-31g'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qmlearn/drivers/core.html#Engine"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qmlearn.drivers.core.Engine" title="Permalink to this definition">#</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Abstract Base class for the External calculator.
+Until now we have implemented: PySCF and Psi4.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Attributes</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><a class="reference internal" href="#qmlearn.drivers.core.Engine.vext" title="qmlearn.drivers.core.Engine.vext"><code class="xref py py-obj docutils literal notranslate"><span class="pre">vext</span></code></a><span class="classifier">ndarray</span></dt><dd><p>External Potential.</p>
+</dd>
+<dt><a class="reference internal" href="#qmlearn.drivers.core.Engine.gamma" title="qmlearn.drivers.core.Engine.gamma"><code class="xref py py-obj docutils literal notranslate"><span class="pre">gamma</span></code></a><span class="classifier">ndarray</span></dt><dd><p>1-body reduced density matrix (1-RDM).</p>
+</dd>
+<dt><a class="reference internal" href="#qmlearn.drivers.core.Engine.gammat" title="qmlearn.drivers.core.Engine.gammat"><code class="xref py py-obj docutils literal notranslate"><span class="pre">gammat</span></code></a><span class="classifier">ndarray</span></dt><dd><p>2-body reduced density matrix (2-RDM).</p>
+</dd>
+<dt><a class="reference internal" href="#qmlearn.drivers.core.Engine.etotal" title="qmlearn.drivers.core.Engine.etotal"><code class="xref py py-obj docutils literal notranslate"><span class="pre">etotal</span></code></a><span class="classifier">float</span></dt><dd><p>Total Energy.</p>
+</dd>
+<dt><a class="reference internal" href="#qmlearn.drivers.core.Engine.forces" title="qmlearn.drivers.core.Engine.forces"><code class="xref py py-obj docutils literal notranslate"><span class="pre">forces</span></code></a><span class="classifier">ndarray</span></dt><dd><p>Atomic Forces.</p>
+</dd>
+<dt><a class="reference internal" href="#qmlearn.drivers.core.Engine.ovlp" title="qmlearn.drivers.core.Engine.ovlp"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ovlp</span></code></a><span class="classifier">ndarray</span></dt><dd><p>Overlap Matrix.</p>
+</dd>
+<dt><a class="reference internal" href="#qmlearn.drivers.core.Engine.kop" title="qmlearn.drivers.core.Engine.kop"><code class="xref py py-obj docutils literal notranslate"><span class="pre">kop</span></code></a><span class="classifier">ndarray</span></dt><dd><p>Kinetic Energy Operator.</p>
+</dd>
+<dt><strong>eri</strong><span class="classifier">ndarray</span></dt><dd><p>2-electron integrals: 8-fold or 4-fold ERIs or complex integral array with N^4 elements
+(N is the number of orbitals).</p>
+</dd>
+<dt><strong>orb</strong><span class="classifier">ndarray</span></dt><dd><p>Molecular orbital coefficients</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Methods</p>
+<table class="longtable table autosummary">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#qmlearn.drivers.core.Engine.calc_gamma" title="qmlearn.drivers.core.Engine.calc_gamma"><code class="xref py py-obj docutils literal notranslate"><span class="pre">calc_gamma</span></code></a>([orb, occs])</p></td>
+<td><p>Calculate the 1-body reduced density matrix (1-RDM).</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#qmlearn.drivers.core.Engine.calc_idempotency" title="qmlearn.drivers.core.Engine.calc_idempotency"><code class="xref py py-obj docutils literal notranslate"><span class="pre">calc_idempotency</span></code></a>(gamma[, ovlp, kind])</p></td>
+<td><p>Check idempotency of gamma</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#qmlearn.drivers.core.Engine.calc_ke" title="qmlearn.drivers.core.Engine.calc_ke"><code class="xref py py-obj docutils literal notranslate"><span class="pre">calc_ke</span></code></a>(gamma[, kop])</p></td>
+<td><p>Get Total kinetic energy</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#qmlearn.drivers.core.Engine.calc_ncharge" title="qmlearn.drivers.core.Engine.calc_ncharge"><code class="xref py py-obj docutils literal notranslate"><span class="pre">calc_ncharge</span></code></a>(gamma[, ovlp])</p></td>
+<td><p>Get calculated total number of electrons</p></td>
+</tr>
+</tbody>
+</table>
+<table class="table">
+<colgroup>
+<col style="width: 44%" />
+<col style="width: 56%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><strong>init</strong></p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p><strong>run</strong></p></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt class="sig sig-object py" id="qmlearn.drivers.core.Engine.calc_gamma">
+<span class="sig-name descname"><span class="pre">calc_gamma</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">orb</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">occs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qmlearn/drivers/core.html#Engine.calc_gamma"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qmlearn.drivers.core.Engine.calc_gamma" title="Permalink to this definition">#</a></dt>
+<dd><p>Calculate the 1-body reduced density matrix (1-RDM).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>orb</strong><span class="classifier">ndarray</span></dt><dd><p>Orbital Coefficients. Each column is one orbital</p>
+</dd>
+<dt><strong>occs</strong><span class="classifier">ndarray</span></dt><dd><p>Occupancy</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>1-RDM</strong><span class="classifier">ndarray</span></dt><dd></dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qmlearn.drivers.core.Engine.calc_idempotency">
+<span class="sig-name descname"><span class="pre">calc_idempotency</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gamma</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ovlp</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kind</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qmlearn/drivers/core.html#Engine.calc_idempotency"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qmlearn.drivers.core.Engine.calc_idempotency" title="Permalink to this definition">#</a></dt>
+<dd><p>Check idempotency of gamma</p>
+<div class="math">
+<p><img src="_images/math/5f388de048ca0cd9547eddb78f7fd3ea3e3e772d.png" alt="\gamma S \gamma &amp;= 2 \gamma"/></p>
+</div><dl class="field-list">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>gamma</strong><span class="classifier">ndarray</span></dt><dd><p>1-RDM</p>
+</dd>
+<dt><strong>ovlp</strong><span class="classifier">ndarray</span></dt><dd><p>Overlap matrix</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>errorsum</strong><span class="classifier">float</span></dt><dd><p>Sum over the Absolute difference among matrix 1 and 2.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-odd">Attributes</dt>
+<dd class="field-odd"><dl>
+<dt><strong>kind</strong><span class="classifier">int</span></dt><dd><div class="line-block">
+<div class="line">1 : Level 1 </div>
+<div class="line">2 : Level 2</div>
+<div class="line">3 : Level 3</div>
+</div>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qmlearn.drivers.core.Engine.calc_ke">
+<span class="sig-name descname"><span class="pre">calc_ke</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gamma</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kop</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qmlearn/drivers/core.html#Engine.calc_ke"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qmlearn.drivers.core.Engine.calc_ke" title="Permalink to this definition">#</a></dt>
+<dd><p>Get Total kinetic energy</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>gamma</strong><span class="classifier">ndarray</span></dt><dd><p>1-RDM</p>
+</dd>
+<dt><strong>kop</strong><span class="classifier">ndarray</span></dt><dd><p>Kinetic energy operator</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>ke</strong><span class="classifier">float</span></dt><dd><p>Total kinetic energy</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qmlearn.drivers.core.Engine.calc_ncharge">
+<span class="sig-name descname"><span class="pre">calc_ncharge</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gamma</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ovlp</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qmlearn/drivers/core.html#Engine.calc_ncharge"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qmlearn.drivers.core.Engine.calc_ncharge" title="Permalink to this definition">#</a></dt>
+<dd><p>Get calculated total number of electrons</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>gamma</strong><span class="classifier">ndarray</span></dt><dd><p>1-RDM</p>
+</dd>
+<dt><strong>ovlp</strong><span class="classifier">ndarray</span></dt><dd><p>Overlap Matrix</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>ncharge</strong><span class="classifier">int</span></dt><dd><p>Calcualted number of electrons</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qmlearn.drivers.core.Engine.etotal">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">etotal</span></span><a class="headerlink" href="#qmlearn.drivers.core.Engine.etotal" title="Permalink to this definition">#</a></dt>
+<dd><p>Total Energy.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qmlearn.drivers.core.Engine.forces">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">forces</span></span><a class="headerlink" href="#qmlearn.drivers.core.Engine.forces" title="Permalink to this definition">#</a></dt>
+<dd><p>Atomic Forces.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qmlearn.drivers.core.Engine.gamma">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">gamma</span></span><a class="headerlink" href="#qmlearn.drivers.core.Engine.gamma" title="Permalink to this definition">#</a></dt>
+<dd><p>1-body reduced density matrix (1-RDM).</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qmlearn.drivers.core.Engine.gammat">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">gammat</span></span><a class="headerlink" href="#qmlearn.drivers.core.Engine.gammat" title="Permalink to this definition">#</a></dt>
+<dd><p>2-body reduced density matrix (2-RDM).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qmlearn.drivers.core.Engine.init">
+<span class="sig-name descname"><span class="pre">init</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qmlearn/drivers/core.html#Engine.init"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qmlearn.drivers.core.Engine.init" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qmlearn.drivers.core.Engine.kop">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">kop</span></span><a class="headerlink" href="#qmlearn.drivers.core.Engine.kop" title="Permalink to this definition">#</a></dt>
+<dd><p>Kinetic Energy Operator.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qmlearn.drivers.core.Engine.ncharge0">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">ncharge0</span></span><a class="headerlink" href="#qmlearn.drivers.core.Engine.ncharge0" title="Permalink to this definition">#</a></dt>
+<dd><p>Calculated number of electrons.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qmlearn.drivers.core.Engine.ovlp">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">ovlp</span></span><a class="headerlink" href="#qmlearn.drivers.core.Engine.ovlp" title="Permalink to this definition">#</a></dt>
+<dd><p>Overlap Matrix.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qmlearn.drivers.core.Engine.run">
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qmlearn/drivers/core.html#Engine.run"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qmlearn.drivers.core.Engine.run" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qmlearn.drivers.core.Engine.vext">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">vext</span></span><a class="headerlink" href="#qmlearn.drivers.core.Engine.vext" title="Permalink to this definition">#</a></dt>
+<dd><p>External Potential.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="qmlearn.drivers.core.atoms2bestplane">
+<span class="sig-prename descclassname"><span class="pre">qmlearn.drivers.core.</span></span><span class="sig-name descname"><span class="pre">atoms2bestplane</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">atoms</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">direction</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qmlearn/drivers/core.html#atoms2bestplane"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qmlearn.drivers.core.atoms2bestplane" title="Permalink to this definition">#</a></dt>
+<dd><p>Apply Principal Component Analysis (PCA) to atoms and re-oriente them.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>atoms</strong><span class="classifier">:obj: ASE atoms object</span></dt><dd><p>Atoms coordinates</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>atoms</strong><span class="classifier">ndarray</span></dt><dd><p>Reoriented atom positions</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-odd">Attributes</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>direction</strong><span class="classifier">ndarray</span></dt><dd><p>1D-vector to re-orient the atoms positions</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="qmlearn.drivers.core.atoms2newdirection">
+<span class="sig-prename descclassname"><span class="pre">qmlearn.drivers.core.</span></span><span class="sig-name descname"><span class="pre">atoms2newdirection</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">atoms</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">a</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(0,</span> <span class="pre">0,</span> <span class="pre">1)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(1,</span> <span class="pre">0,</span> <span class="pre">0)</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qmlearn/drivers/core.html#atoms2newdirection"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qmlearn.drivers.core.atoms2newdirection" title="Permalink to this definition">#</a></dt>
+<dd><p>Function to re-orientate the atom positions. 
+If Vector is None, the default rotation is around X-axis.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>atoms</strong><span class="classifier">:obj: ASE atom object</span></dt><dd></dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>atoms</strong><span class="classifier">ndarray</span></dt><dd><p>Rotated atoms coordinates</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="qmlearn.drivers.core.atoms_rmsd">
+<span class="sig-prename descclassname"><span class="pre">qmlearn.drivers.core.</span></span><span class="sig-name descname"><span class="pre">atoms_rmsd</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">target</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">atoms</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transform</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qmlearn/drivers/core.html#atoms_rmsd"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qmlearn.drivers.core.atoms_rmsd" title="Permalink to this definition">#</a></dt>
+<dd><p>Function to return RMSD : Root mean square deviation between atoms and target:transform atom object. And the target atom coordinates.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>target</strong><span class="classifier">:obj: ASE atoms object</span></dt><dd><p>Reference atoms.</p>
+</dd>
+<dt><strong>atoms</strong><span class="classifier">:obj: ASE atoms object</span></dt><dd><p>Atoms to be transformed (Rotate y/o translate).</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>rmsd</strong><span class="classifier">float</span></dt><dd><p>RMSD betwwen reference and transform atoms.</p>
+</dd>
+<dt><strong>atoms</strong><span class="classifier">:obj: ASE atoms object</span></dt><dd><p>Transformed target molecule.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-odd">Attributes</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>keep</strong><span class="classifier">bool</span></dt><dd><p>If True keep a copy of atoms.</p>
+</dd>
+<dt><strong>transform</strong><span class="classifier">bool</span></dt><dd><p>If True minimize rotation and translation between refatoms and atoms. 
+(See ASE documentation: Minimize RMSD between atoms and target.)</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="qmlearn.drivers.core.diff_coords">
+<span class="sig-prename descclassname"><span class="pre">qmlearn.drivers.core.</span></span><span class="sig-name descname"><span class="pre">diff_coords</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">target</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pos</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weights</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">diff_method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'rmsd'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qmlearn/drivers/core.html#diff_coords"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qmlearn.drivers.core.diff_coords" title="Permalink to this definition">#</a></dt>
+<dd><p>Function to return mean base on method error/deviation between pos and target atomic positions.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>pos</strong><span class="classifier">:obj: ASE atoms object</span></dt><dd><p>Reference atoms.</p>
+</dd>
+<dt><strong>target</strong><span class="classifier">:obj: ASE atoms object</span></dt><dd><p>Atoms to be transformed (Rotate y/o translate).</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>rmsd</strong><span class="classifier">float</span></dt><dd><p>Mean base on method error/deviation between pos and target atomic positions</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-odd">Attributes</dt>
+<dd class="field-odd"><dl>
+<dt><strong>diff_method</strong><span class="classifier">str</span></dt><dd><div class="line-block">
+<div class="line">RMSD(root-mean-square deviation) : ‘rsmd’  </div>
+<div class="line">RMSE(root-mean-square error) : ‘rmse’  </div>
+<div class="line">MSD(mean-square deviation) : ‘msd’  </div>
+<div class="line">MSE(mean-square error) : ‘mse’ </div>
+<div class="line">MAE(mean absolute error) : ‘mae’</div>
+</div>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="qmlearn.drivers.core.get_atoms_axes">
+<span class="sig-prename descclassname"><span class="pre">qmlearn.drivers.core.</span></span><span class="sig-name descname"><span class="pre">get_atoms_axes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">atoms</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qmlearn/drivers/core.html#get_atoms_axes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qmlearn.drivers.core.get_atoms_axes" title="Permalink to this definition">#</a></dt>
+<dd><p>Get PCA components of atomic positions.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>atoms</strong><span class="classifier">:obj: ASE object</span></dt><dd></dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>axes</strong><span class="classifier">ndarry</span></dt><dd><p>Vector containing the PCA components of the atomic positions</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="qmlearn.drivers.core.get_match_rotate">
+<span class="sig-prename descclassname"><span class="pre">qmlearn.drivers.core.</span></span><span class="sig-name descname"><span class="pre">get_match_rotate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">target</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">atoms</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rotate_method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'kabsch'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qmlearn/drivers/core.html#get_match_rotate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qmlearn.drivers.core.get_match_rotate" title="Permalink to this definition">#</a></dt>
+<dd><p>Rotate Atoms with a customize method</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>target</strong><span class="classifier">:obj: ASE atoms object</span></dt><dd><p>References atoms</p>
+</dd>
+<dt><strong>atoms</strong><span class="classifier">:obj: ASE atoms object</span></dt><dd><p>Initialize atoms</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>rotate</strong><span class="classifier">ndarray</span></dt><dd><p>Rotated atom positions</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-odd">Attributes</dt>
+<dd class="field-odd"><dl>
+<dt><strong>rotate_metod: str</strong></dt><dd><div class="line-block">
+<div class="line">None : ‘none’</div>
+<div class="line">Kabsch : ‘kabsch’</div>
+<div class="line">Quaternion : ‘quaternion’</div>
+</div>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="qmlearn.drivers.core.minimize_rmsd_operation">
+<span class="sig-prename descclassname"><span class="pre">qmlearn.drivers.core.</span></span><span class="sig-name descname"><span class="pre">minimize_rmsd_operation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">target</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">atoms</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stereo</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rotate_method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'kabsch'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reorder_method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'hungarian'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_reflection</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.2</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qmlearn/drivers/core.html#minimize_rmsd_operation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qmlearn.drivers.core.minimize_rmsd_operation" title="Permalink to this definition">#</a></dt>
+<dd><p>Function to create Rotation Matrix and Translation Vector
+of reference atoms with respect to initialize atoms.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>target</strong><span class="classifier">:obj: ASE atoms object</span></dt><dd><p>References atoms</p>
+</dd>
+<dt><strong>atoms</strong><span class="classifier">:obj: ASE atoms object</span></dt><dd><p>Initialize atoms</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>rotate</strong><span class="classifier">ndarray</span></dt><dd><p>Rotation Matrix</p>
+</dd>
+<dt><strong>translate</strong><span class="classifier">ndarray</span></dt><dd><p>Translation Vector</p>
+</dd>
+<dt><strong>rmsd_final_indices</strong><span class="classifier">ndarry</span></dt><dd><p>Reorderred atom indices</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="qmlearn.drivers.core.reorder_atoms_indices">
+<span class="sig-prename descclassname"><span class="pre">qmlearn.drivers.core.</span></span><span class="sig-name descname"><span class="pre">reorder_atoms_indices</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">target</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">atoms</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reorder_method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'hungarian'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qmlearn/drivers/core.html#reorder_atoms_indices"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qmlearn.drivers.core.reorder_atoms_indices" title="Permalink to this definition">#</a></dt>
+<dd><p>Reorder atoms indices</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>target</strong><span class="classifier">:obj: ASE atoms object</span></dt><dd><p>References atoms</p>
+</dd>
+<dt><strong>atoms</strong><span class="classifier">:obj: ASE atoms object</span></dt><dd><p>Initialize atoms</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>indices</strong><span class="classifier">ndarray</span></dt><dd><p>Reordered atom indices</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="qmlearn.drivers.core.rmsd_coords">
+<span class="sig-prename descclassname"><span class="pre">qmlearn.drivers.core.</span></span><span class="sig-name descname"><span class="pre">rmsd_coords</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">target</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pos</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qmlearn/drivers/core.html#rmsd_coords"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qmlearn.drivers.core.rmsd_coords" title="Permalink to this definition">#</a></dt>
+<dd><p>Function to return RMSD : Root mean square deviation between pos and target atomic positions.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>pos</strong><span class="classifier">:obj: ASE atoms object</span></dt><dd><p>Reference atoms.</p>
+</dd>
+<dt><strong>target</strong><span class="classifier">:obj: ASE atoms object</span></dt><dd><p>Atoms to be transformed (Rotate y/o translate).</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>rmsd</strong><span class="classifier">float</span></dt><dd><p>RMSD between pos and target atomic positions</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-qmlearn.drivers.mol">
+<span id="qmlearn-drivers-mol-module"></span><h2>qmlearn.drivers.mol module<a class="headerlink" href="#module-qmlearn.drivers.mol" title="Permalink to this headline">#</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="qmlearn.drivers.mol.QMMol">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">qmlearn.drivers.mol.</span></span><span class="sig-name descname"><span class="pre">QMMol</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">atoms</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">engine_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'pyscf'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'rks'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">basis</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'6-31g'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">occs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">refatoms</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">engine_options</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">charge</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">engine</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stereo</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rotate_method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'kabsch'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reorder_method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'hungarian'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_reflection</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qmlearn/drivers/mol.html#QMMol"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qmlearn.drivers.mol.QMMol" title="Permalink to this definition">#</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Class to create qmlearn mol object.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Attributes</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><a class="reference internal" href="#qmlearn.drivers.mol.QMMol.atom_naos" title="qmlearn.drivers.mol.QMMol.atom_naos"><code class="xref py py-obj docutils literal notranslate"><span class="pre">atom_naos</span></code></a></dt><dd><p>Number of atomic orbitals.</p>
+</dd>
+<dt><a class="reference internal" href="#qmlearn.drivers.mol.QMMol.rotmat" title="qmlearn.drivers.mol.QMMol.rotmat"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rotmat</span></code></a></dt><dd><p>Rotated density matrix</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Methods</p>
+<table class="longtable table autosummary">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#qmlearn.drivers.mol.QMMol.convert_back" title="qmlearn.drivers.mol.QMMol.convert_back"><code class="xref py py-obj docutils literal notranslate"><span class="pre">convert_back</span></code></a>(y[, prop, rotate, reorder])</p></td>
+<td><p>Function to rotate gamma or forces base on initial coordinates.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#qmlearn.drivers.mol.QMMol.duplicate" title="qmlearn.drivers.mol.QMMol.duplicate"><code class="xref py py-obj docutils literal notranslate"><span class="pre">duplicate</span></code></a>(atoms, **kwargs)</p></td>
+<td><p>Function to create a duplicate image of Atomic coordinates ('refatoms')</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#qmlearn.drivers.mol.QMMol.init" title="qmlearn.drivers.mol.QMMol.init"><code class="xref py py-obj docutils literal notranslate"><span class="pre">init</span></code></a>()</p></td>
+<td><p>Function to initialize qmlearn object.</p></td>
+</tr>
+</tbody>
+</table>
+<table class="table">
+<colgroup>
+<col style="width: 41%" />
+<col style="width: 59%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><strong>run</strong></p></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<dl class="py property">
+<dt class="sig sig-object py" id="qmlearn.drivers.mol.QMMol.atom_naos">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">atom_naos</span></span><a class="headerlink" href="#qmlearn.drivers.mol.QMMol.atom_naos" title="Permalink to this definition">#</a></dt>
+<dd><p>Number of atomic orbitals.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qmlearn.drivers.mol.QMMol.convert_back">
+<span class="sig-name descname"><span class="pre">convert_back</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prop</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'gamma'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rotate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reorder</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qmlearn/drivers/mol.html#QMMol.convert_back"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qmlearn.drivers.mol.QMMol.convert_back" title="Permalink to this definition">#</a></dt>
+<dd><p>Function to rotate gamma or forces base on initial coordinates.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl>
+<dt><strong>pro</strong><span class="classifier">str</span></dt><dd><p>Options</p>
+<div class="line-block">
+<div class="line">1-RDM : ‘gamma’</div>
+<div class="line">Forces : ‘forces’</div>
+</div>
+</dd>
+<dt><strong>y</strong><span class="classifier">ndarray</span></dt><dd><p>Predicted gamma or forces matrix to be rotated.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>y</strong><span class="classifier">ndarray</span></dt><dd><p>Rotated gamma or forces matrix.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qmlearn.drivers.mol.QMMol.duplicate">
+<span class="sig-name descname"><span class="pre">duplicate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">atoms</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qmlearn/drivers/mol.html#QMMol.duplicate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qmlearn.drivers.mol.QMMol.duplicate" title="Permalink to this definition">#</a></dt>
+<dd><p>Function to create a duplicate image of Atomic coordinates (‘refatoms’)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>atoms</strong><span class="classifier">:obj: PySCF or ASE atom object</span></dt><dd><p>Molecular geometry</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>obj</strong><span class="classifier">:obj: PySCF or ASE atom object</span></dt><dd><p>Reference atoms.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="qmlearn.drivers.mol.QMMol.engine_calcs">
+<span class="sig-name descname"><span class="pre">engine_calcs</span></span><em class="property"> <span class="pre">=</span> <span class="pre">['calc_gamma',</span> <span class="pre">'calc_ncharge',</span> <span class="pre">'calc_etotal',</span> <span class="pre">'calc_etotal2',</span> <span class="pre">'calc_ke',</span> <span class="pre">'calc_dipole',</span> <span class="pre">'calc_quadrupole',</span> <span class="pre">'calc_forces',</span> <span class="pre">'calc_idempotency',</span> <span class="pre">'rotation2rotmat',</span> <span class="pre">'get_atom_naos',</span> <span class="pre">'vext',</span> <span class="pre">'ovlp',</span> <span class="pre">'nao']</span></em><a class="headerlink" href="#qmlearn.drivers.mol.QMMol.engine_calcs" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qmlearn.drivers.mol.QMMol.init">
+<span class="sig-name descname"><span class="pre">init</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/qmlearn/drivers/mol.html#QMMol.init"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qmlearn.drivers.mol.QMMol.init" title="Permalink to this definition">#</a></dt>
+<dd><p>Function to initialize qmlearn object.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl>
+<dt><strong>atoms</strong><span class="classifier">:obj: PySCF or ASE atom object</span></dt><dd><p>Molecular geometry</p>
+</dd>
+<dt><strong>engine_name</strong><span class="classifier">str</span></dt><dd><p>Options:</p>
+<div class="line-block">
+<div class="line">PySCF (Default) : ‘pyscf’</div>
+<div class="line">Psi4 : ‘psi4’</div>
+</div>
+</dd>
+<dt><strong>method</strong><span class="classifier">str</span></dt><dd></dd>
+<dt><strong>PySCF:</strong></dt><dd><div class="line-block">
+<div class="line">DFT : ‘dft’</div>
+<div class="line">HF : ‘hf’</div>
+<div class="line">RKS : ‘rks’</div>
+<div class="line">RHF : ‘rhf</div>
+<div class="line">MP2 : ‘mp2’</div>
+<div class="line">CISD : ‘cisd’</div>
+<div class="line">FCI : ‘fci’</div>
+</div>
+</dd>
+<dt><strong>Psi4:</strong></dt><dd><div class="line-block">
+<div class="line">HF(‘rhf+hf’)  : ‘hf’</div>
+<div class="line">RHF(‘rhf+hf’) : ‘rhf</div>
+<div class="line">SCF(‘rks+scf’) : ‘scf’</div>
+<div class="line">RKS(‘rks+scf’) : ‘rks’</div>
+<div class="line">MP2(‘rhf+mp2’) : ‘mp2’</div>
+</div>
+</dd>
+<dt><strong>basis</strong><span class="classifier">dict or str</span></dt><dd><p>To define basis set.</p>
+</dd>
+<dt><strong>xc</strong><span class="classifier">dict or str</span></dt><dd><p>To define xchange-correlation functional</p>
+</dd>
+<dt><strong>charge</strong><span class="classifier">int</span></dt><dd><p>Total electronic charge.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qmlearn.drivers.mol.QMMol.rotmat">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">rotmat</span></span><a class="headerlink" href="#qmlearn.drivers.mol.QMMol.rotmat" title="Permalink to this definition">#</a></dt>
+<dd><p>Rotated density matrix</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qmlearn.drivers.mol.QMMol.run">
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qmlearn/drivers/mol.html#QMMol.run"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qmlearn.drivers.mol.QMMol.run" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-qmlearn.drivers.psi4">
+<span id="qmlearn-drivers-psi4-module"></span><h2>qmlearn.drivers.psi4 module<a class="headerlink" href="#module-qmlearn.drivers.psi4" title="Permalink to this headline">#</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="qmlearn.drivers.psi4.EnginePsi4">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">qmlearn.drivers.psi4.</span></span><span class="sig-name descname"><span class="pre">EnginePsi4</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qmlearn/drivers/psi4.html#EnginePsi4"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qmlearn.drivers.psi4.EnginePsi4" title="Permalink to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#qmlearn.drivers.core.Engine" title="qmlearn.drivers.core.Engine"><code class="xref py py-class docutils literal notranslate"><span class="pre">qmlearn.drivers.core.Engine</span></code></a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Attributes</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>eri</strong></dt><dd></dd>
+<dt><code class="xref py py-obj docutils literal notranslate"><span class="pre">etotal</span></code></dt><dd><p>Total Energy.</p>
+</dd>
+<dt><code class="xref py py-obj docutils literal notranslate"><span class="pre">forces</span></code></dt><dd><p>Atomic Forces.</p>
+</dd>
+<dt><code class="xref py py-obj docutils literal notranslate"><span class="pre">gamma</span></code></dt><dd><p>1-body reduced density matrix (1-RDM).</p>
+</dd>
+<dt><code class="xref py py-obj docutils literal notranslate"><span class="pre">gammat</span></code></dt><dd><p>2-body reduced density matrix (2-RDM).</p>
+</dd>
+<dt><a class="reference internal" href="#qmlearn.drivers.psi4.EnginePsi4.kop" title="qmlearn.drivers.psi4.EnginePsi4.kop"><code class="xref py py-obj docutils literal notranslate"><span class="pre">kop</span></code></a></dt><dd><p>Kinetic Energy Operator.</p>
+</dd>
+<dt><code class="xref py py-obj docutils literal notranslate"><span class="pre">ncharge0</span></code></dt><dd><p>Calculated number of electrons.</p>
+</dd>
+<dt><strong>nelectron</strong></dt><dd></dd>
+<dt><a class="reference internal" href="#qmlearn.drivers.psi4.EnginePsi4.ovlp" title="qmlearn.drivers.psi4.EnginePsi4.ovlp"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ovlp</span></code></a></dt><dd><p>Overlap Matrix.</p>
+</dd>
+<dt><a class="reference internal" href="#qmlearn.drivers.psi4.EnginePsi4.vext" title="qmlearn.drivers.psi4.EnginePsi4.vext"><code class="xref py py-obj docutils literal notranslate"><span class="pre">vext</span></code></a></dt><dd><p>External Potential.</p>
+</dd>
+<dt><strong>xcfunc</strong></dt><dd></dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Methods</p>
+<table class="longtable table autosummary">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#qmlearn.drivers.psi4.EnginePsi4.calc_gamma" title="qmlearn.drivers.psi4.EnginePsi4.calc_gamma"><code class="xref py py-obj docutils literal notranslate"><span class="pre">calc_gamma</span></code></a>([orb, occs])</p></td>
+<td><p>Calculate the 1-body reduced density matrix (1-RDM).</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">calc_idempotency</span></code>(gamma[, ovlp, kind])</p></td>
+<td><p>Check idempotency of gamma</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">calc_ke</span></code>(gamma[, kop])</p></td>
+<td><p>Get Total kinetic energy</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">calc_ncharge</span></code>(gamma[, ovlp])</p></td>
+<td><p>Get calculated total number of electrons</p></td>
+</tr>
+</tbody>
+</table>
+<table class="table">
+<colgroup>
+<col style="width: 73%" />
+<col style="width: 27%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><strong>calc_dipole</strong></p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p><strong>calc_etotal</strong></p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p><strong>calc_exc</strong></p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p><strong>calc_quadrupole</strong></p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p><strong>calc_quadrupole_nuclear</strong></p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p><strong>init</strong></p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p><strong>init_mol</strong></p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p><strong>run</strong></p></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt class="sig sig-object py" id="qmlearn.drivers.psi4.EnginePsi4.calc_dipole">
+<span class="sig-name descname"><span class="pre">calc_dipole</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gamma</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qmlearn/drivers/psi4.html#EnginePsi4.calc_dipole"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qmlearn.drivers.psi4.EnginePsi4.calc_dipole" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qmlearn.drivers.psi4.EnginePsi4.calc_etotal">
+<span class="sig-name descname"><span class="pre">calc_etotal</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gamma</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qmlearn/drivers/psi4.html#EnginePsi4.calc_etotal"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qmlearn.drivers.psi4.EnginePsi4.calc_etotal" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qmlearn.drivers.psi4.EnginePsi4.calc_exc">
+<span class="sig-name descname"><span class="pre">calc_exc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gamma</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qmlearn/drivers/psi4.html#EnginePsi4.calc_exc"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qmlearn.drivers.psi4.EnginePsi4.calc_exc" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qmlearn.drivers.psi4.EnginePsi4.calc_gamma">
+<span class="sig-name descname"><span class="pre">calc_gamma</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">orb</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">occs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qmlearn/drivers/psi4.html#EnginePsi4.calc_gamma"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qmlearn.drivers.psi4.EnginePsi4.calc_gamma" title="Permalink to this definition">#</a></dt>
+<dd><p>Calculate the 1-body reduced density matrix (1-RDM).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>orb</strong><span class="classifier">ndarray</span></dt><dd><p>Orbital Coefficients. Each column is one orbital</p>
+</dd>
+<dt><strong>occs</strong><span class="classifier">ndarray</span></dt><dd><p>Occupancy</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>1-RDM</strong><span class="classifier">ndarray</span></dt><dd></dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qmlearn.drivers.psi4.EnginePsi4.calc_quadrupole">
+<span class="sig-name descname"><span class="pre">calc_quadrupole</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gamma</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">traceless</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qmlearn/drivers/psi4.html#EnginePsi4.calc_quadrupole"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qmlearn.drivers.psi4.EnginePsi4.calc_quadrupole" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qmlearn.drivers.psi4.EnginePsi4.calc_quadrupole_nuclear">
+<span class="sig-name descname"><span class="pre">calc_quadrupole_nuclear</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qmlearn/drivers/psi4.html#EnginePsi4.calc_quadrupole_nuclear"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qmlearn.drivers.psi4.EnginePsi4.calc_quadrupole_nuclear" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qmlearn.drivers.psi4.EnginePsi4.eri">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">eri</span></span><a class="headerlink" href="#qmlearn.drivers.psi4.EnginePsi4.eri" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qmlearn.drivers.psi4.EnginePsi4.init">
+<span class="sig-name descname"><span class="pre">init</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qmlearn/drivers/psi4.html#EnginePsi4.init"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qmlearn.drivers.psi4.EnginePsi4.init" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qmlearn.drivers.psi4.EnginePsi4.init_mol">
+<span class="sig-name descname"><span class="pre">init_mol</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mol</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">basis</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qmlearn/drivers/psi4.html#EnginePsi4.init_mol"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qmlearn.drivers.psi4.EnginePsi4.init_mol" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qmlearn.drivers.psi4.EnginePsi4.kop">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">kop</span></span><a class="headerlink" href="#qmlearn.drivers.psi4.EnginePsi4.kop" title="Permalink to this definition">#</a></dt>
+<dd><p>Kinetic Energy Operator.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qmlearn.drivers.psi4.EnginePsi4.nelectron">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">nelectron</span></span><a class="headerlink" href="#qmlearn.drivers.psi4.EnginePsi4.nelectron" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qmlearn.drivers.psi4.EnginePsi4.ovlp">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">ovlp</span></span><a class="headerlink" href="#qmlearn.drivers.psi4.EnginePsi4.ovlp" title="Permalink to this definition">#</a></dt>
+<dd><p>Overlap Matrix.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qmlearn.drivers.psi4.EnginePsi4.run">
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ao_repr</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qmlearn/drivers/psi4.html#EnginePsi4.run"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qmlearn.drivers.psi4.EnginePsi4.run" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qmlearn.drivers.psi4.EnginePsi4.vext">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">vext</span></span><a class="headerlink" href="#qmlearn.drivers.psi4.EnginePsi4.vext" title="Permalink to this definition">#</a></dt>
+<dd><p>External Potential.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qmlearn.drivers.psi4.EnginePsi4.xcfunc">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">xcfunc</span></span><a class="headerlink" href="#qmlearn.drivers.psi4.EnginePsi4.xcfunc" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-qmlearn.drivers.pyscf">
+<span id="qmlearn-drivers-pyscf-module"></span><h2>qmlearn.drivers.pyscf module<a class="headerlink" href="#module-qmlearn.drivers.pyscf" title="Permalink to this headline">#</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="qmlearn.drivers.pyscf.EnginePyscf">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">qmlearn.drivers.pyscf.</span></span><span class="sig-name descname"><span class="pre">EnginePyscf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qmlearn/drivers/pyscf.html#EnginePyscf"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qmlearn.drivers.pyscf.EnginePyscf" title="Permalink to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#qmlearn.drivers.core.Engine" title="qmlearn.drivers.core.Engine"><code class="xref py py-class docutils literal notranslate"><span class="pre">qmlearn.drivers.core.Engine</span></code></a></p>
+<p>PySCF calculator</p>
+<dl class="field-list simple">
+<dt class="field-odd">Attributes</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><a class="reference internal" href="#qmlearn.drivers.pyscf.EnginePyscf.etotal" title="qmlearn.drivers.pyscf.EnginePyscf.etotal"><code class="xref py py-obj docutils literal notranslate"><span class="pre">etotal</span></code></a></dt><dd><p>Total Energy.</p>
+</dd>
+<dt><a class="reference internal" href="#qmlearn.drivers.pyscf.EnginePyscf.forces" title="qmlearn.drivers.pyscf.EnginePyscf.forces"><code class="xref py py-obj docutils literal notranslate"><span class="pre">forces</span></code></a></dt><dd><p>Atomic Forces.</p>
+</dd>
+<dt><a class="reference internal" href="#qmlearn.drivers.pyscf.EnginePyscf.gamma" title="qmlearn.drivers.pyscf.EnginePyscf.gamma"><code class="xref py py-obj docutils literal notranslate"><span class="pre">gamma</span></code></a></dt><dd><p>1-body reduced density matrix (1-RDM).</p>
+</dd>
+<dt><a class="reference internal" href="#qmlearn.drivers.pyscf.EnginePyscf.gammat" title="qmlearn.drivers.pyscf.EnginePyscf.gammat"><code class="xref py py-obj docutils literal notranslate"><span class="pre">gammat</span></code></a></dt><dd><p>2-body reduced density matrix (2-RDM).</p>
+</dd>
+<dt><a class="reference internal" href="#qmlearn.drivers.pyscf.EnginePyscf.kop" title="qmlearn.drivers.pyscf.EnginePyscf.kop"><code class="xref py py-obj docutils literal notranslate"><span class="pre">kop</span></code></a></dt><dd><p>Kinetic Energy Operator.</p>
+</dd>
+<dt><a class="reference internal" href="#qmlearn.drivers.pyscf.EnginePyscf.nao" title="qmlearn.drivers.pyscf.EnginePyscf.nao"><code class="xref py py-obj docutils literal notranslate"><span class="pre">nao</span></code></a></dt><dd><p>Natural atomic orbitals.</p>
+</dd>
+<dt><code class="xref py py-obj docutils literal notranslate"><span class="pre">ncharge0</span></code></dt><dd><p>Calculated number of electrons.</p>
+</dd>
+<dt><a class="reference internal" href="#qmlearn.drivers.pyscf.EnginePyscf.nelectron" title="qmlearn.drivers.pyscf.EnginePyscf.nelectron"><code class="xref py py-obj docutils literal notranslate"><span class="pre">nelectron</span></code></a></dt><dd><p>Total number of electrons.</p>
+</dd>
+<dt><a class="reference internal" href="#qmlearn.drivers.pyscf.EnginePyscf.ovlp" title="qmlearn.drivers.pyscf.EnginePyscf.ovlp"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ovlp</span></code></a></dt><dd><p>Overlap Matrix.</p>
+</dd>
+<dt><a class="reference internal" href="#qmlearn.drivers.pyscf.EnginePyscf.vext" title="qmlearn.drivers.pyscf.EnginePyscf.vext"><code class="xref py py-obj docutils literal notranslate"><span class="pre">vext</span></code></a></dt><dd><p>External Potential.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Methods</p>
+<table class="longtable table autosummary">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#qmlearn.drivers.pyscf.EnginePyscf.calc_dipole" title="qmlearn.drivers.pyscf.EnginePyscf.calc_dipole"><code class="xref py py-obj docutils literal notranslate"><span class="pre">calc_dipole</span></code></a>(gamma, **kwargs)</p></td>
+<td><p>Get the total dipole moment.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#qmlearn.drivers.pyscf.EnginePyscf.calc_etotal" title="qmlearn.drivers.pyscf.EnginePyscf.calc_etotal"><code class="xref py py-obj docutils literal notranslate"><span class="pre">calc_etotal</span></code></a>(gamma, **kwargs)</p></td>
+<td><p>Get the total electronic energy based on 1-RDM.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#qmlearn.drivers.pyscf.EnginePyscf.calc_etotal2" title="qmlearn.drivers.pyscf.EnginePyscf.calc_etotal2"><code class="xref py py-obj docutils literal notranslate"><span class="pre">calc_etotal2</span></code></a>(gammat[, gamma1])</p></td>
+<td><p>Get the total electronic energy based on 2-RDM.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#qmlearn.drivers.pyscf.EnginePyscf.calc_forces" title="qmlearn.drivers.pyscf.EnginePyscf.calc_forces"><code class="xref py py-obj docutils literal notranslate"><span class="pre">calc_forces</span></code></a>(gamma, **kwargs)</p></td>
+<td><p>Function to calculate Forces with a given 1-RDM</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#qmlearn.drivers.pyscf.EnginePyscf.calc_gamma" title="qmlearn.drivers.pyscf.EnginePyscf.calc_gamma"><code class="xref py py-obj docutils literal notranslate"><span class="pre">calc_gamma</span></code></a>([orb, occs])</p></td>
+<td><p>Calculate the 1-body reduced density matrix (1-RDM).</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">calc_idempotency</span></code>(gamma[, ovlp, kind])</p></td>
+<td><p>Check idempotency of gamma</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">calc_ke</span></code>(gamma[, kop])</p></td>
+<td><p>Get Total kinetic energy</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">calc_ncharge</span></code>(gamma[, ovlp])</p></td>
+<td><p>Get calculated total number of electrons</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#qmlearn.drivers.pyscf.EnginePyscf.calc_quadrupole" title="qmlearn.drivers.pyscf.EnginePyscf.calc_quadrupole"><code class="xref py py-obj docutils literal notranslate"><span class="pre">calc_quadrupole</span></code></a>(gamma[, traceless])</p></td>
+<td><p>Function to calculate the total quadruple for XX, XY, XY, YY, YZ, ZZ components.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#qmlearn.drivers.pyscf.EnginePyscf.calc_quadrupole_nuclear" title="qmlearn.drivers.pyscf.EnginePyscf.calc_quadrupole_nuclear"><code class="xref py py-obj docutils literal notranslate"><span class="pre">calc_quadrupole_nuclear</span></code></a>([mol])</p></td>
+<td><p>Function to calculate the nuclear quadruple for XX, XY, XY, YY, YZ, ZZ components.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#qmlearn.drivers.pyscf.EnginePyscf.init" title="qmlearn.drivers.pyscf.EnginePyscf.init"><code class="xref py py-obj docutils literal notranslate"><span class="pre">init</span></code></a>(**kwargs)</p></td>
+<td><p>Function to initialize mf PySCF object</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#qmlearn.drivers.pyscf.EnginePyscf.init_mol" title="qmlearn.drivers.pyscf.EnginePyscf.init_mol"><code class="xref py py-obj docutils literal notranslate"><span class="pre">init_mol</span></code></a>(mol, basis[, charge])</p></td>
+<td><p>Function to create PySCF atom object</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#qmlearn.drivers.pyscf.EnginePyscf.rotation2rotmat" title="qmlearn.drivers.pyscf.EnginePyscf.rotation2rotmat"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rotation2rotmat</span></code></a>(rotation[, mol])</p></td>
+<td><p>Function to rotate the density matrix.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#qmlearn.drivers.pyscf.EnginePyscf.run" title="qmlearn.drivers.pyscf.EnginePyscf.run"><code class="xref py py-obj docutils literal notranslate"><span class="pre">run</span></code></a>([properties, ao_repr])</p></td>
+<td><p>Caculate electronic properties using PySCF.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#qmlearn.drivers.pyscf.EnginePyscf.run_forces" title="qmlearn.drivers.pyscf.EnginePyscf.run_forces"><code class="xref py py-obj docutils literal notranslate"><span class="pre">run_forces</span></code></a>(**kwargs)</p></td>
+<td><p>Function to calculate Forces with calculated 1-RDM</p></td>
+</tr>
+</tbody>
+</table>
+<table class="table">
+<colgroup>
+<col style="width: 63%" />
+<col style="width: 37%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><strong>get_atom_naos</strong></p></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt class="sig sig-object py" id="qmlearn.drivers.pyscf.EnginePyscf.calc_dipole">
+<span class="sig-name descname"><span class="pre">calc_dipole</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gamma</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qmlearn/drivers/pyscf.html#EnginePyscf.calc_dipole"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qmlearn.drivers.pyscf.EnginePyscf.calc_dipole" title="Permalink to this definition">#</a></dt>
+<dd><p>Get the total dipole moment.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>gamma</strong><span class="classifier">ndarray</span></dt><dd><p>1-RDM</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>dip</strong><span class="classifier">list</span></dt><dd><p>The dipole moment on x, y and z component.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qmlearn.drivers.pyscf.EnginePyscf.calc_etotal">
+<span class="sig-name descname"><span class="pre">calc_etotal</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gamma</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qmlearn/drivers/pyscf.html#EnginePyscf.calc_etotal"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qmlearn.drivers.pyscf.EnginePyscf.calc_etotal" title="Permalink to this definition">#</a></dt>
+<dd><p>Get the total electronic energy based on 1-RDM.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>gamma</strong><span class="classifier">ndarray</span></dt><dd><p>1-RDM</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>etotal</strong><span class="classifier">float</span></dt><dd><p>Total electronic energy.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qmlearn.drivers.pyscf.EnginePyscf.calc_etotal2">
+<span class="sig-name descname"><span class="pre">calc_etotal2</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gammat</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gamma1</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qmlearn/drivers/pyscf.html#EnginePyscf.calc_etotal2"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qmlearn.drivers.pyscf.EnginePyscf.calc_etotal2" title="Permalink to this definition">#</a></dt>
+<dd><p>Get the total electronic energy based on 2-RDM.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>gamma</strong><span class="classifier">ndarray</span></dt><dd><p>1-RDM</p>
+</dd>
+<dt><strong>gammat</strong><span class="classifier">ndarray</span></dt><dd><p>2-RDM</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>etotal</strong><span class="classifier">float</span></dt><dd><p>Total electronic energy.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qmlearn.drivers.pyscf.EnginePyscf.calc_forces">
+<span class="sig-name descname"><span class="pre">calc_forces</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gamma</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qmlearn/drivers/pyscf.html#EnginePyscf.calc_forces"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qmlearn.drivers.pyscf.EnginePyscf.calc_forces" title="Permalink to this definition">#</a></dt>
+<dd><p>Function to calculate Forces with a given 1-RDM</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>gamma</strong><span class="classifier">ndarray</span></dt><dd><p>1-RDM</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>forces</strong><span class="classifier">ndarray</span></dt><dd><p>Total atomic forces for a given 1-RDM.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qmlearn.drivers.pyscf.EnginePyscf.calc_gamma">
+<span class="sig-name descname"><span class="pre">calc_gamma</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">orb</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">occs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qmlearn/drivers/pyscf.html#EnginePyscf.calc_gamma"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qmlearn.drivers.pyscf.EnginePyscf.calc_gamma" title="Permalink to this definition">#</a></dt>
+<dd><p>Calculate the 1-body reduced density matrix (1-RDM).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>orb</strong><span class="classifier">ndarray</span></dt><dd><p>Orbital Coefficients. Each column is one orbital</p>
+</dd>
+<dt><strong>occs</strong><span class="classifier">ndarray</span></dt><dd><p>Occupancy</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>1-RDM</strong><span class="classifier">ndarray</span></dt><dd></dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qmlearn.drivers.pyscf.EnginePyscf.calc_quadrupole">
+<span class="sig-name descname"><span class="pre">calc_quadrupole</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gamma</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">traceless</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qmlearn/drivers/pyscf.html#EnginePyscf.calc_quadrupole"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qmlearn.drivers.pyscf.EnginePyscf.calc_quadrupole" title="Permalink to this definition">#</a></dt>
+<dd><p>Function to calculate the total quadruple for XX, XY, XY, YY, YZ, ZZ components.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>gamma</strong><span class="classifier">ndarray</span></dt><dd><p>1-RDM</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>quadrupol</strong><span class="classifier">ndarray</span></dt><dd><p>An array containing a quadruple per component.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qmlearn.drivers.pyscf.EnginePyscf.calc_quadrupole_nuclear">
+<span class="sig-name descname"><span class="pre">calc_quadrupole_nuclear</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qmlearn/drivers/pyscf.html#EnginePyscf.calc_quadrupole_nuclear"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qmlearn.drivers.pyscf.EnginePyscf.calc_quadrupole_nuclear" title="Permalink to this definition">#</a></dt>
+<dd><p>Function to calculate the nuclear quadruple for XX, XY, XY, YY, YZ, ZZ components.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>gamma</strong><span class="classifier">ndarray</span></dt><dd><p>1-RDM</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>quadrupol</strong><span class="classifier">ndarray</span></dt><dd><p>An array containing the nuclear quadruple per component.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qmlearn.drivers.pyscf.EnginePyscf.etotal">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">etotal</span></span><a class="headerlink" href="#qmlearn.drivers.pyscf.EnginePyscf.etotal" title="Permalink to this definition">#</a></dt>
+<dd><p>Total Energy.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qmlearn.drivers.pyscf.EnginePyscf.forces">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">forces</span></span><a class="headerlink" href="#qmlearn.drivers.pyscf.EnginePyscf.forces" title="Permalink to this definition">#</a></dt>
+<dd><p>Atomic Forces.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qmlearn.drivers.pyscf.EnginePyscf.gamma">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">gamma</span></span><a class="headerlink" href="#qmlearn.drivers.pyscf.EnginePyscf.gamma" title="Permalink to this definition">#</a></dt>
+<dd><p>1-body reduced density matrix (1-RDM).</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qmlearn.drivers.pyscf.EnginePyscf.gammat">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">gammat</span></span><a class="headerlink" href="#qmlearn.drivers.pyscf.EnginePyscf.gammat" title="Permalink to this definition">#</a></dt>
+<dd><p>2-body reduced density matrix (2-RDM).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qmlearn.drivers.pyscf.EnginePyscf.get_atom_naos">
+<span class="sig-name descname"><span class="pre">get_atom_naos</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qmlearn/drivers/pyscf.html#EnginePyscf.get_atom_naos"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qmlearn.drivers.pyscf.EnginePyscf.get_atom_naos" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qmlearn.drivers.pyscf.EnginePyscf.init">
+<span class="sig-name descname"><span class="pre">init</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qmlearn/drivers/pyscf.html#EnginePyscf.init"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qmlearn.drivers.pyscf.EnginePyscf.init" title="Permalink to this definition">#</a></dt>
+<dd><p>Function to initialize mf PySCF object</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl>
+<dt><strong>mol</strong><span class="classifier">:obj: PySCF or ASE atom object</span></dt><dd><p>Molecular geometry</p>
+</dd>
+<dt><strong>basis</strong><span class="classifier">dict or str</span></dt><dd><p>To define basis set.</p>
+</dd>
+<dt><strong>xc</strong><span class="classifier">dict or str</span></dt><dd><p>To define xchange-correlation functional</p>
+</dd>
+<dt><strong>verbose :int</strong></dt><dd><p>Printing level</p>
+</dd>
+<dt><strong>method</strong><span class="classifier">str</span></dt><dd><div class="line-block">
+<div class="line">DFT : ‘dft’</div>
+<div class="line">HF : ‘hf’</div>
+<div class="line">RKS : ‘rks’</div>
+<div class="line">RHF : ‘rhf</div>
+<div class="line">MP2 : ‘mp2’</div>
+<div class="line">CISD : ‘cisd’</div>
+<div class="line">FCI : ‘fci’</div>
+</div>
+</dd>
+<dt><strong>charge</strong><span class="classifier">int</span></dt><dd><p>Total charge of the molecule</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qmlearn.drivers.pyscf.EnginePyscf.init_mol">
+<span class="sig-name descname"><span class="pre">init_mol</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mol</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">basis</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">charge</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qmlearn/drivers/pyscf.html#EnginePyscf.init_mol"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qmlearn.drivers.pyscf.EnginePyscf.init_mol" title="Permalink to this definition">#</a></dt>
+<dd><p>Function to create PySCF atom object</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl>
+<dt><strong>mol</strong><span class="classifier">list or str (From PySCF) or ASE atom object</span></dt><dd><p>To define molecluar structure.  The internal format is</p>
+<div class="line-block">
+<div class="line">atom = [[atom1, (x, y, z)],</div>
+<div class="line-block">
+<div class="line">[atom2, (x, y, z)],</div>
+<div class="line">…</div>
+<div class="line">[atomN, (x, y, z)]]</div>
+</div>
+</div>
+</dd>
+<dt><strong>basis:  dict or str</strong></dt><dd><p>To define basis set.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>atoms</strong><span class="classifier">:obj: PySCF atom object</span></dt><dd><p>Molecular Structure, basis, and charge definition into gto PySCF atom object</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qmlearn.drivers.pyscf.EnginePyscf.kop">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">kop</span></span><a class="headerlink" href="#qmlearn.drivers.pyscf.EnginePyscf.kop" title="Permalink to this definition">#</a></dt>
+<dd><p>Kinetic Energy Operator.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qmlearn.drivers.pyscf.EnginePyscf.nao">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">nao</span></span><a class="headerlink" href="#qmlearn.drivers.pyscf.EnginePyscf.nao" title="Permalink to this definition">#</a></dt>
+<dd><p>Natural atomic orbitals.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qmlearn.drivers.pyscf.EnginePyscf.nelectron">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">nelectron</span></span><a class="headerlink" href="#qmlearn.drivers.pyscf.EnginePyscf.nelectron" title="Permalink to this definition">#</a></dt>
+<dd><p>Total number of electrons.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qmlearn.drivers.pyscf.EnginePyscf.ovlp">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">ovlp</span></span><a class="headerlink" href="#qmlearn.drivers.pyscf.EnginePyscf.ovlp" title="Permalink to this definition">#</a></dt>
+<dd><p>Overlap Matrix.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qmlearn.drivers.pyscf.EnginePyscf.rotation2rotmat">
+<span class="sig-name descname"><span class="pre">rotation2rotmat</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rotation</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qmlearn/drivers/pyscf.html#EnginePyscf.rotation2rotmat"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qmlearn.drivers.pyscf.EnginePyscf.rotation2rotmat" title="Permalink to this definition">#</a></dt>
+<dd><p>Function to rotate the density matrix.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>rotation</strong><span class="classifier">ndarray</span></dt><dd><p>Rotation Matrix</p>
+</dd>
+<dt><strong>mol</strong><span class="classifier">:obj: PySCF mol object</span></dt><dd><p>Molecluar structure</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>rotmat</strong><span class="classifier">ndarray</span></dt><dd></dd>
+<dt>Rotated density matrix</dt><dd></dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qmlearn.drivers.pyscf.EnginePyscf.run">
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">properties</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">('energy',</span> <span class="pre">'forces')</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ao_repr</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qmlearn/drivers/pyscf.html#EnginePyscf.run"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qmlearn.drivers.pyscf.EnginePyscf.run" title="Permalink to this definition">#</a></dt>
+<dd><p>Caculate electronic properties using PySCF.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl>
+<dt><strong>properties</strong><span class="classifier">str</span></dt><dd><div class="line-block">
+<div class="line">Total electronic energy : ‘energy’</div>
+<div class="line">Total atomic forces : ‘forces’</div>
+</div>
+</dd>
+<dt><strong>If ‘energy’ is choosen the following properties are also calculated:</strong></dt><dd><div class="line-block">
+<div class="line">1-RDM (1-body reduced density matrix) : ‘gamma’</div>
+<div class="line">2-RDM (2-body reduced density matrix) : ‘gammat’</div>
+<div class="line">Occupation number : ‘occs’</div>
+<div class="line">Molecular orbitals : ‘orb’</div>
+</div>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qmlearn.drivers.pyscf.EnginePyscf.run_forces">
+<span class="sig-name descname"><span class="pre">run_forces</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qmlearn/drivers/pyscf.html#EnginePyscf.run_forces"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qmlearn.drivers.pyscf.EnginePyscf.run_forces" title="Permalink to this definition">#</a></dt>
+<dd><p>Function to calculate Forces with calculated 1-RDM</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>forces</strong><span class="classifier">ndarray</span></dt><dd><p>Total atomic forces.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="qmlearn.drivers.pyscf.EnginePyscf.vext">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">vext</span></span><a class="headerlink" href="#qmlearn.drivers.pyscf.EnginePyscf.vext" title="Permalink to this definition">#</a></dt>
+<dd><p>External Potential.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="qmlearn.drivers.pyscf.gamma2gamma">
+<span class="sig-prename descclassname"><span class="pre">qmlearn.drivers.pyscf.</span></span><span class="sig-name descname"><span class="pre">gamma2gamma</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qmlearn/drivers/pyscf.html#gamma2gamma"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qmlearn.drivers.pyscf.gamma2gamma" title="Permalink to this definition">#</a></dt>
+<dd><p>Function two assure 1-RDM to be the predicted one.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>gamma</strong><span class="classifier">ndarray</span></dt><dd><p>1-RDM</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="qmlearn.drivers.pyscf.gamma2rdm1e">
+<span class="sig-prename descclassname"><span class="pre">qmlearn.drivers.pyscf.</span></span><span class="sig-name descname"><span class="pre">gamma2rdm1e</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mf</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qmlearn/drivers/pyscf.html#gamma2rdm1e"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qmlearn.drivers.pyscf.gamma2rdm1e" title="Permalink to this definition">#</a></dt>
+<dd><p>Function to calculate the energy density matrix (1-RDMe).</p>
+<div class="math">
+<p><img src="_images/math/b9cab5dec5b2b98c8b62ecdf3384562df61ca9b2.png" alt="\hat{D} = \sum_{i=1}^{occ} \epsilon_{i} \left|i\right&gt; \left&lt; i \right| \\
+\left&lt; \mu |\hat{D}| \nu \right&gt; = \sum_{\sigma \tau} F_{\mu \sigma} S_{\sigma \tau}^{-1} P_{\tau \mu}"/></p>
+</div><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>mf</strong><span class="classifier">:obj: PySCF object</span></dt><dd><p>SCF class of PySCF</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>dm1e</strong><span class="classifier">ndarray</span></dt><dd><p>Energy density matrix</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="qmlearn.drivers.pyscf.get_atom_naos">
+<span class="sig-prename descclassname"><span class="pre">qmlearn.drivers.pyscf.</span></span><span class="sig-name descname"><span class="pre">get_atom_naos</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mol</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qmlearn/drivers/pyscf.html#get_atom_naos"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qmlearn.drivers.pyscf.get_atom_naos" title="Permalink to this definition">#</a></dt>
+<dd><p>Function to get the number of atomic orbitals for a given angular momentum.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>mol</strong><span class="classifier">:obj: PySCF mol object</span></dt><dd><p>Molecluar structure.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>naos</strong><span class="classifier">ndarray</span></dt><dd><p>Number of atomic orbitals.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="qmlearn.drivers.pyscf.rotation2rotmat">
+<span class="sig-prename descclassname"><span class="pre">qmlearn.drivers.pyscf.</span></span><span class="sig-name descname"><span class="pre">rotation2rotmat</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rotation</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mol</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qmlearn/drivers/pyscf.html#rotation2rotmat"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qmlearn.drivers.pyscf.rotation2rotmat" title="Permalink to this definition">#</a></dt>
+<dd><p>Function to rotate the density matrix.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>rotation</strong><span class="classifier">ndarray</span></dt><dd><p>Rotation Matrix</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>rotmat</strong><span class="classifier">ndarray</span></dt><dd><p>Rotated density matrix</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-qmlearn.drivers">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-qmlearn.drivers" title="Permalink to this headline">#</a></h2>
+</section>
+</section>
+
+
+              </div>
+              
+              
+          </main>
+          
+
+      </div>
+    </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf"></script>
+<footer class="footer mt-5 mt-md-0">
+  <div class="container">
+    
+    <div class="footer-item">
+      <p class="copyright">
+    &copy; Copyright 2022, Jessica A. and Musa.<br>
+</p>
+    </div>
+    
+    <div class="footer-item">
+      <p class="sphinx-version">
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.2.0.<br>
+</p>
+    </div>
+    
+  </div>
+</footer>
+  </body>
+</html>

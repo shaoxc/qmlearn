@@ -22,6 +22,24 @@ methods_pyscf = {
 
 class EnginePyscf(Engine):
     r""" PySCF calculator
+
+    Attributes
+    ----------
+
+    vext : ndarray
+        External Potential.
+    gamma : ndarray
+        1-body reduced density matrix (1-RDM).
+    gammat : ndarray
+        2-body reduced density matrix (2-RDM).
+    etotal : float
+        Total electronic energy (Atomic Units a.u.)
+    forces : ndarray
+        Atomic forces (Atomic Units a.u.)
+    ovlp : ndarray
+        Overlap Matrix.
+    kop : ndarray
+        Kinetic Energy Operator.
     """
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -33,7 +51,7 @@ class EnginePyscf(Engine):
         Parameters
         ----------
         mol : :obj: PySCF or ASE atom object
-            Molecular geometry
+            Molecular geometry. Coordinates in Angstroms.
         basis : dict or str
             To define basis set.
         xc : dict or str

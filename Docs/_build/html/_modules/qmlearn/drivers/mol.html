@@ -13,7 +13,6 @@
         <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
         <script src="../../../_static/jquery.js"></script>
         <script src="../../../_static/underscore.js"></script>
-        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../../../_static/doctools.js"></script>
     <script src="../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
@@ -75,10 +74,65 @@
         <span class="p">}</span>
 
 <div class="viewcode-block" id="QMMol"><a class="viewcode-back" href="../../../qmlearn.drivers.html#qmlearn.drivers.mol.QMMol">[docs]</a><span class="k">class</span> <span class="nc">QMMol</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot; Class to create qmlearn mol object. </span>
+<span class="sd">    </span>
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    atoms : :obj: PySCF or ASE atom object</span>
+<span class="sd">        Molecular geometry</span>
+<span class="sd">    engine_name : str</span>
+<span class="sd">        Options:</span>
+
+<span class="sd">        | PySCF (Default) : &#39;pyscf&#39;</span>
+<span class="sd">        | Psi4 : &#39;psi4&#39;</span>
+
+<span class="sd">    method : str</span>
+
+<span class="sd">        | PySCF:</span>
+<span class="sd">        | DFT : &#39;dft&#39;</span>
+<span class="sd">        | HF : &#39;hf&#39;</span>
+<span class="sd">        | RKS : &#39;rks&#39;</span>
+<span class="sd">        | RHF : &#39;rhf</span>
+<span class="sd">        | MP2 : &#39;mp2&#39;</span>
+<span class="sd">        | CISD : &#39;cisd&#39;</span>
+<span class="sd">        | FCI : &#39;fci&#39;</span>
+
+<span class="sd">        | Psi4:</span>
+<span class="sd">        | HF(&#39;rhf+hf&#39;)  : &#39;hf&#39;</span>
+<span class="sd">        | RHF(&#39;rhf+hf&#39;) : &#39;rhf</span>
+<span class="sd">        | SCF(&#39;rks+scf&#39;) : &#39;scf&#39;</span>
+<span class="sd">        | RKS(&#39;rks+scf&#39;) : &#39;rks&#39;</span>
+<span class="sd">        | MP2(&#39;rhf+mp2&#39;) : &#39;mp2&#39;</span>
+
+<span class="sd">    basis : dict or str</span>
+<span class="sd">        To define basis set.</span>
+<span class="sd">    xc : dict or str</span>
+<span class="sd">        To define xchange-correlation functional</span>
+<span class="sd">    charge : int</span>
+<span class="sd">        Total electronic charge.</span>
+<span class="sd">    rotate_method : str</span>
+<span class="sd">        </span>
+<span class="sd">        | None : &#39;none&#39;</span>
+<span class="sd">        | Kabsch : &#39;kabsch&#39;</span>
+<span class="sd">        | Quaternion : &#39;quaternion&#39;</span>
+
+<span class="sd">    reorder_method : str</span>
+
+<span class="sd">        | &#39;hungarian&#39;</span>
+<span class="sd">        | &#39;inertia-hungarian&#39;</span>
+<span class="sd">        | &#39;brute&#39;</span>
+<span class="sd">        | &#39;distance&#39;</span>
+
+<span class="sd">    use_reflection : bool</span>
+<span class="sd">        If True it applies a reflection on your molecule.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
     <span class="n">engine_calcs</span> <span class="o">=</span> <span class="p">[</span>
             <span class="s1">&#39;calc_gamma&#39;</span><span class="p">,</span>
             <span class="s1">&#39;calc_ncharge&#39;</span><span class="p">,</span>
             <span class="s1">&#39;calc_etotal&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;calc_etotal2&#39;</span><span class="p">,</span>
             <span class="s1">&#39;calc_ke&#39;</span><span class="p">,</span>
             <span class="s1">&#39;calc_dipole&#39;</span><span class="p">,</span>
             <span class="s1">&#39;calc_quadrupole&#39;</span><span class="p">,</span>
@@ -197,6 +251,17 @@
         <span class="k">return</span> <span class="bp">self</span></div>
 
 <div class="viewcode-block" id="QMMol.duplicate"><a class="viewcode-back" href="../../../qmlearn.drivers.html#qmlearn.drivers.mol.QMMol.duplicate">[docs]</a>    <span class="k">def</span> <span class="nf">duplicate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atoms</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot; Function to create a duplicate image of Atomic coordinates (&#39;refatoms&#39;)</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        atoms : :obj: PySCF or ASE atom object</span>
+<span class="sd">            Molecular geometry</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        obj : :obj: PySCF or ASE atom object</span>
+<span class="sd">            Reference atoms. &quot;&quot;&quot;</span>
         <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">init_kwargs</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="k">if</span> <span class="n">k</span> <span class="o">==</span> <span class="s1">&#39;self&#39;</span> <span class="ow">or</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">kwargs</span> <span class="p">:</span>
                 <span class="k">continue</span>
@@ -210,6 +275,7 @@
         <span class="k">return</span> <span class="n">obj</span></div>
 
 <div class="viewcode-block" id="QMMol.run"><a class="viewcode-back" href="../../../qmlearn.drivers.html#qmlearn.drivers.mol.QMMol.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Function to run the External Calculator.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">engine</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
     <span class="k">def</span> <span class="fm">__getattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attr</span><span class="p">):</span>
@@ -224,17 +290,39 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">rotmat</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot; Rotated density matrix &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rotmat</span> <span class="ow">is</span> <span class="kc">None</span> <span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_rotmat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">rotation2rotmat</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">op_rotate</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rotmat</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">atom_naos</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot; Number of atomic orbitals. &quot;&quot;&quot;</span>
+
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_atom_naos</span> <span class="ow">is</span> <span class="kc">None</span> <span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_atom_naos</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_atom_naos</span><span class="p">()</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_atom_naos</span>
 
 <div class="viewcode-block" id="QMMol.convert_back"><a class="viewcode-back" href="../../../qmlearn.drivers.html#qmlearn.drivers.mol.QMMol.convert_back">[docs]</a>    <span class="k">def</span> <span class="nf">convert_back</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">prop</span> <span class="o">=</span> <span class="s1">&#39;gamma&#39;</span><span class="p">,</span> <span class="n">rotate</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">reorder</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot; Function to rotate gamma or forces base on initial coordinates.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        pro : str</span>
+<span class="sd">            Options</span>
+
+<span class="sd">            | 1-RDM : &#39;gamma&#39;</span>
+<span class="sd">            | Forces : &#39;forces&#39;</span>
+
+<span class="sd">        y : ndarray</span>
+<span class="sd">            Predicted gamma or forces matrix to be rotated.</span>
+<span class="sd">        </span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        y : ndarray</span>
+<span class="sd">           Rotated gamma or forces matrix.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">nao</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">nao</span>
         <span class="c1">#</span>
         <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">op_rotate</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">op_rotate_inv</span><span class="p">)</span> <span class="p">:</span> <span class="n">rotate</span> <span class="o">=</span> <span class="kc">False</span>

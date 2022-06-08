@@ -95,6 +95,29 @@
 <em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">qmlearn.io.core.</span></span><span class="sig-name descname"><span class="pre">DB</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'a'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qmlearn/io/core.html#DB"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qmlearn.io.core.DB" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>Abstract base class to create and manipulate database</p>
+<dl class="field-list simple">
+<dt class="field-odd">Attributes</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>group</strong></dt><dd></dd>
+<dt><strong>names</strong></dt><dd></dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Methods</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 62%" />
+<col style="width: 38%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><strong>create_group</strong></p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p><strong>get_group</strong></p></td>
+<td></td>
+</tr>
+</tbody>
+</table>
 <dl class="py method">
 <dt class="sig sig-object py" id="qmlearn.io.core.DB.create_group">
 <span class="sig-name descname"><span class="pre">create_group</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fh</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qmlearn/io/core.html#DB.create_group"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qmlearn.io.core.DB.create_group" title="Permalink to this definition"></a></dt>
@@ -126,22 +149,58 @@
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>Class to create and manipulate database in HDF5 format
 …</p>
-<dl class="simple">
-<dt>filename<span class="classifier">str</span></dt><dd><p>Filename of database.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Attributes</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>filename</strong><span class="classifier">str</span></dt><dd><p>Filename of database.</p>
 </dd>
 </dl>
-<dl class="simple">
-<dt>qmmol()</dt><dd><p>getter and setter for qmmol attribute</p>
-</dd>
-<dt>write_qmmol(self, qmmol = None, name = None, <a href="#id1"><span class="problematic" id="id2">**</span></a>kwargs)</dt><dd><p>write qmmol file to the database</p>
-</dd>
-<dt>get_all_names(self, fh = None, attr = None)</dt><dd><p>returns list of databases from database file</p>
-</dd>
-<dt>read_qmmol(self, name, <a href="#id3"><span class="problematic" id="id4">**</span></a>kwargs)</dt><dd><p>read qmmol from database file and return it.</p>
-</dd>
-<dt>write_properties(self, properties = None, prefix = ‘train’, name = None, <a href="#id5"><span class="problematic" id="id6">**</span></a>kwargs)</dt><dd><p>write properties (i.e. Vext, gamma, energy, forces) to the database</p>
 </dd>
 </dl>
+<p class="rubric">Methods</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#qmlearn.io.hdf5.DBHDF5.get_all_names" title="qmlearn.io.hdf5.DBHDF5.get_all_names"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_all_names</span></code></a>([fh, attr])</p></td>
+<td><p>Return a list of all databases in the database file</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#qmlearn.io.hdf5.DBHDF5.get_names" title="qmlearn.io.hdf5.DBHDF5.get_names"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_names</span></code></a>([name])</p></td>
+<td><p>Return a list of database name based on pattern</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#qmlearn.io.hdf5.DBHDF5.read_images" title="qmlearn.io.hdf5.DBHDF5.read_images"><code class="xref py py-obj docutils literal notranslate"><span class="pre">read_images</span></code></a>([name])</p></td>
+<td><p>Read atomic structure from the database</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#qmlearn.io.hdf5.DBHDF5.read_properties" title="qmlearn.io.hdf5.DBHDF5.read_properties"><code class="xref py py-obj docutils literal notranslate"><span class="pre">read_properties</span></code></a>(name, **kwargs)</p></td>
+<td><p>read properties from database file</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#qmlearn.io.hdf5.DBHDF5.read_qmmol" title="qmlearn.io.hdf5.DBHDF5.read_qmmol"><code class="xref py py-obj docutils literal notranslate"><span class="pre">read_qmmol</span></code></a>(name, **kwargs)</p></td>
+<td><p>read qmmol object from the database</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#qmlearn.io.hdf5.DBHDF5.write_images" title="qmlearn.io.hdf5.DBHDF5.write_images"><code class="xref py py-obj docutils literal notranslate"><span class="pre">write_images</span></code></a>([images, prefix, name])</p></td>
+<td><p>Write atomic structure in the database</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#qmlearn.io.hdf5.DBHDF5.write_properties" title="qmlearn.io.hdf5.DBHDF5.write_properties"><code class="xref py py-obj docutils literal notranslate"><span class="pre">write_properties</span></code></a>([properties, prefix, name])</p></td>
+<td><p>Write properties (i.e.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#qmlearn.io.hdf5.DBHDF5.write_qmmol" title="qmlearn.io.hdf5.DBHDF5.write_qmmol"><code class="xref py py-obj docutils literal notranslate"><span class="pre">write_qmmol</span></code></a>([qmmol, name])</p></td>
+<td><p>Write qmmol object in the database</p></td>
+</tr>
+</tbody>
+</table>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 47%" />
+<col style="width: 53%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><strong>close</strong></p></td>
+<td></td>
+</tr>
+</tbody>
+</table>
 <dl class="py method">
 <dt class="sig sig-object py" id="qmlearn.io.hdf5.DBHDF5.close">
 <span class="sig-name descname"><span class="pre">close</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/qmlearn/io/hdf5.html#DBHDF5.close"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qmlearn.io.hdf5.DBHDF5.close" title="Permalink to this definition"></a></dt>
@@ -151,35 +210,43 @@
 <dt class="sig sig-object py" id="qmlearn.io.hdf5.DBHDF5.get_all_names">
 <span class="sig-name descname"><span class="pre">get_all_names</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fh</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attr</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qmlearn/io/hdf5.html#DBHDF5.get_all_names"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qmlearn.io.hdf5.DBHDF5.get_all_names" title="Permalink to this definition"></a></dt>
 <dd><p>Return a list of all databases in the database file</p>
-<dl class="simple">
-<dt>fh<span class="classifier">obj</span></dt><dd><p>Filehandler object for database file</p>
-</dd>
-<dt>mode<span class="classifier">{‘a’,’r’,’w’} str</span></dt><dd><p>mode of operation (i.e. append, read, or write) for the database</p>
-</dd>
-</dl>
-<blockquote>
-<div><dl class="simple">
-<dt>names<span class="classifier">list</span></dt><dd><p>return list of all database from the database file</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>names</strong><span class="classifier">list</span></dt><dd><p>return list of all database from the database file</p>
 </dd>
 </dl>
-</div></blockquote>
+</dd>
+<dt class="field-even">Attributes</dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>fh</strong><span class="classifier">obj</span></dt><dd><p>Filehandler object for database file</p>
+</dd>
+<dt><strong>mode</strong><span class="classifier">{‘a’,’r’,’w’} str</span></dt><dd><p>mode of operation (i.e. append, read, or write) for the database</p>
+</dd>
+</dl>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="qmlearn.io.hdf5.DBHDF5.get_names">
 <span class="sig-name descname"><span class="pre">get_names</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'*'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qmlearn/io/hdf5.html#DBHDF5.get_names"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qmlearn.io.hdf5.DBHDF5.get_names" title="Permalink to this definition"></a></dt>
 <dd><p>Return a list of database name based on pattern</p>
-<dl class="simple">
-<dt>name<span class="classifier">str</span></dt><dd><p>pattern of database names. 
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>names</strong><span class="classifier">list</span></dt><dd><p>return list of all database from the database file</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Attributes</dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>name</strong><span class="classifier">str</span></dt><dd><p>pattern of database names. 
 Only support ‘*’, ‘?’, ‘[seq]’ and ‘[!seq]’ with fnmatch</p>
 </dd>
 </dl>
-<blockquote>
-<div><dl class="simple">
-<dt>names<span class="classifier">list</span></dt><dd><p>return list of all database from the database file</p>
 </dd>
 </dl>
-</div></blockquote>
 </dd></dl>
 
 <dl class="py property">
@@ -202,12 +269,18 @@ Only support ‘*’, ‘?’, ‘[seq]’ and ‘[!seq]’ with fnmatch</p>
 <dt class="sig sig-object py" id="qmlearn.io.hdf5.DBHDF5.read_images">
 <span class="sig-name descname"><span class="pre">read_images</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qmlearn/io/hdf5.html#DBHDF5.read_images"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qmlearn.io.hdf5.DBHDF5.read_images" title="Permalink to this definition"></a></dt>
 <dd><p>Read atomic structure from the database</p>
-<dl class="simple">
-<dt>name<span class="classifier">str</span></dt><dd><p>name of the database file</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>images</strong><span class="classifier">list</span></dt><dd><p>List of ASE Atoms objects</p>
 </dd>
 </dl>
-<dl class="simple">
-<dt>images<span class="classifier">list</span></dt><dd><p>List of ASE Atoms objects</p>
+</dd>
+<dt class="field-even">Attributes</dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>name</strong><span class="classifier">str</span></dt><dd><p>name of the database file</p>
+</dd>
+</dl>
 </dd>
 </dl>
 </dd></dl>
@@ -216,44 +289,56 @@ Only support ‘*’, ‘?’, ‘[seq]’ and ‘[!seq]’ with fnmatch</p>
 <dt class="sig sig-object py" id="qmlearn.io.hdf5.DBHDF5.read_properties">
 <span class="sig-name descname"><span class="pre">read_properties</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qmlearn/io/hdf5.html#DBHDF5.read_properties"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qmlearn.io.hdf5.DBHDF5.read_properties" title="Permalink to this definition"></a></dt>
 <dd><p>read properties from database file</p>
-<dl class="simple">
-<dt>name<span class="classifier">str</span></dt><dd><p>name of the database file</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>properties</strong><span class="classifier">dict</span></dt><dd><p>return properties as dictionary</p>
 </dd>
 </dl>
-<blockquote>
-<div><dl class="simple">
-<dt>properties<span class="classifier">dict</span></dt><dd><p>return properties as dictionary</p>
+</dd>
+<dt class="field-even">Attributes</dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>name</strong><span class="classifier">str</span></dt><dd><p>name of the database file</p>
 </dd>
 </dl>
-</div></blockquote>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="qmlearn.io.hdf5.DBHDF5.read_qmmol">
 <span class="sig-name descname"><span class="pre">read_qmmol</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qmlearn/io/hdf5.html#DBHDF5.read_qmmol"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qmlearn.io.hdf5.DBHDF5.read_qmmol" title="Permalink to this definition"></a></dt>
 <dd><p>read qmmol object from the database</p>
-<dl class="simple">
-<dt>name<span class="classifier">str</span></dt><dd><p>name of the database file</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>qmmol</strong><span class="classifier">obj</span></dt><dd><p>return qmmol object from the database</p>
 </dd>
 </dl>
-<blockquote>
-<div><dl class="simple">
-<dt>qmmol<span class="classifier">obj</span></dt><dd><p>return qmmol object from the database</p>
+</dd>
+<dt class="field-even">Attributes</dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>name</strong><span class="classifier">str</span></dt><dd><p>name of the database file</p>
 </dd>
 </dl>
-</div></blockquote>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="qmlearn.io.hdf5.DBHDF5.write_images">
 <span class="sig-name descname"><span class="pre">write_images</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">images</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prefix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'train'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qmlearn/io/hdf5.html#DBHDF5.write_images"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qmlearn.io.hdf5.DBHDF5.write_images" title="Permalink to this definition"></a></dt>
 <dd><p>Write atomic structure in the database</p>
-<dl class="simple">
-<dt>images<span class="classifier">list</span></dt><dd><p>List of ASE Atoms objects</p>
+<dl class="field-list simple">
+<dt class="field-odd">Attributes</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>images</strong><span class="classifier">list</span></dt><dd><p>List of ASE Atoms objects</p>
 </dd>
-<dt>prefix<span class="classifier">{‘train’, ‘test’} str</span></dt><dd><p>determine wheter to write properties in the training or testing database</p>
+<dt><strong>prefix</strong><span class="classifier">{‘train’, ‘test’} str</span></dt><dd><p>determine wheter to write properties in the training or testing database</p>
 </dd>
-<dt>name<span class="classifier">str</span></dt><dd><p>name of the database file</p>
+<dt><strong>name</strong><span class="classifier">str</span></dt><dd><p>name of the database file</p>
+</dd>
+</dl>
 </dd>
 </dl>
 </dd></dl>
@@ -262,13 +347,17 @@ Only support ‘*’, ‘?’, ‘[seq]’ and ‘[!seq]’ with fnmatch</p>
 <dt class="sig sig-object py" id="qmlearn.io.hdf5.DBHDF5.write_properties">
 <span class="sig-name descname"><span class="pre">write_properties</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">properties</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prefix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'train'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qmlearn/io/hdf5.html#DBHDF5.write_properties"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qmlearn.io.hdf5.DBHDF5.write_properties" title="Permalink to this definition"></a></dt>
 <dd><p>Write properties (i.e. gamma, energy, forces, Vext) to the database</p>
-<dl class="simple">
-<dt>properties<span class="classifier">dict</span></dt><dd><p>Dictionary of properties calulate with Pyscf, Psi4numpy or any other 
+<dl class="field-list simple">
+<dt class="field-odd">Attributes</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>properties</strong><span class="classifier">dict</span></dt><dd><p>Dictionary of properties calulate with Pyscf, Psi4numpy or any other 
 external engine</p>
 </dd>
-<dt>prefix<span class="classifier">{‘train’, ‘test’} str</span></dt><dd><p>determine wheter to write properties in the training or testing database</p>
+<dt><strong>prefix</strong><span class="classifier">{‘train’, ‘test’} str</span></dt><dd><p>determine wheter to write properties in the training or testing database</p>
 </dd>
-<dt>name<span class="classifier">str</span></dt><dd><p>name of the database file</p>
+<dt><strong>name</strong><span class="classifier">str</span></dt><dd><p>name of the database file</p>
+</dd>
+</dl>
 </dd>
 </dl>
 </dd></dl>
@@ -277,11 +366,15 @@ external engine</p>
 <dt class="sig sig-object py" id="qmlearn.io.hdf5.DBHDF5.write_qmmol">
 <span class="sig-name descname"><span class="pre">write_qmmol</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">qmmol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qmlearn/io/hdf5.html#DBHDF5.write_qmmol"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qmlearn.io.hdf5.DBHDF5.write_qmmol" title="Permalink to this definition"></a></dt>
 <dd><p>Write qmmol object in the database</p>
-<dl class="simple">
-<dt>qmmol<span class="classifier">obj</span></dt><dd><p>qmmol object. raise AttributeError if not defined</p>
+<dl class="field-list simple">
+<dt class="field-odd">Attributes</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>qmmol</strong><span class="classifier">obj</span></dt><dd><p>qmmol object. raise AttributeError if not defined</p>
 </dd>
-<dt>name<span class="classifier">str</span></dt><dd><p>name of the database where qmmol will be saved. if not given it will be set to
+<dt><strong>name</strong><span class="classifier">str</span></dt><dd><p>name of the database where qmmol will be saved. if not given it will be set to
 <cite>qmmol.method</cite>/qmmol</p>
+</dd>
+</dl>
 </dd>
 </dl>
 </dd></dl>
@@ -297,18 +390,24 @@ external engine</p>
 <dd><p>Train QMModel to learn <span class="math notranslate nohighlight">\({\gamma}\)</span> in terms of <span class="math notranslate nohighlight">\(V_{ext}\)</span> from training data
 then an additional layer of training learn <span class="math notranslate nohighlight">\({\delta}E\)</span> and <span class="math notranslate nohighlight">\({\delta}{\gamma}\)</span> 
 based on previously learned <span class="math notranslate nohighlight">\({\gamma}\)</span>.</p>
-<dl class="simple">
-<dt>filename<span class="classifier">str</span></dt><dd><p>Name of database file</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>filename</strong><span class="classifier">str</span></dt><dd><p>Name of database file</p>
 </dd>
-<dt>names<span class="classifier">str, optional</span></dt><dd><p>name of database, by default ‘*’</p>
+<dt><strong>names</strong><span class="classifier">str, optional</span></dt><dd><p>name of database, by default ‘*’</p>
 </dd>
-<dt>mmodels<span class="classifier">dict, optional</span></dt><dd><p>set of machine learning models used for training , If not provided
+<dt><strong>mmodels</strong><span class="classifier">dict, optional</span></dt><dd><p>set of machine learning models used for training , If not provided
 by default KKR will be used to learn gamma and linear regression for
 delta learning</p>
 </dd>
 </dl>
-<dl class="simple">
-<dt>model<span class="classifier">obj</span></dt><dd><p>trained model</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>model</strong><span class="classifier">obj</span></dt><dd><p>trained model</p>
+</dd>
+</dl>
 </dd>
 </dl>
 </dd></dl>

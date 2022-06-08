@@ -13,19 +13,6 @@ class DBHDF5(object):
     ----------
     filename : str
         Filename of database.
-    
-    Methods
-    -------
-    qmmol()
-        getter and setter for qmmol attribute 
-    write_qmmol(self, qmmol = None, name = None, **kwargs)
-        write qmmol file to the database
-    get_all_names(self, fh = None, attr = None)
-        returns list of databases from database file
-    read_qmmol(self, name, **kwargs)
-        read qmmol from database file and return it.
-    write_properties(self, properties = None, prefix = 'train', name = None, **kwargs)
-        write properties (i.e. Vext, gamma, energy, forces) to the database
     """
 
     def __init__(self, filename, mode = 'a', qmmol = None):

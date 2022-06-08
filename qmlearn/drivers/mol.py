@@ -9,7 +9,60 @@ qm_engines = {
         }
 
 class QMMol(object):
-    r""" Class to create qmlearn mol object. """
+    r""" Class to create qmlearn mol object. 
+    
+    Attributes
+    ----------
+    atoms : :obj: PySCF or ASE atom object
+        Molecular geometry
+    engine_name : str
+        Options:
+
+        | PySCF (Default) : 'pyscf'
+        | Psi4 : 'psi4'
+
+    method : str
+
+        | PySCF:
+        | DFT : 'dft'
+        | HF : 'hf'
+        | RKS : 'rks'
+        | RHF : 'rhf
+        | MP2 : 'mp2'
+        | CISD : 'cisd'
+        | FCI : 'fci'
+
+        | Psi4:
+        | HF('rhf+hf')  : 'hf'
+        | RHF('rhf+hf') : 'rhf
+        | SCF('rks+scf') : 'scf'
+        | RKS('rks+scf') : 'rks'
+        | MP2('rhf+mp2') : 'mp2'
+
+    basis : dict or str
+        To define basis set.
+    xc : dict or str
+        To define xchange-correlation functional
+    charge : int
+        Total electronic charge.
+    rotate_method : str
+        
+        | None : 'none'
+        | Kabsch : 'kabsch'
+        | Quaternion : 'quaternion'
+
+    reorder_method : str
+
+        | 'hungarian'
+        | 'inertia-hungarian'
+        | 'brute'
+        | 'distance'
+
+    use_reflection : bool
+        If True it applies a reflection on your molecule.
+
+    """
+
     engine_calcs = [
             'calc_gamma',
             'calc_ncharge',
@@ -36,44 +89,6 @@ class QMMol(object):
         self.init()
 
     def init(self):
-        r""" Function to initialize qmlearn object.
-
-        Parameters
-        ----------
-        atoms : :obj: PySCF or ASE atom object
-            Molecular geometry
-        engine_name : str
-            Options:
-
-            | PySCF (Default) : 'pyscf'
-            | Psi4 : 'psi4'
-
-        method : str
-        PySCF:
-
-            | DFT : 'dft'
-            | HF : 'hf'
-            | RKS : 'rks'
-            | RHF : 'rhf
-            | MP2 : 'mp2'
-            | CISD : 'cisd'
-            | FCI : 'fci'
-
-        Psi4:
-
-            | HF('rhf+hf')  : 'hf'
-            | RHF('rhf+hf') : 'rhf
-            | SCF('rks+scf') : 'scf'
-            | RKS('rks+scf') : 'rks'
-            | MP2('rhf+mp2') : 'mp2'
-
-        basis : dict or str
-            To define basis set.
-        xc : dict or str
-            To define xchange-correlation functional
-        charge : int
-            Total electronic charge.
-        """
         # Draw the arguments
         engine=self.init_kwargs.get('engine', None)
         atoms=self.init_kwargs.get('atoms', None)
@@ -195,6 +210,7 @@ class QMMol(object):
         return obj
 
     def run(self, **kwargs):
+        r"""Function to run the External Calculator."""
         self.engine.run(**kwargs)
 
     def __getattr__(self, attr):

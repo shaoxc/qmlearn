@@ -57,9 +57,11 @@ class Engine(object):
         self._orb = None
 
     def init(self, *args, **kwargs):
+        r""" Initialize ABC class."""
         pass
 
     def run(self, *args, **kwargs):
+        r""" ABC to check run function."""
         pass
 
     @property
@@ -162,7 +164,7 @@ class Engine(object):
         r""" Check idempotency of gamma  
 
         .. math::
-           \gamma S \gamma &= 2 \gamma 
+           \gamma S \gamma = 2 \gamma 
 
         Parameters
         ----------
@@ -360,6 +362,21 @@ def minimize_rmsd_operation(target, atoms, stereo = True, rotate_method = 'kabsc
         References atoms
     atoms : :obj: ASE atoms object
         Initialize atoms
+    reorder_method : str
+
+        | 'hungarian'
+        | 'inertia-hungarian'
+        | 'brute'
+        | 'distance'
+
+    rotate_metod: str
+        
+        | None : 'none'
+        | Kabsch : 'kabsch'
+        | Quaternion : 'quaternion'
+
+    use_reflection : bool
+        If True it applies a reflection on your molecule.
 
     Returns
     -------
@@ -436,9 +453,6 @@ def get_match_rotate(target, atoms, rotate_method = 'kabsch'):
         References atoms
     atoms : :obj: ASE atoms object
         Initialize atoms
-
-    Attributes
-    ----------
     rotate_metod: str
         
         | None : 'none'
@@ -470,6 +484,12 @@ def reorder_atoms_indices(target, atoms, reorder_method='hungarian'):
         References atoms
     atoms : :obj: ASE atoms object
         Initialize atoms
+    reorder_method : str
+
+        | 'hungarian'
+        | 'inertia-hungarian'
+        | 'brute'
+        | 'distance'
 
     Returns
     -------

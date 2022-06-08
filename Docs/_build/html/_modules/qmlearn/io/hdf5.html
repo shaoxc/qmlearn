@@ -79,19 +79,6 @@
 <span class="sd">    ----------</span>
 <span class="sd">    filename : str</span>
 <span class="sd">        Filename of database.</span>
-<span class="sd">    </span>
-<span class="sd">    Methods</span>
-<span class="sd">    -------</span>
-<span class="sd">    qmmol()</span>
-<span class="sd">        getter and setter for qmmol attribute </span>
-<span class="sd">    write_qmmol(self, qmmol = None, name = None, **kwargs)</span>
-<span class="sd">        write qmmol file to the database</span>
-<span class="sd">    get_all_names(self, fh = None, attr = None)</span>
-<span class="sd">        returns list of databases from database file</span>
-<span class="sd">    read_qmmol(self, name, **kwargs)</span>
-<span class="sd">        read qmmol from database file and return it.</span>
-<span class="sd">    write_properties(self, properties = None, prefix = &#39;train&#39;, name = None, **kwargs)</span>
-<span class="sd">        write properties (i.e. Vext, gamma, energy, forces) to the database</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">mode</span> <span class="o">=</span> <span class="s1">&#39;a&#39;</span><span class="p">,</span> <span class="n">qmmol</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>

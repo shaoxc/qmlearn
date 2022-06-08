@@ -26,6 +26,6 @@ Contributors
 ====================
 Contributors
 
-- Xuecheng Shao, Lukas Paetow, Md Rajib Khan Musa and Michele Pavanello @ PRG at Rutgers University-Newark.
+- Xuecheng Shao, Lukas Paetow, Md Rajib Khan Musam, Jessica A. Martinez B. and Michele Pavanello @ PRG at Rutgers University-Newark.
 - Mark E Tuckerman @ Tuckerman Research Group at NYU
 

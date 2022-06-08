@@ -13,7 +13,6 @@
         <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
         <script src="../../../_static/jquery.js"></script>
         <script src="../../../_static/underscore.js"></script>
-        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../../../_static/doctools.js"></script>
     <script src="../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
@@ -70,8 +69,9 @@
 <span class="kn">from</span> <span class="nn">scipy.spatial.transform</span> <span class="kn">import</span> <span class="n">Rotation</span>
 <span class="kn">from</span> <span class="nn">ase</span> <span class="kn">import</span> <span class="n">Atoms</span><span class="p">,</span> <span class="n">io</span>
 <span class="kn">from</span> <span class="nn">pyscf.pbc.tools.pyscf_ase</span> <span class="kn">import</span> <span class="n">atoms_from_ase</span>
-<span class="kn">from</span> <span class="nn">pyscf</span> <span class="kn">import</span> <span class="n">gto</span><span class="p">,</span> <span class="n">dft</span><span class="p">,</span> <span class="n">scf</span><span class="p">,</span> <span class="n">mp</span><span class="p">,</span> <span class="n">fci</span><span class="p">,</span> <span class="n">ci</span>
+<span class="kn">from</span> <span class="nn">pyscf</span> <span class="kn">import</span> <span class="n">gto</span><span class="p">,</span> <span class="n">dft</span><span class="p">,</span> <span class="n">scf</span><span class="p">,</span> <span class="n">mp</span><span class="p">,</span> <span class="n">fci</span><span class="p">,</span> <span class="n">ci</span><span class="p">,</span> <span class="n">ao2mo</span>
 <span class="kn">from</span> <span class="nn">pyscf.symm</span> <span class="kn">import</span> <span class="n">Dmatrix</span>
+<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">reduce</span>
 
 <span class="kn">from</span> <span class="nn">qmlearn.drivers.core</span> <span class="kn">import</span> <span class="n">Engine</span>
 
@@ -86,11 +86,56 @@
         <span class="p">}</span>
 
 <div class="viewcode-block" id="EnginePyscf"><a class="viewcode-back" href="../../../qmlearn.drivers.html#qmlearn.drivers.pyscf.EnginePyscf">[docs]</a><span class="k">class</span> <span class="nc">EnginePyscf</span><span class="p">(</span><span class="n">Engine</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot; PySCF calculator</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+
+<span class="sd">    vext : ndarray</span>
+<span class="sd">        External Potential.</span>
+<span class="sd">    gamma : ndarray</span>
+<span class="sd">        1-body reduced density matrix (1-RDM).</span>
+<span class="sd">    gammat : ndarray</span>
+<span class="sd">        2-body reduced density matrix (2-RDM).</span>
+<span class="sd">    etotal : float</span>
+<span class="sd">        Total electronic energy (Atomic Units a.u.)</span>
+<span class="sd">    forces : ndarray</span>
+<span class="sd">        Atomic forces (Atomic Units a.u.)</span>
+<span class="sd">    ovlp : ndarray</span>
+<span class="sd">        Overlap Matrix.</span>
+<span class="sd">    kop : ndarray</span>
+<span class="sd">        Kinetic Energy Operator.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="p">()</span>
 
 <div class="viewcode-block" id="EnginePyscf.init"><a class="viewcode-back" href="../../../qmlearn.drivers.html#qmlearn.drivers.pyscf.EnginePyscf.init">[docs]</a>    <span class="k">def</span> <span class="nf">init</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot; Function to initialize mf PySCF object</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        mol : :obj: PySCF or ASE atom object</span>
+<span class="sd">            Molecular geometry. Coordinates in Angstroms.</span>
+<span class="sd">        basis : dict or str</span>
+<span class="sd">            To define basis set.</span>
+<span class="sd">        xc : dict or str</span>
+<span class="sd">            To define xchange-correlation functional</span>
+<span class="sd">        verbose :int</span>
+<span class="sd">            Printing level</span>
+<span class="sd">        method : str</span>
+
+<span class="sd">            | DFT : &#39;dft&#39;</span>
+<span class="sd">            | HF : &#39;hf&#39;</span>
+<span class="sd">            | RKS : &#39;rks&#39;</span>
+<span class="sd">            | RHF : &#39;rhf</span>
+<span class="sd">            | MP2 : &#39;mp2&#39;</span>
+<span class="sd">            | CISD : &#39;cisd&#39;</span>
+<span class="sd">            | FCI : &#39;fci&#39;</span>
+
+<span class="sd">        charge : int</span>
+<span class="sd">            Total charge of the molecule</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">mol</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;mol&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
         <span class="n">mf</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;mf&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
         <span class="n">basis</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;basis&#39;</span><span class="p">,</span> <span class="s1">&#39;6-31g&#39;</span><span class="p">)</span>
@@ -116,6 +161,26 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">mol</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mf</span><span class="o">.</span><span class="n">mol</span></div>
 
 <div class="viewcode-block" id="EnginePyscf.init_mol"><a class="viewcode-back" href="../../../qmlearn.drivers.html#qmlearn.drivers.pyscf.EnginePyscf.init_mol">[docs]</a>    <span class="k">def</span> <span class="nf">init_mol</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mol</span><span class="p">,</span> <span class="n">basis</span><span class="p">,</span> <span class="n">charge</span> <span class="o">=</span> <span class="mi">0</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot; Function to create PySCF atom object</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        mol : list or str (From PySCF) or ASE atom object</span>
+<span class="sd">            To define molecluar structure.  The internal format is</span>
+
+<span class="sd">            | atom = [[atom1, (x, y, z)],</span>
+<span class="sd">            |         [atom2, (x, y, z)],</span>
+<span class="sd">            |         ...</span>
+<span class="sd">            |         [atomN, (x, y, z)]]</span>
+
+<span class="sd">        basis:  dict or str</span>
+<span class="sd">            To define basis set.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        atoms : :obj: PySCF atom object</span>
+<span class="sd">           Molecular Structure, basis, and charge definition into gto PySCF atom object</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">ase_atoms</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">mol</span><span class="p">,</span> <span class="n">Atoms</span><span class="p">):</span>
             <span class="n">ase_atoms</span> <span class="o">=</span> <span class="n">mol</span>
@@ -133,10 +198,28 @@
         <span class="k">return</span> <span class="n">mol</span></div>
 
 <div class="viewcode-block" id="EnginePyscf.run"><a class="viewcode-back" href="../../../qmlearn.drivers.html#qmlearn.drivers.pyscf.EnginePyscf.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">properties</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;energy&#39;</span><span class="p">,</span> <span class="s1">&#39;forces&#39;</span><span class="p">),</span> <span class="n">ao_repr</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot; Caculate electronic properties using PySCF.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        properties : str</span>
+<span class="sd">            </span>
+<span class="sd">            | Total electronic energy : &#39;energy&#39;</span>
+<span class="sd">            | Total atomic forces : &#39;forces&#39;</span>
+
+<span class="sd">        If &#39;energy&#39; is choosen the following properties are also calculated:</span>
+
+<span class="sd">            | 1-RDM (1-body reduced density matrix) : &#39;gamma&#39;</span>
+<span class="sd">            | 2-RDM (2-body reduced density matrix) : &#39;gammat&#39;</span>
+<span class="sd">            | Occupation number : &#39;occs&#39;</span>
+<span class="sd">            | Molecular orbitals : &#39;orb&#39;</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="s1">&#39;energy&#39;</span> <span class="ow">in</span> <span class="n">properties</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">_gamma</span> <span class="ow">is</span> <span class="kc">None</span> <span class="p">:</span>
             <span class="c1"># (dft.uks.UKS, dft.rks.RKS, scf.uhf.UHF, scf.hf.RHF))</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">mf</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">occs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mf</span><span class="o">.</span><span class="n">get_occ</span><span class="p">()</span>
+            <span class="n">mf0</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">mf</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
             <span class="c1">#</span>
             <span class="k">if</span> <span class="s1">&#39;+&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">method</span> <span class="p">:</span>
                 <span class="n">mf2</span> <span class="o">=</span> <span class="n">methods_pyscf</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">method</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;+&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]](</span><span class="bp">self</span><span class="o">.</span><span class="n">mf</span><span class="p">)</span>
@@ -146,9 +229,19 @@
             <span class="k">else</span> <span class="p">:</span>
                 <span class="n">mf</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mf</span>
 
-            <span class="bp">self</span><span class="o">.</span><span class="n">_orb</span> <span class="o">=</span> <span class="n">mf</span><span class="o">.</span><span class="n">mo_coeff</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_gamma</span> <span class="o">=</span> <span class="n">mf</span><span class="o">.</span><span class="n">make_rdm1</span><span class="p">(</span><span class="n">ao_repr</span> <span class="o">=</span> <span class="n">ao_repr</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_etotal</span> <span class="o">=</span> <span class="n">mf</span><span class="o">.</span><span class="n">e_tot</span>
+            <span class="k">if</span> <span class="s1">&#39;+&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">method</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">method</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;+&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;fci&#39;</span><span class="p">:</span>
+               <span class="n">cisolver</span> <span class="o">=</span> <span class="n">mf</span>
+               <span class="n">e</span><span class="p">,</span> <span class="n">ci</span> <span class="o">=</span> <span class="n">cisolver</span><span class="o">.</span><span class="n">kernel</span><span class="p">()</span>  <span class="c1">#To get 2RDM, gammat. You need the cisolver.make_rdm12 function.</span>
+               <span class="n">rdm_1</span><span class="p">,</span> <span class="n">rdm_2</span> <span class="o">=</span> <span class="n">cisolver</span><span class="o">.</span><span class="n">make_rdm12</span><span class="p">(</span><span class="n">fcivec</span><span class="o">=</span><span class="n">ci</span><span class="p">,</span><span class="n">norb</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">mf0</span><span class="o">.</span><span class="n">get_occ</span><span class="p">())[</span><span class="mi">0</span><span class="p">],</span><span class="n">nelec</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">nelec</span><span class="p">)</span>
+               <span class="bp">self</span><span class="o">.</span><span class="n">_gamma</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_gammat</span> <span class="o">=</span> <span class="n">fci</span><span class="o">.</span><span class="n">rdm</span><span class="o">.</span><span class="n">reorder_rdm</span><span class="p">(</span><span class="n">rdm1</span><span class="o">=</span><span class="n">rdm_1</span><span class="p">,</span><span class="n">rdm2</span><span class="o">=</span><span class="n">rdm_2</span><span class="p">)</span> <span class="c1">#Call reorder_rdm to transform to the normal rdm2a</span>
+               <span class="c1">#self._gamma, self._gammat = cisolver.make_rdm12(fcivec=ci,norb=np.shape(mf0.get_occ())[0],nelec=self.mol.nelec)</span>
+               <span class="n">h1</span><span class="o">=</span><span class="n">mf0</span><span class="o">.</span><span class="n">get_hcore</span><span class="p">()</span>
+               <span class="bp">self</span><span class="o">.</span><span class="n">_orb</span> <span class="o">=</span> <span class="n">mf0</span><span class="o">.</span><span class="n">mo_coeff</span>
+               <span class="bp">self</span><span class="o">.</span><span class="n">_etotal</span> <span class="o">=</span> <span class="n">cisolver</span><span class="o">.</span><span class="n">e_tot</span>
+            <span class="k">else</span> <span class="p">:</span>
+               <span class="bp">self</span><span class="o">.</span><span class="n">_orb</span> <span class="o">=</span> <span class="n">mf</span><span class="o">.</span><span class="n">mo_coeff</span>
+               <span class="bp">self</span><span class="o">.</span><span class="n">_gamma</span> <span class="o">=</span> <span class="n">mf</span><span class="o">.</span><span class="n">make_rdm1</span><span class="p">(</span><span class="n">ao_repr</span> <span class="o">=</span> <span class="n">ao_repr</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+               <span class="bp">self</span><span class="o">.</span><span class="n">_etotal</span> <span class="o">=</span> <span class="n">mf</span><span class="o">.</span><span class="n">e_tot</span>
 
         <span class="k">if</span> <span class="s1">&#39;forces&#39;</span> <span class="ow">in</span> <span class="n">properties</span> <span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_forces</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">run_forces</span><span class="p">()</span></div>
@@ -158,6 +251,12 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_gamma</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">properties</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;energy&#39;</span><span class="p">))</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_gamma</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">gammat</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_gammat</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">properties</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;energy&#39;</span><span class="p">))</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_gammat</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">etotal</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -191,10 +290,12 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">nelectron</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot; Total number of electrons. &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">nelectron</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">nao</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot; Natural atomic orbitals. &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">nao</span>
 
 <div class="viewcode-block" id="EnginePyscf.calc_gamma"><a class="viewcode-back" href="../../../qmlearn.drivers.html#qmlearn.drivers.pyscf.EnginePyscf.calc_gamma">[docs]</a>    <span class="k">def</span> <span class="nf">calc_gamma</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">orb</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">occs</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
@@ -205,18 +306,81 @@
         <span class="k">return</span> <span class="n">gamma</span></div>
 
 <div class="viewcode-block" id="EnginePyscf.calc_etotal"><a class="viewcode-back" href="../../../qmlearn.drivers.html#qmlearn.drivers.pyscf.EnginePyscf.calc_etotal">[docs]</a>    <span class="k">def</span> <span class="nf">calc_etotal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gamma</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="n">etotal</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mf</span><span class="o">.</span><span class="n">energy_tot</span><span class="p">(</span><span class="n">gamma</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot; Get the total electronic energy based on 1-RDM.</span>
+<span class="sd">        </span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        gamma : ndarray</span>
+<span class="sd">            1-RDM</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        etotal : float</span>
+<span class="sd">            Total electronic energy. &quot;&quot;&quot;</span>
+        <span class="n">etotal</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mf</span><span class="o">.</span><span class="n">energy_tot</span><span class="p">(</span><span class="n">gamma</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>  <span class="c1">#nuc + energy_elec(e1+coul) </span>
         <span class="k">return</span> <span class="n">etotal</span></div>
 
-<div class="viewcode-block" id="EnginePyscf.calc_dipole"><a class="viewcode-back" href="../../../qmlearn.drivers.html#qmlearn.drivers.pyscf.EnginePyscf.calc_dipole">[docs]</a>    <span class="k">def</span> <span class="nf">calc_dipole</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gamma</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="EnginePyscf.calc_etotal2"><a class="viewcode-back" href="../../../qmlearn.drivers.html#qmlearn.drivers.pyscf.EnginePyscf.calc_etotal2">[docs]</a>    <span class="k">def</span> <span class="nf">calc_etotal2</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gammat</span><span class="p">,</span> <span class="n">gamma1</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot; Get the total electronic energy based on 2-RDM. </span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        gamma : ndarray</span>
+<span class="sd">            1-RDM</span>
+<span class="sd">        gammat : ndarray</span>
+<span class="sd">            2-RDM</span>
+<span class="sd">        </span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        etotal : float</span>
+<span class="sd">            Total electronic energy. &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">mf</span><span class="o">.</span><span class="n">run</span><span class="p">()</span> <span class="c1">#HF to get orb and occ</span>
+        <span class="n">orb</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mf</span><span class="o">.</span><span class="n">mo_coeff</span>
+        <span class="n">occs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mf</span><span class="o">.</span><span class="n">get_occ</span><span class="p">()</span>
+        
+        <span class="n">nmo</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">occs</span><span class="p">)</span>   
+        <span class="n">h1e</span> <span class="o">=</span> <span class="n">reduce</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">,(</span><span class="n">orb</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">mf</span><span class="o">.</span><span class="n">get_hcore</span><span class="p">(),</span> <span class="n">orb</span><span class="p">))</span>
+        <span class="n">h2e</span> <span class="o">=</span> <span class="n">ao2mo</span><span class="o">.</span><span class="n">kernel</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mf</span><span class="o">.</span><span class="n">_eri</span><span class="p">,</span> <span class="n">orb</span><span class="p">)</span>
+        <span class="n">h2e</span> <span class="o">=</span> <span class="n">ao2mo</span><span class="o">.</span><span class="n">restore</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">h2e</span><span class="p">,</span> <span class="n">nmo</span><span class="p">)</span>
+        
+        <span class="n">etotal</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">einsum</span><span class="p">(</span><span class="s1">&#39;ij,ji&#39;</span><span class="p">,</span> <span class="n">h1e</span><span class="p">,</span> <span class="n">gamma1</span><span class="p">)</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">einsum</span><span class="p">(</span><span class="s1">&#39;ijkl,ijkl&#39;</span><span class="p">,</span> <span class="n">h2e</span><span class="p">,</span> <span class="n">gammat</span><span class="p">)</span> <span class="o">*</span> <span class="mf">.5</span><span class="p">)</span>
+        <span class="c1">#etotal = (self.mf.energy_elec(gamma1) + np.einsum(&#39;ijkl,ijkl&#39;, h2e, gammat) * .5)</span>
+        <span class="c1">#etotal = (np.einsum(&#39;ijkl,ijkl&#39;, h2e, gammat) * .5)</span>
+        <span class="n">etotal</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">energy_nuc</span><span class="p">()</span>
+        
+        <span class="k">return</span> <span class="n">etotal</span></div>
+
+<div class="viewcode-block" id="EnginePyscf.calc_dipole"><a class="viewcode-back" href="../../../qmlearn.drivers.html#qmlearn.drivers.pyscf.EnginePyscf.calc_dipole">[docs]</a>    <span class="k">def</span> <span class="nf">calc_dipole</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gamma</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span> 
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot; Get the total dipole moment.</span>
+<span class="sd">        </span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        gamma : ndarray</span>
+<span class="sd">            1-RDM</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        dip : list</span>
+<span class="sd">            The dipole moment on x, y and z component.&quot;&quot;&quot;</span>
         <span class="n">dip</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mf</span><span class="o">.</span><span class="n">dip_moment</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="p">,</span> <span class="n">gamma</span><span class="p">,</span> <span class="n">unit</span> <span class="o">=</span> <span class="s1">&#39;au&#39;</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">mf</span><span class="o">.</span><span class="n">verbose</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">dip</span></div>
 
 <div class="viewcode-block" id="EnginePyscf.run_forces"><a class="viewcode-back" href="../../../qmlearn.drivers.html#qmlearn.drivers.pyscf.EnginePyscf.run_forces">[docs]</a>    <span class="k">def</span> <span class="nf">run_forces</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot; Function to calculate Forces with calculated 1-RDM</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        forces : ndarray</span>
+<span class="sd">           Total atomic forces. &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="s1">&#39;+&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">method</span> <span class="p">:</span>
-            <span class="n">mf</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mf2</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">method</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;+&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;fci&#39;</span><span class="p">:</span>  <span class="c1">#With FCI method Forces can&#39;t be obtained from FCI object. I approximated using RHF object. </span>
+               <span class="n">mf</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mf</span>
+            <span class="k">else</span><span class="p">:</span>
+               <span class="n">mf</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mf2</span>
         <span class="k">else</span> <span class="p">:</span>
             <span class="n">mf</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mf</span>
+
         <span class="n">gf</span> <span class="o">=</span> <span class="n">mf</span><span class="o">.</span><span class="n">nuc_grad_method</span><span class="p">()</span>
         <span class="n">gf</span><span class="o">.</span><span class="n">verbose</span> <span class="o">=</span> <span class="n">mf</span><span class="o">.</span><span class="n">verbose</span>
         <span class="n">gf</span><span class="o">.</span><span class="n">grid_response</span> <span class="o">=</span> <span class="kc">True</span>
@@ -224,6 +388,18 @@
         <span class="k">return</span> <span class="n">forces</span></div>
 
 <div class="viewcode-block" id="EnginePyscf.calc_forces"><a class="viewcode-back" href="../../../qmlearn.drivers.html#qmlearn.drivers.pyscf.EnginePyscf.calc_forces">[docs]</a>    <span class="k">def</span> <span class="nf">calc_forces</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gamma</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot; Function to calculate Forces with a given 1-RDM</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        gamma : ndarray</span>
+<span class="sd">            1-RDM</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        forces : ndarray</span>
+<span class="sd">           Total atomic forces for a given 1-RDM. &quot;&quot;&quot;</span>
+
         <span class="c1"># only for rhf and rks</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">method</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;+&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;rhf&#39;</span><span class="p">,</span> <span class="s1">&#39;rks&#39;</span><span class="p">]</span> <span class="ow">or</span> <span class="s1">&#39;+&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">method</span> <span class="p">:</span>
             <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Sorry the calc_forces not support &#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">method</span><span class="si">}</span><span class="s2">&#39;&quot;</span><span class="p">)</span>
@@ -248,6 +424,18 @@
         <span class="k">return</span> <span class="n">quad</span>
 
 <div class="viewcode-block" id="EnginePyscf.calc_quadrupole"><a class="viewcode-back" href="../../../qmlearn.drivers.html#qmlearn.drivers.pyscf.EnginePyscf.calc_quadrupole">[docs]</a>    <span class="k">def</span> <span class="nf">calc_quadrupole</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gamma</span><span class="p">,</span> <span class="n">traceless</span> <span class="o">=</span> <span class="kc">True</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot; Function to calculate the total quadruple for XX, XY, XY, YY, YZ, ZZ components.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        gamma : ndarray</span>
+<span class="sd">            1-RDM</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        quadrupol : ndarray</span>
+<span class="sd">           An array containing a quadruple per component.&quot;&quot;&quot;</span>
+
         <span class="c1"># XX, XY, XZ, YY, YZ, ZZ</span>
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">with_common_orig</span><span class="p">((</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">)):</span>
             <span class="n">q</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">intor</span><span class="p">(</span><span class="s1">&#39;int1e_rr&#39;</span><span class="p">,</span> <span class="n">comp</span><span class="o">=</span><span class="mi">9</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="o">*</span><span class="n">gamma</span><span class="o">.</span><span class="n">shape</span><span class="p">))</span>
@@ -268,6 +456,18 @@
         <span class="k">return</span> <span class="n">quadp</span></div>
 
 <div class="viewcode-block" id="EnginePyscf.calc_quadrupole_nuclear"><a class="viewcode-back" href="../../../qmlearn.drivers.html#qmlearn.drivers.pyscf.EnginePyscf.calc_quadrupole_nuclear">[docs]</a>    <span class="k">def</span> <span class="nf">calc_quadrupole_nuclear</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mol</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot; Function to calculate the nuclear quadruple for XX, XY, XY, YY, YZ, ZZ components.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        gamma : ndarray</span>
+<span class="sd">            1-RDM</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        quadrupol : ndarray</span>
+<span class="sd">           An array containing the nuclear quadruple per component.&quot;&quot;&quot;</span>
+
         <span class="n">mol</span> <span class="o">=</span> <span class="n">mol</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">mol</span>
         <span class="n">charges</span> <span class="o">=</span> <span class="n">mol</span><span class="o">.</span><span class="n">atom_charges</span><span class="p">()</span>
         <span class="n">pos</span> <span class="o">=</span> <span class="n">mol</span><span class="o">.</span><span class="n">atom_coords</span><span class="p">()</span>
@@ -291,6 +491,20 @@
         <span class="k">return</span> <span class="n">mo</span>
 
 <div class="viewcode-block" id="EnginePyscf.rotation2rotmat"><a class="viewcode-back" href="../../../qmlearn.drivers.html#qmlearn.drivers.pyscf.EnginePyscf.rotation2rotmat">[docs]</a>    <span class="k">def</span> <span class="nf">rotation2rotmat</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rotation</span><span class="p">,</span> <span class="n">mol</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot; Function to rotate the density matrix.</span>
+<span class="sd"> </span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        rotation : ndarray</span>
+<span class="sd">            Rotation Matrix</span>
+<span class="sd">        mol : :obj: PySCF mol object</span>
+<span class="sd">            Molecluar structure</span>
+<span class="sd"> </span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        rotmat : ndarray</span>
+<span class="sd">        Rotated density matrix &quot;&quot;&quot;</span>
+
         <span class="n">mol</span> <span class="o">=</span> <span class="n">mol</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">mol</span>
         <span class="k">return</span> <span class="n">rotation2rotmat</span><span class="p">(</span><span class="n">rotation</span><span class="p">,</span> <span class="n">mol</span><span class="p">)</span></div>
 
@@ -299,6 +513,12 @@
         <span class="k">return</span> <span class="n">get_atom_naos</span><span class="p">(</span><span class="n">mol</span><span class="p">)</span></div></div>
 
 <div class="viewcode-block" id="gamma2gamma"><a class="viewcode-back" href="../../../qmlearn.drivers.html#qmlearn.drivers.pyscf.gamma2gamma">[docs]</a><span class="k">def</span> <span class="nf">gamma2gamma</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot; Function two assure 1-RDM to be the predicted one.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    gamma : ndarray</span>
+<span class="sd">        1-RDM &quot;&quot;&quot;</span>
     <span class="n">gamma</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">args</span> <span class="p">:</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
@@ -314,6 +534,21 @@
     <span class="k">return</span> <span class="n">gamma</span></div>
 
 <div class="viewcode-block" id="gamma2rdm1e"><a class="viewcode-back" href="../../../qmlearn.drivers.html#qmlearn.drivers.pyscf.gamma2rdm1e">[docs]</a><span class="k">def</span> <span class="nf">gamma2rdm1e</span><span class="p">(</span><span class="n">mf</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot; Function to calculate the energy density matrix (1-RDMe).</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        \hat{D} = \sum_{i=1}^{occ} \epsilon_{i} \left|i\right&gt; \left&lt; i \right| \\</span>
+<span class="sd">        \left&lt; \mu |\hat{D}| \nu \right&gt; = \sum_{\sigma \tau} F_{\mu \sigma} S_{\sigma \tau}^{-1} P_{\tau \mu}</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    mf : :obj: PySCF object</span>
+<span class="sd">        SCF class of PySCF</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    dm1e : ndarray</span>
+<span class="sd">        Energy density matrix &quot;&quot;&quot;</span>
     <span class="n">gamma</span> <span class="o">=</span> <span class="n">gamma2gamma</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
     <span class="n">s</span> <span class="o">=</span> <span class="n">mf</span><span class="o">.</span><span class="n">get_ovlp</span><span class="p">()</span>
     <span class="n">sinv</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">inv</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
@@ -322,6 +557,17 @@
     <span class="k">return</span> <span class="n">dm1e</span></div>
 
 <div class="viewcode-block" id="rotation2rotmat"><a class="viewcode-back" href="../../../qmlearn.drivers.html#qmlearn.drivers.pyscf.rotation2rotmat">[docs]</a><span class="k">def</span> <span class="nf">rotation2rotmat</span><span class="p">(</span><span class="n">rotation</span><span class="p">,</span> <span class="n">mol</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot; Function to rotate the density matrix.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    rotation : ndarray</span>
+<span class="sd">        Rotation Matrix</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    rotmat : ndarray</span>
+<span class="sd">        Rotated density matrix &quot;&quot;&quot;</span>
     <span class="n">alpha</span><span class="p">,</span> <span class="n">beta</span><span class="p">,</span> <span class="n">gamma</span> <span class="o">=</span> <span class="n">Rotation</span><span class="o">.</span><span class="n">from_matrix</span><span class="p">(</span><span class="n">rotation</span><span class="p">)</span><span class="o">.</span><span class="n">as_euler</span><span class="p">(</span><span class="s1">&#39;zyz&#39;</span><span class="p">)</span><span class="o">*-</span><span class="mf">1.0</span>
     <span class="n">angl</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">for</span> <span class="n">ib</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">mol</span><span class="o">.</span><span class="n">nbas</span><span class="p">):</span>
@@ -340,6 +586,17 @@
     <span class="k">return</span> <span class="n">rotmat</span></div>
 
 <div class="viewcode-block" id="get_atom_naos"><a class="viewcode-back" href="../../../qmlearn.drivers.html#qmlearn.drivers.pyscf.get_atom_naos">[docs]</a><span class="k">def</span> <span class="nf">get_atom_naos</span><span class="p">(</span><span class="n">mol</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot; Function to get the number of atomic orbitals for a given angular momentum.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    mol : :obj: PySCF mol object</span>
+<span class="sd">        Molecluar structure.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    naos : ndarray</span>
+<span class="sd">        Number of atomic orbitals. &quot;&quot;&quot;</span>
     <span class="n">angl</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="n">atomids</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">for</span> <span class="n">ib</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">mol</span><span class="o">.</span><span class="n">nbas</span><span class="p">):</span>

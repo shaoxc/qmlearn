@@ -97,6 +97,55 @@
 <dt class="sig sig-object py" id="qmlearn.model.model.MQMModel">
 <em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">qmlearn.model.model.</span></span><span class="sig-name descname"><span class="pre">MQMModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mmodels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'gamma'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ncharge</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nspin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">occs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">refqmmol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fragments</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qmmodels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qmlearn/model/model.html#MQMModel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qmlearn.model.model.MQMModel" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <a class="reference internal" href="#qmlearn.model.model.QMModel" title="qmlearn.model.model.QMModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">qmlearn.model.model.QMModel</span></code></a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Attributes</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>fragments</strong></dt><dd></dd>
+<dt><strong>method</strong></dt><dd></dd>
+<dt><strong>model</strong></dt><dd></dd>
+<dt><strong>qmmodels</strong></dt><dd></dd>
+<dt><strong>refqmmol</strong></dt><dd></dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Methods</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">fit</span></code>(X, y[, model, method])</p></td>
+<td><p>Fit model</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#qmlearn.model.model.MQMModel.predict" title="qmlearn.model.model.MQMModel.predict"><code class="xref py py-obj docutils literal notranslate"><span class="pre">predict</span></code></a>(x[, method, convert, split])</p></td>
+<td><p>Predict using trained QMModel</p></td>
+</tr>
+</tbody>
+</table>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 66%" />
+<col style="width: 34%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><strong>convert_back</strong></p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p><strong>get_block_vext</strong></p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p><strong>orth_orb</strong></p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p><strong>predict_block</strong></p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p><strong>translate_input</strong></p></td>
+<td></td>
+</tr>
+</tbody>
+</table>
 <dl class="py property">
 <dt class="sig sig-object py" id="qmlearn.model.model.MQMModel.fragments">
 <em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">fragments</span></span><a class="headerlink" href="#qmlearn.model.model.MQMModel.fragments" title="Permalink to this definition"></a></dt>
@@ -111,16 +160,22 @@
 <dt class="sig sig-object py" id="qmlearn.model.model.MQMModel.predict">
 <span class="sig-name descname"><span class="pre">predict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">convert</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">split</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qmlearn/model/model.html#MQMModel.predict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qmlearn.model.model.MQMModel.predict" title="Permalink to this definition"></a></dt>
 <dd><p>Predict using trained QMModel</p>
-<dl class="simple">
-<dt>X<span class="classifier">array</span></dt><dd><p>Training data</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>X</strong><span class="classifier">array</span></dt><dd><p>Training data</p>
 </dd>
-<dt>model<span class="classifier">_type_, optional</span></dt><dd><p>_description_, by default None</p>
+<dt><strong>model</strong><span class="classifier">_type_, optional</span></dt><dd><p>_description_, by default None</p>
 </dd>
-<dt>method<span class="classifier">_type_, optional</span></dt><dd><p>_description_, by default None</p>
+<dt><strong>method</strong><span class="classifier">_type_, optional</span></dt><dd><p>_description_, by default None</p>
 </dd>
 </dl>
-<dl class="simple">
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
 <dt>_type_</dt><dd><p>_description_</p>
+</dd>
+</dl>
 </dd>
 </dl>
 </dd></dl>
@@ -148,22 +203,65 @@
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>QMModel class is wrapper around sklearn regression model classes. It provide mthod to
 fit and predict based on provided training and testing data</p>
-<dl class="simple">
-<dt>mmodels<span class="classifier">dict, optional</span></dt><dd><p>set of machine learning algorithms used for training , If not provided
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>mmodels</strong><span class="classifier">dict, optional</span></dt><dd><p>set of machine learning algorithms used for training , If not provided
 by default Kernel Ridge Rigression (KRR) will be used to learn <span class="math notranslate nohighlight">\({\gmmma}\)</span> from <span class="math notranslate nohighlight">\(V_{ext}\)</span> and 
 linear regression to learn <span class="math notranslate nohighlight">\({\delta}E\)</span>, and <span class="math notranslate nohighlight">\({\delta}{\gamma}\)</span></p>
 </dd>
-<dt>method<span class="classifier">{‘gamma’}, str</span></dt><dd><p>determine which property to learn from external potentials <span class="math notranslate nohighlight">\(V_{ext}\)</span> . as of now only 
+<dt><strong>method</strong><span class="classifier">{‘gamma’}, str</span></dt><dd><p>determine which property to learn from external potentials <span class="math notranslate nohighlight">\(V_{ext}\)</span> . as of now only 
 <span class="math notranslate nohighlight">\({\gamma}\)</span> can be learned from <span class="math notranslate nohighlight">\(V_{ext}\)</span>. And then all other properties
 calculated from <span class="math notranslate nohighlight">\({\gamma}\)</span></p>
 </dd>
-<dt>ncharge: int, optional</dt><dd><p>charge of the atoms</p>
+<dt><strong>ncharge: int, optional</strong></dt><dd><p>charge of the atoms</p>
 </dd>
-<dt>nspin: int, optional</dt><dd><p>??</p>
+<dt><strong>nspin: int, optional</strong></dt><dd><p>??</p>
 </dd>
-<dt>refqmmol: QMMol object</dt><dd><p>Refernce QMMol object</p>
+<dt><strong>refqmmol: QMMol object</strong></dt><dd><p>Refernce QMMol object</p>
 </dd>
 </dl>
+</dd>
+<dt class="field-even">Attributes</dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>method</strong></dt><dd></dd>
+<dt><strong>model</strong></dt><dd></dd>
+<dt><strong>refqmmol</strong></dt><dd></dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Methods</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#qmlearn.model.model.QMModel.fit" title="qmlearn.model.model.QMModel.fit"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fit</span></code></a>(X, y[, model, method])</p></td>
+<td><p>Fit model</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#qmlearn.model.model.QMModel.predict" title="qmlearn.model.model.QMModel.predict"><code class="xref py py-obj docutils literal notranslate"><span class="pre">predict</span></code></a>(x[, model, method])</p></td>
+<td><p>Predict using trained QMModel</p></td>
+</tr>
+</tbody>
+</table>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 66%" />
+<col style="width: 34%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><strong>convert_back</strong></p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p><strong>orth_orb</strong></p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p><strong>translate_input</strong></p></td>
+<td></td>
+</tr>
+</tbody>
+</table>
 <dl class="py method">
 <dt class="sig sig-object py" id="qmlearn.model.model.QMModel.convert_back">
 <span class="sig-name descname"><span class="pre">convert_back</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prop</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'gamma'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qmmol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qmlearn/model/model.html#QMModel.convert_back"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qmlearn.model.model.QMModel.convert_back" title="Permalink to this definition"></a></dt>
@@ -173,22 +271,26 @@ calculated from <span class="math notranslate nohighlight">\({\gamma}\)</span></
 <dt class="sig sig-object py" id="qmlearn.model.model.QMModel.fit">
 <span class="sig-name descname"><span class="pre">fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qmlearn/model/model.html#QMModel.fit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qmlearn.model.model.QMModel.fit" title="Permalink to this definition"></a></dt>
 <dd><p>Fit model</p>
-<dl class="simple">
-<dt>X<span class="classifier">array</span></dt><dd><p>Training data</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>X</strong><span class="classifier">array</span></dt><dd><p>Training data</p>
 </dd>
-<dt>y<span class="classifier">array</span></dt><dd><p>Target values</p>
+<dt><strong>y</strong><span class="classifier">array</span></dt><dd><p>Target values</p>
 </dd>
-<dt>model<span class="classifier">QMModel obj, optional</span></dt><dd><p>Regression model (i.e., KernelRidge, LinearRegression), If not provided will take from
+<dt><strong>model</strong><span class="classifier">QMModel obj, optional</span></dt><dd><p>Regression model (i.e., KernelRidge, LinearRegression), If not provided will take from
 mmodels dictionary.</p>
 </dd>
-<dt>method<span class="classifier">{‘gamma’, ‘d_gamma’, ‘d_energy’, ‘d_forces’} </span></dt><dd><p>‘gamma’ -&gt; learn <span class="math notranslate nohighlight">\({\delta\gamma}\)</span> using <span class="math notranslate nohighlight">\(V_{ext}\)</span>
+<dt><strong>method</strong><span class="classifier">{‘gamma’, ‘d_gamma’, ‘d_energy’, ‘d_forces’}</span></dt><dd><p>‘gamma’ -&gt; learn <span class="math notranslate nohighlight">\({\delta\gamma}\)</span> using <span class="math notranslate nohighlight">\(V_{ext}\)</span>
 ‘d_gamma’ -&gt; learn <span class="math notranslate nohighlight">\({\delta\gamma}\)</span> based on predicted <span class="math notranslate nohighlight">\({\gamma}\)</span>.
 ‘d_energy’ -&gt; learn <span class="math notranslate nohighlight">\({\delta}E\)</span> based on predicted <span class="math notranslate nohighlight">\({\gamma}\)</span>
 ‘d_forces’ -&gt; learn <span class="math notranslate nohighlight">\({\delta}F\)</span> based on predicted <span class="math notranslate nohighlight">\({\gamma}\)</span></p>
 </dd>
+<dt><strong>Returns</strong></dt><dd></dd>
+<dt><strong>——-</strong></dt><dd></dd>
+<dt><strong>QMModel</strong></dt><dd><p>return trained QMModel object</p>
+</dd>
 </dl>
-<dl class="simple">
-<dt>QMModel</dt><dd><p>return trained QMModel object</p>
 </dd>
 </dl>
 </dd></dl>
@@ -212,16 +314,22 @@ mmodels dictionary.</p>
 <dt class="sig sig-object py" id="qmlearn.model.model.QMModel.predict">
 <span class="sig-name descname"><span class="pre">predict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qmlearn/model/model.html#QMModel.predict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qmlearn.model.model.QMModel.predict" title="Permalink to this definition"></a></dt>
 <dd><p>Predict using trained QMModel</p>
-<dl class="simple">
-<dt>X<span class="classifier">array</span></dt><dd><p>Training data</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>X</strong><span class="classifier">array</span></dt><dd><p>Training data</p>
 </dd>
-<dt>model<span class="classifier">_type_, optional</span></dt><dd><p>_description_, by default None</p>
+<dt><strong>model</strong><span class="classifier">_type_, optional</span></dt><dd><p>_description_, by default None</p>
 </dd>
-<dt>method<span class="classifier">_type_, optional</span></dt><dd><p>_description_, by default None</p>
+<dt><strong>method</strong><span class="classifier">_type_, optional</span></dt><dd><p>_description_, by default None</p>
 </dd>
 </dl>
-<dl class="simple">
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
 <dt>_type_</dt><dd><p>_description_</p>
+</dd>
+</dl>
 </dd>
 </dl>
 </dd></dl>

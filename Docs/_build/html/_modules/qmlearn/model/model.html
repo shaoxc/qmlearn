@@ -35,7 +35,8 @@
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">qmlearn</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">QMLearn</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html#installation">Installation</a></li>
 </ul>
 
         </div>
@@ -73,19 +74,18 @@
 
 
 <div class="viewcode-block" id="QMModel"><a class="viewcode-back" href="../../../qmlearn.model.html#qmlearn.model.model.QMModel">[docs]</a><span class="k">class</span> <span class="nc">QMModel</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; QMModel class is wrapper around sklearn regression model classes. It provide mthod to</span>
+    <span class="sd">&quot;&quot;&quot; QMModel class is wrapper around sklearn regression model classes. It provide method to</span>
 <span class="sd">    fit and predict based on provided training and testing data    </span>
 
-<span class="sd">    Parameters</span>
+<span class="sd">    Attributes</span>
 <span class="sd">    ----------</span>
 <span class="sd">    mmodels : dict, optional</span>
-<span class="sd">        set of machine learning algorithms used for training , If not provided</span>
+<span class="sd">        Set of machine learning algorithms used for training , If not provided</span>
 <span class="sd">        by default Kernel Ridge Rigression (KRR) will be used to learn :math:`{\gamma}` from :math:`V_{ext}` and </span>
 <span class="sd">        linear regression to learn :math:`{\delta}E`, and :math:`{\delta}{\gamma}`</span>
-<span class="sd">        </span>
 
 <span class="sd">    method : {&#39;gamma&#39;}, str</span>
-<span class="sd">        determine which property to learn from external potentials :math:`V_{ext}` . as of now only </span>
+<span class="sd">        Determine which property to learn from external potentials :math:`V_{ext}`. As of now only </span>
 <span class="sd">        :math:`{\gamma}` can be learned from :math:`V_{ext}`. And then all other properties</span>
 <span class="sd">        calculated from :math:`{\gamma}`</span>
 <span class="sd">    </span>
@@ -96,12 +96,7 @@
 <span class="sd">        Total spin as defined in PySCF (num. alpha electrons - num. beta electrons). </span>
 <span class="sd">    </span>
 <span class="sd">    refqmmol: QMMol object</span>
-<span class="sd">        Refernce QMMol object</span>
-<span class="sd">    </span>
-
-<span class="sd">        </span>
-
-
+<span class="sd">        Reference QMMol object</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mmodels</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;gamma&#39;</span><span class="p">,</span> <span class="n">ncharge</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">nspin</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">occs</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">refqmmol</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_method</span> <span class="o">=</span> <span class="n">method</span>

@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>qmlearn.api package &mdash; qmlearn 0.8 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="qmlearn.drivers package" href="qmlearn.drivers.html" />
+    <link rel="prev" title="qmlearn package" href="qmlearn.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="index.html" class="icon icon-home"> qmlearn
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">QMLearn</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="qmlearn.html">qmlearn package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="qmlearn.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4 current"><a class="current reference internal" href="#">qmlearn.api package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="qmlearn.drivers.html">qmlearn.drivers package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="qmlearn.io.html">qmlearn.io package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="qmlearn.model.html">qmlearn.model package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="qmlearn.preprocessing.html">qmlearn.preprocessing package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="qmlearn.utils.html">qmlearn.utils package</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="modules.html#installation">Installation</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">qmlearn</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="modules.html">QMLearn</a> &raquo;</li>
+          <li><a href="qmlearn.html">qmlearn package</a> &raquo;</li>
+      <li>qmlearn.api package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/qmlearn.api.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="qmlearn-api-package">
+<h1>qmlearn.api package<a class="headerlink" href="#qmlearn-api-package" title="Permalink to this headline"></a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline"></a></h2>
+</section>
+<section id="qmlearn-api-api4ase-module">
+<h2>qmlearn.api.api4ase module<a class="headerlink" href="#qmlearn-api-api4ase-module" title="Permalink to this headline"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="qmlearn.api.api4ase.QMLCalculator">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">qmlearn.api.api4ase.</span></span><span class="sig-name descname"><span class="pre">QMLCalculator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">qmmodel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">second_learn</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'gamma'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'QMLearn'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">atoms</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">directory</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'.'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">refqmmol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">properties</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'energy'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qmlearn/api/api4ase.html#QMLCalculator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qmlearn.api.api4ase.QMLCalculator" title="Permalink to this definition"></a></dt>
+<dd><p>Mean QML calculator</p>
+<dl class="field-list">
+<dt class="field-odd">Attributes</dt>
+<dd class="field-odd"><dl>
+<dt><strong>qmmodel</strong><span class="classifier">QMMol object</span></dt><dd><p>Reference QMMol object</p>
+</dd>
+<dt><strong>method</strong><span class="classifier">str</span></dt><dd><p>Options</p>
+<div class="line-block">
+<div class="line">‘gamma’ : Use QMLearn learning proccess to predict the desire property.</div>
+<div class="line">‘engine’ : Use PySCF engine to predict the desire property.</div>
+</div>
+</dd>
+<dt><strong>properties</strong><span class="classifier">list:str</span></dt><dd><p>Options</p>
+<div class="line-block">
+<div class="line">‘energy’ : Energy </div>
+<div class="line">‘forces’ : Forces </div>
+<div class="line">‘dipole’ : Dipole </div>
+<div class="line">‘stress’ : Stress </div>
+<div class="line">‘gamma’ : 1-RDM  </div>
+</div>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Methods</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#qmlearn.api.api4ase.QMLCalculator.calc_with_engine" title="qmlearn.api.api4ase.QMLCalculator.calc_with_engine"><code class="xref py py-obj docutils literal notranslate"><span class="pre">calc_with_engine</span></code></a>(qmmol[, properties])</p></td>
+<td><p>Function to calculate the desire properties using PySCF engine.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#qmlearn.api.api4ase.QMLCalculator.calc_with_gamma" title="qmlearn.api.api4ase.QMLCalculator.calc_with_gamma"><code class="xref py py-obj docutils literal notranslate"><span class="pre">calc_with_gamma</span></code></a>(qmmol[, properties])</p></td>
+<td><p>Function to calculate the desire properties using QMLearn learning process.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#qmlearn.api.api4ase.QMLCalculator.calculate" title="qmlearn.api.api4ase.QMLCalculator.calculate"><code class="xref py py-obj docutils literal notranslate"><span class="pre">calculate</span></code></a>([atoms, properties, system_changes])</p></td>
+<td><p>Function to calculate the desire properties.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt class="sig sig-object py" id="qmlearn.api.api4ase.QMLCalculator.calc_with_engine">
+<span class="sig-name descname"><span class="pre">calc_with_engine</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">qmmol</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">properties</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'energy'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qmlearn/api/api4ase.html#QMLCalculator.calc_with_engine"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qmlearn.api.api4ase.QMLCalculator.calc_with_engine" title="Permalink to this definition"></a></dt>
+<dd><p>Function to calculate the desire properties using PySCF engine.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl>
+<dt><strong>properties</strong><span class="classifier">list:str</span></dt><dd><p>Options</p>
+<div class="line-block">
+<div class="line">Energy : ‘energy’</div>
+<div class="line">Forces : ‘forces’</div>
+<div class="line">Dipole : ‘dipole’</div>
+<div class="line">Stress : ‘stress’</div>
+<div class="line">1-RDM : ‘gamma’</div>
+</div>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qmlearn.api.api4ase.QMLCalculator.calc_with_gamma">
+<span class="sig-name descname"><span class="pre">calc_with_gamma</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">qmmol</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">properties</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">['energy']</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qmlearn/api/api4ase.html#QMLCalculator.calc_with_gamma"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qmlearn.api.api4ase.QMLCalculator.calc_with_gamma" title="Permalink to this definition"></a></dt>
+<dd><p>Function to calculate the desire properties using QMLearn learning process.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl>
+<dt><strong>properties</strong><span class="classifier">list:str</span></dt><dd><p>Options</p>
+<div class="line-block">
+<div class="line">Energy : ‘energy’</div>
+<div class="line">Forces : ‘forces’</div>
+<div class="line">Dipole : ‘dipole’</div>
+<div class="line">Stress : ‘stress’</div>
+<div class="line">1-RDM : ‘gamma’</div>
+</div>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qmlearn.api.api4ase.QMLCalculator.calculate">
+<span class="sig-name descname"><span class="pre">calculate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">atoms</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">properties</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'energy'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">system_changes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">['positions',</span> <span class="pre">'numbers',</span> <span class="pre">'cell',</span> <span class="pre">'pbc',</span> <span class="pre">'initial_charges',</span> <span class="pre">'initial_magmoms']</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qmlearn/api/api4ase.html#QMLCalculator.calculate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qmlearn.api.api4ase.QMLCalculator.calculate" title="Permalink to this definition"></a></dt>
+<dd><p>Function to calculate the desire properties.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl>
+<dt><strong>properties</strong><span class="classifier">list:str</span></dt><dd><p>Options</p>
+<div class="line-block">
+<div class="line">Energy : ‘energy’</div>
+<div class="line">Forces : ‘forces’</div>
+<div class="line">Dipole : ‘dipole’</div>
+<div class="line">Stress : ‘stress’</div>
+<div class="line">1-RDM : ‘gamma’</div>
+</div>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-qmlearn.api.constraints">
+<span id="qmlearn-api-constraints-module"></span><h2>qmlearn.api.constraints module<a class="headerlink" href="#module-qmlearn.api.constraints" title="Permalink to this headline"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="qmlearn.api.constraints.FixBondLComb">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">qmlearn.api.constraints.</span></span><span class="sig-name descname"><span class="pre">FixBondLComb</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pairs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coefs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-06</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">maxiter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qmlearn/api/constraints.html#FixBondLComb"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qmlearn.api.constraints.FixBondLComb" title="Permalink to this definition"></a></dt>
+<dd><p>This is similar to ASE FixBondLengths, but with linear combination of bond lengths.
+sum_i(bond_length_i * coefs_i) = constant</p>
+<dl class="field-list simple">
+<dt class="field-odd">Attributes</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>dt</strong></dt><dd></dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Methods</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 67%" />
+<col style="width: 33%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><strong>adjust_forces</strong></p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p><strong>adjust_momenta</strong></p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p><strong>adjust_positions</strong></p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p><strong>copy</strong></p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p><strong>get_jacobian</strong></p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p><strong>get_prims</strong></p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p><strong>get_prims_vel</strong></p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p><strong>get_removed_dof</strong></p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p><strong>output</strong></p></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</section>
+<section id="module-qmlearn.api">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-qmlearn.api" title="Permalink to this headline"></a></h2>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="qmlearn.html" class="btn btn-neutral float-left" title="qmlearn package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="qmlearn.drivers.html" class="btn btn-neutral float-right" title="qmlearn.drivers package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Jessica and Musa.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

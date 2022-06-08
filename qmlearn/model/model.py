@@ -8,19 +8,18 @@ from qmlearn.drivers.mol import QMMol
 
 
 class QMModel(object):
-    """ QMModel class is wrapper around sklearn regression model classes. It provide mthod to
+    """ QMModel class is wrapper around sklearn regression model classes. It provide method to
     fit and predict based on provided training and testing data    
 
-    Parameters
+    Attributes
     ----------
     mmodels : dict, optional
-        set of machine learning algorithms used for training , If not provided
+        Set of machine learning algorithms used for training , If not provided
         by default Kernel Ridge Rigression (KRR) will be used to learn :math:`{\gamma}` from :math:`V_{ext}` and 
         linear regression to learn :math:`{\delta}E`, and :math:`{\delta}{\gamma}`
-        
 
     method : {'gamma'}, str
-        determine which property to learn from external potentials :math:`V_{ext}` . as of now only 
+        Determine which property to learn from external potentials :math:`V_{ext}`. As of now only 
         :math:`{\gamma}` can be learned from :math:`V_{ext}`. And then all other properties
         calculated from :math:`{\gamma}`
     
@@ -31,12 +30,7 @@ class QMModel(object):
         Total spin as defined in PySCF (num. alpha electrons - num. beta electrons). 
     
     refqmmol: QMMol object
-        Refernce QMMol object
-    
-
-        
-
-
+        Reference QMMol object
     """
     def __init__(self, mmodels = None, method='gamma', ncharge=None, nspin = 1, occs = None, refqmmol = None, **kwargs):
         self._method = method

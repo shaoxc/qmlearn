@@ -6,6 +6,7 @@ Subpackages
 
 .. toctree::
 
+    qmlearn.api
     qmlearn.drivers
     qmlearn.io
     qmlearn.model

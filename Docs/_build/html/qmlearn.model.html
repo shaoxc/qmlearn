@@ -39,9 +39,10 @@
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <ul class="current">
-<li class="toctree-l1 current"><a class="reference internal" href="modules.html">qmlearn</a><ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">QMLearn</a><ul class="current">
 <li class="toctree-l2 current"><a class="reference internal" href="qmlearn.html">qmlearn package</a><ul class="current">
 <li class="toctree-l3 current"><a class="reference internal" href="qmlearn.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="qmlearn.api.html">qmlearn.api package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="qmlearn.drivers.html">qmlearn.drivers package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="qmlearn.io.html">qmlearn.io package</a></li>
 <li class="toctree-l4 current"><a class="current reference internal" href="#">qmlearn.model package</a></li>
@@ -49,12 +50,11 @@
 <li class="toctree-l4"><a class="reference internal" href="qmlearn.utils.html">qmlearn.utils package</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="qmlearn.html#module-qmlearn">Module contents</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="setup.html">setup module</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="modules.html#installation">Installation</a></li>
 </ul>
 
         </div>
@@ -71,7 +71,7 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
-          <li><a href="modules.html">qmlearn</a> &raquo;</li>
+          <li><a href="modules.html">QMLearn</a> &raquo;</li>
           <li><a href="qmlearn.html">qmlearn package</a> &raquo;</li>
       <li>qmlearn.model package</li>
       <li class="wy-breadcrumbs-aside">
@@ -206,16 +206,16 @@ or QMMol object</p>
 <dt class="sig sig-object py" id="qmlearn.model.model.QMModel">
 <em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">qmlearn.model.model.</span></span><span class="sig-name descname"><span class="pre">QMModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mmodels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'gamma'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ncharge</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nspin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">occs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">refqmmol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/qmlearn/model/model.html#QMModel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qmlearn.model.model.QMModel" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
-<p>QMModel class is wrapper around sklearn regression model classes. It provide mthod to
+<p>QMModel class is wrapper around sklearn regression model classes. It provide method to
 fit and predict based on provided training and testing data</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Attributes</dt>
 <dd class="field-odd"><dl class="simple">
-<dt><strong>mmodels</strong><span class="classifier">dict, optional</span></dt><dd><p>set of machine learning algorithms used for training , If not provided
+<dt><strong>mmodels</strong><span class="classifier">dict, optional</span></dt><dd><p>Set of machine learning algorithms used for training , If not provided
 by default Kernel Ridge Rigression (KRR) will be used to learn <span class="math notranslate nohighlight">\({\gamma}\)</span> from <span class="math notranslate nohighlight">\(V_{ext}\)</span> and 
 linear regression to learn <span class="math notranslate nohighlight">\({\delta}E\)</span>, and <span class="math notranslate nohighlight">\({\delta}{\gamma}\)</span></p>
 </dd>
-<dt><strong>method</strong><span class="classifier">{‘gamma’}, str</span></dt><dd><p>determine which property to learn from external potentials <span class="math notranslate nohighlight">\(V_{ext}\)</span> . as of now only 
+<dt><strong>method</strong><span class="classifier">{‘gamma’}, str</span></dt><dd><p>Determine which property to learn from external potentials <span class="math notranslate nohighlight">\(V_{ext}\)</span>. As of now only 
 <span class="math notranslate nohighlight">\({\gamma}\)</span> can be learned from <span class="math notranslate nohighlight">\(V_{ext}\)</span>. And then all other properties
 calculated from <span class="math notranslate nohighlight">\({\gamma}\)</span></p>
 </dd>
@@ -223,15 +223,8 @@ calculated from <span class="math notranslate nohighlight">\({\gamma}\)</span></
 </dd>
 <dt><strong>nspin: int, optional</strong></dt><dd><p>Total spin as defined in PySCF (num. alpha electrons - num. beta electrons).</p>
 </dd>
-<dt><strong>refqmmol: QMMol object</strong></dt><dd><p>Refernce QMMol object</p>
+<dt><strong>refqmmol: QMMol object</strong></dt><dd><p>Reference QMMol object</p>
 </dd>
-</dl>
-</dd>
-<dt class="field-even">Attributes</dt>
-<dd class="field-even"><dl class="simple">
-<dt><strong>method</strong></dt><dd></dd>
-<dt><strong>model</strong></dt><dd></dd>
-<dt><strong>refqmmol</strong></dt><dd></dd>
 </dl>
 </dd>
 </dl>

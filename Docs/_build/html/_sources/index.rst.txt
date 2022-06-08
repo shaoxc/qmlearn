@@ -8,12 +8,24 @@ Quantum Machine Learning by learning one-body reduced density matrices in the AO
   :width: 600
   :alt: QMLearnOverview
 
-installation
-=============
-python3 -m pip install .
+Installation from source
+========================
+
+Git:
+----------
+
+    You can get the source from gitlab like this::
+
+        $ git clone https://gitlab.com/pavanello-research-group/qmlearn.git
+        $ python -m pip install ./qmlearn.git
+
+    or simpler::
+
+        $ python -m pip install git+https://gitlab.com/pavanello-research-group/qmlearn.git
 
 Tutorials
 ===============
+
 
 API Documentation
 =================
@@ -21,6 +33,7 @@ API Documentation
    :maxdepth: 2
 
    modules
+ 
 
 Contributors
 ====================

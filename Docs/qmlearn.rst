@@ -12,10 +12,3 @@ Subpackages
     qmlearn.preprocessing
     qmlearn.utils
 
-Module contents
----------------
-
-.. automodule:: qmlearn
-    :members:
-    :undoc-members:
-    :show-inheritance:

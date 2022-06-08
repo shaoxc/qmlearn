@@ -80,7 +80,7 @@
 <span class="sd">    ----------</span>
 <span class="sd">    mmodels : dict, optional</span>
 <span class="sd">        set of machine learning algorithms used for training , If not provided</span>
-<span class="sd">        by default Kernel Ridge Rigression (KRR) will be used to learn :math:`{\gmmma}` from :math:`V_{ext}` and </span>
+<span class="sd">        by default Kernel Ridge Rigression (KRR) will be used to learn :math:`{\gamma}` from :math:`V_{ext}` and </span>
 <span class="sd">        linear regression to learn :math:`{\delta}E`, and :math:`{\delta}{\gamma}`</span>
 <span class="sd">        </span>
 
@@ -90,10 +90,10 @@
 <span class="sd">        calculated from :math:`{\gamma}`</span>
 <span class="sd">    </span>
 <span class="sd">    ncharge: int, optional</span>
-<span class="sd">        charge of the atoms</span>
+<span class="sd">        Total number of electrons.</span>
 <span class="sd">    </span>
 <span class="sd">    nspin: int, optional</span>
-<span class="sd">        ??</span>
+<span class="sd">        Total spin as defined in PySCF (num. alpha electrons - num. beta electrons). </span>
 <span class="sd">    </span>
 <span class="sd">    refqmmol: QMMol object</span>
 <span class="sd">        Refernce QMMol object</span>
@@ -160,10 +160,12 @@
 <span class="sd">            Regression model (i.e., KernelRidge, LinearRegression), If not provided will take from</span>
 <span class="sd">            mmodels dictionary.</span>
 <span class="sd">        method : {&#39;gamma&#39;, &#39;d_gamma&#39;, &#39;d_energy&#39;, &#39;d_forces&#39;} </span>
-<span class="sd">            &#39;gamma&#39; -&gt; learn :math:`{\delta\gamma}` using :math:`V_{ext}`</span>
-<span class="sd">            &#39;d_gamma&#39; -&gt; learn :math:`{\delta\gamma}` based on predicted :math:`{\gamma}`.</span>
-<span class="sd">            &#39;d_energy&#39; -&gt; learn :math:`{\delta}E` based on predicted :math:`{\gamma}`</span>
-<span class="sd">            &#39;d_forces&#39; -&gt; learn :math:`{\delta}F` based on predicted :math:`{\gamma}`</span>
+
+<span class="sd">            | &#39;gamma&#39; -&gt; learn :math:`{\delta\gamma}` using :math:`V_{ext}`</span>
+<span class="sd">            | &#39;d_gamma&#39; -&gt; learn :math:`{\delta\gamma}` based on predicted :math:`{\gamma}`.</span>
+<span class="sd">            | &#39;d_energy&#39; -&gt; learn :math:`{\delta}E` based on predicted :math:`{\gamma}`</span>
+<span class="sd">            | &#39;d_forces&#39; -&gt; learn :math:`{\delta}F` based on predicted :math:`{\gamma}`</span>
+
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        QMModel</span>
@@ -188,17 +190,19 @@
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        X : array</span>
+<span class="sd">        x : array</span>
 <span class="sd">            Training data</span>
-<span class="sd">        model : _type_, optional</span>
-<span class="sd">            _description_, by default None</span>
-<span class="sd">        method : _type_, optional</span>
-<span class="sd">            _description_, by default None</span>
+<span class="sd">       </span>
+<span class="sd">       method : {&#39;gamma&#39;, &#39;d_gamma&#39;, &#39;d_energy&#39;, &#39;d_forces&#39;} </span>
+<span class="sd">            | &#39;gamma&#39; -&gt; predict :math:`{\delta\gamma}` using :math:`V_{ext}`</span>
+<span class="sd">            | &#39;d_gamma&#39; -&gt; predict :math:`{\gamma}+{\delta\gamma}` based on predicted :math:`{\gamma}`.</span>
+<span class="sd">            | &#39;d_energy&#39; -&gt; predict :math:`E+{\delta}E` based on predicted :math:`{\gamma}`</span>
+<span class="sd">            | &#39;d_forces&#39; -&gt; predict :math:`F+{\delta}F` based on predicted :math:`{\gamma}`</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        _type_</span>
-<span class="sd">            _description_</span>
+<span class="sd">        y : array</span>
+<span class="sd">            Predicted target values</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">x</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">translate_input</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span><span class="o">.</span><span class="n">ravel</span><span class="p">()]</span>
         <span class="k">if</span> <span class="n">model</span> <span class="ow">is</span> <span class="kc">None</span> <span class="p">:</span>
@@ -210,11 +214,21 @@
         <span class="k">return</span> <span class="n">y</span></div>
 
 <div class="viewcode-block" id="QMModel.convert_back"><a class="viewcode-back" href="../../../qmlearn.model.html#qmlearn.model.model.QMModel.convert_back">[docs]</a>    <span class="k">def</span> <span class="nf">convert_back</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">prop</span> <span class="o">=</span> <span class="s1">&#39;gamma&#39;</span><span class="p">,</span> <span class="n">qmmol</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Convert back the predicted properties to the original reference frame of the molecule </span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        y : array</span>
+<span class="sd">            Predicted target values in original refrence frame of the molecule</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">qmmol</span> <span class="o">=</span> <span class="n">qmmol</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">qmmol</span>
         <span class="n">y</span> <span class="o">=</span> <span class="n">qmmol</span><span class="o">.</span><span class="n">convert_back</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">prop</span> <span class="o">=</span> <span class="n">prop</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">y</span></div>
 
 <div class="viewcode-block" id="QMModel.translate_input"><a class="viewcode-back" href="../../../qmlearn.model.html#qmlearn.model.model.QMModel.translate_input">[docs]</a>    <span class="k">def</span> <span class="nf">translate_input</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return external potential :math:`V_{ext}` from x. x could be numpy ndarray, ASE Atoms object,</span>
+<span class="sd">         or QMMol object   </span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="p">:</span>
             <span class="n">out</span> <span class="o">=</span> <span class="n">x</span>
         <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">Atoms</span><span class="p">)</span> <span class="p">:</span>

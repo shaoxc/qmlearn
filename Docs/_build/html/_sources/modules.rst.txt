@@ -1,8 +1,14 @@
-qmlearn
+QMLearn
 =======
 
 .. toctree::
    :maxdepth: 4
 
    qmlearn
-   setup
+
+Installation
+============
+.. toctree::
+
+   install
+

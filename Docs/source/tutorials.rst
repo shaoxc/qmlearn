@@ -28,10 +28,10 @@ Using a QMModel: Performing Geometry Optimization
    tutorials/predict/predict
 
 Video Tutorials
-===============
+---------------
 
 QMLearn Installation
---------------------
+~~~~~~~~~~~~~~~~~~~~~~
 
 ..  youtube:: aG5vqBpNfZw
    :align: center
@@ -39,7 +39,7 @@ QMLearn Installation
    
 
 Code Architecture
------------------
+~~~~~~~~~~~~~~~~~
 
 ..  youtube:: WoHENfVD4cE
    :align: center
@@ -47,7 +47,7 @@ Code Architecture
 
 
 Creating a Database
--------------------
+~~~~~~~~~~~~~~~~~~~~~~
 
 ..  youtube:: CDeEbsPkLhM
    :align: center
@@ -55,14 +55,14 @@ Creating a Database
 
 
 Creating a QMModel: Fitting the Model and Predicting
-----------------------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 ..  youtube:: 5GPem7jsgB0
    :align: center
    :aspect: 16:9
 
 Using a QMModel: Performing Geometry Optimization
--------------------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 ..  youtube:: q15Kp4rkdsA
    :align: center

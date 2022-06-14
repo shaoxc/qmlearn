@@ -24,7 +24,7 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-            <a href="../../../index.html" class="icon icon-home"> qmlearn
+            <a href="../../../source/index.html" class="icon icon-home"> qmlearn
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
@@ -35,8 +35,10 @@
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">QMLearn</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../modules.html#installation">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../source/modules.html">QMLearn Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../source/modules.html#installation">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../source/modules.html#contact">Contact</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../source/modules.html#tutorials">Tutorials</a></li>
 </ul>
 
         </div>
@@ -45,14 +47,14 @@
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../../../index.html">qmlearn</a>
+          <a href="../../../source/index.html">qmlearn</a>
       </nav>
 
       <div class="wy-nav-content">
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+      <li><a href="../../../source/index.html" class="icon icon-home"></a> &raquo;</li>
           <li><a href="../../index.html">Module code</a> &raquo;</li>
           <li><a href="../io.html">qmlearn.io</a> &raquo;</li>
       <li>qmlearn.io.core</li>
@@ -65,7 +67,7 @@
            <div itemprop="articleBody">
              
   <h1>Source code for qmlearn.io.core</h1><div class="highlight"><pre>
-<div class="viewcode-block" id="DB"><a class="viewcode-back" href="../../../qmlearn.io.html#qmlearn.io.core.DB">[docs]</a><span></span><span class="k">class</span> <span class="nc">DB</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<div class="viewcode-block" id="DB"><a class="viewcode-back" href="../../../source/qmlearn.io.html#qmlearn.io.core.DB">[docs]</a><span></span><span class="k">class</span> <span class="nc">DB</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Abstract base class to create and manipulate database</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">mode</span> <span class="o">=</span> <span class="s1">&#39;a&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
@@ -87,7 +89,7 @@
         <span class="n">names</span> <span class="o">=</span> <span class="p">[[</span><span class="n">k</span><span class="p">,</span> <span class="n">k1</span><span class="p">]</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">dicts</span> <span class="k">for</span> <span class="n">k1</span> <span class="ow">in</span> <span class="n">dicts</span><span class="p">[</span><span class="n">k</span><span class="p">]]</span>
         <span class="k">return</span> <span class="n">names</span>
 
-<div class="viewcode-block" id="DB.create_group"><a class="viewcode-back" href="../../../qmlearn.io.html#qmlearn.io.core.DB.create_group">[docs]</a>    <span class="k">def</span> <span class="nf">create_group</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">fh</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="DB.create_group"><a class="viewcode-back" href="../../../source/qmlearn.io.html#qmlearn.io.core.DB.create_group">[docs]</a>    <span class="k">def</span> <span class="nf">create_group</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">fh</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
         <span class="n">fh</span> <span class="o">=</span> <span class="n">fh</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">fh</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
             <span class="n">name</span> <span class="o">=</span> <span class="n">name</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)</span>
@@ -99,7 +101,7 @@
         <span class="k">else</span> <span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">create_group</span><span class="p">(</span><span class="n">name</span><span class="p">[</span><span class="mi">1</span><span class="p">:],</span> <span class="bp">self</span><span class="o">.</span><span class="n">create_group</span><span class="p">(</span><span class="n">name</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">fh</span><span class="p">))</span></div>
 
-<div class="viewcode-block" id="DB.get_group"><a class="viewcode-back" href="../../../qmlearn.io.html#qmlearn.io.core.DB.get_group">[docs]</a>    <span class="k">def</span> <span class="nf">get_group</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">fh</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="DB.get_group"><a class="viewcode-back" href="../../../source/qmlearn.io.html#qmlearn.io.core.DB.get_group">[docs]</a>    <span class="k">def</span> <span class="nf">get_group</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">fh</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
         <span class="n">fh</span> <span class="o">=</span> <span class="n">fh</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">fh</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
             <span class="n">name</span> <span class="o">=</span> <span class="n">name</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)</span>

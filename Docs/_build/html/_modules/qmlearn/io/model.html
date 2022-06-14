@@ -24,7 +24,7 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-            <a href="../../../index.html" class="icon icon-home"> qmlearn
+            <a href="../../../source/index.html" class="icon icon-home"> qmlearn
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
@@ -35,8 +35,10 @@
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">QMLearn</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../modules.html#installation">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../source/modules.html">QMLearn Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../source/modules.html#installation">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../source/modules.html#contact">Contact</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../source/modules.html#tutorials">Tutorials</a></li>
 </ul>
 
         </div>
@@ -45,14 +47,14 @@
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../../../index.html">qmlearn</a>
+          <a href="../../../source/index.html">qmlearn</a>
       </nav>
 
       <div class="wy-nav-content">
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+      <li><a href="../../../source/index.html" class="icon icon-home"></a> &raquo;</li>
           <li><a href="../../index.html">Module code</a> &raquo;</li>
           <li><a href="../io.html">qmlearn.io</a> &raquo;</li>
       <li>qmlearn.io.model</li>
@@ -70,7 +72,7 @@
 <span class="kn">from</span> <span class="nn">qmlearn.model.model</span> <span class="kn">import</span> <span class="n">QMModel</span>
 <span class="kn">from</span> <span class="nn">qmlearn.io.hdf5</span> <span class="kn">import</span> <span class="n">DBHDF5</span>
 
-<div class="viewcode-block" id="db2qmmodel"><a class="viewcode-back" href="../../../qmlearn.io.html#qmlearn.io.model.db2qmmodel">[docs]</a><span class="k">def</span> <span class="nf">db2qmmodel</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">names</span> <span class="o">=</span> <span class="s1">&#39;*&#39;</span><span class="p">,</span> <span class="n">mmodels</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="db2qmmodel"><a class="viewcode-back" href="../../../source/qmlearn.io.html#qmlearn.io.model.db2qmmodel">[docs]</a><span class="k">def</span> <span class="nf">db2qmmodel</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">names</span> <span class="o">=</span> <span class="s1">&#39;*&#39;</span><span class="p">,</span> <span class="n">mmodels</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Train QMModel to learn :math:`{\gamma}` in terms of :math:`V_{ext}` from training data</span>
 <span class="sd">    then an additional layer of training learn :math:`{\delta}E` and :math:`{\delta}{\gamma}` </span>
 <span class="sd">    based on previously learned :math:`{\gamma}`.</span>

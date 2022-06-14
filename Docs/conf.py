@@ -31,13 +31,6 @@ release = '0.8'
 
 # -- General configuration ---------------------------------------------------
 
-# If your documentation needs a minimal Sphinx version, state it here.
-#
-# needs_sphinx = '1.0'
-
-# Add any Sphinx extension module names here, as strings. They can be
-# extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
-# ones.
 extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.doctest',
@@ -57,14 +50,9 @@ extensions = [
 templates_path = ['_templates']
 numpydoc_show_class_members = True
 
-# The suffix(es) of source filenames.
-# You can specify multiple suffix as a list of string:
-#
-# source_suffix = ['.rst', '.md']
 source_suffix = '.rst'
 
-# The master toctree document.
-master_doc = 'index'
+master_doc = 'source/index'
 
 language = None
 
@@ -76,18 +64,11 @@ pygments_style = None
 
 # -- Options for HTML output -------------------------------------------------
 
-# The theme to use for HTML and HTML Help pages.  See the documentation for
-# a list of builtin themes.
-#
 html_theme = 'sphinx_rtd_theme'
-
-# html_sidebars = {}
 
 # -- Options for HTMLHelp output ---------------------------------------------
 
-# Output file base name for HTML help builder.
 htmlhelp_basename = 'qmlearndoc'
-
 
 # -- Options for LaTeX output ------------------------------------------------
 
@@ -109,33 +90,11 @@ latex_elements = {
     # 'figure_align': 'htbp',
 }
 
-latex_documents = [
-    (master_doc, 'qmlearn.tex', 'qmlearn Documentation',
-     'Jessica and Musa', 'manual'),
-]
+#latex_documents = [
+#    (master_doc, 'qmlearn.tex', 'qmlearn Documentation',
+#     'Jessica and Musa', 'manual'),
+#]
 
-
-# -- Options for manual page output ------------------------------------------
-
-man_pages = [
-    (master_doc, 'qmlearn', 'qmlearn Documentation',
-     [author], 1)
-]
-
-
-# -- Options for Texinfo output ----------------------------------------------
-
-texinfo_documents = [
-    (master_doc, 'qmlearn', 'qmlearn Documentation',
-     author, 'qmlearn', 'One line description of project.',
-     'Miscellaneous'),
-]
-
-# Bibliographic Dublin Core info.
-epub_title = project
-
-# A list of files that should not be packed into the epub file.
-epub_exclude_files = ['search.html']
 
 # -- Options for intersphinx extension ---------------------------------------
 

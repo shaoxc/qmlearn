@@ -24,7 +24,7 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-            <a href="../../../index.html" class="icon icon-home"> qmlearn
+            <a href="../../../source/index.html" class="icon icon-home"> qmlearn
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
@@ -35,8 +35,10 @@
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">QMLearn</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../modules.html#installation">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../source/modules.html">QMLearn Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../source/modules.html#installation">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../source/modules.html#contact">Contact</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../source/modules.html#tutorials">Tutorials</a></li>
 </ul>
 
         </div>
@@ -45,14 +47,14 @@
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../../../index.html">qmlearn</a>
+          <a href="../../../source/index.html">qmlearn</a>
       </nav>
 
       <div class="wy-nav-content">
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+      <li><a href="../../../source/index.html" class="icon icon-home"></a> &raquo;</li>
           <li><a href="../../index.html">Module code</a> &raquo;</li>
       <li>qmlearn.api.constraints</li>
       <li class="wy-breadcrumbs-aside">
@@ -67,10 +69,25 @@
 <span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">from</span> <span class="nn">ase.geometry</span> <span class="kn">import</span> <span class="n">get_distances_derivatives</span><span class="p">,</span> <span class="n">get_distances</span>
 
-<div class="viewcode-block" id="FixBondLComb"><a class="viewcode-back" href="../../../qmlearn.api.html#qmlearn.api.constraints.FixBondLComb">[docs]</a><span class="k">class</span> <span class="nc">FixBondLComb</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    This is similar to ASE FixBondLengths, but with linear combination of bond lengths.</span>
+<div class="viewcode-block" id="FixBondLComb"><a class="viewcode-back" href="../../../source/qmlearn.api.html#qmlearn.api.constraints.FixBondLComb">[docs]</a><span class="k">class</span> <span class="nc">FixBondLComb</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;This is similar to ASE FixBondLengths, but with linear combination of bond lengths.</span>
 <span class="sd">    sum_i(bond_length_i * coefs_i) = constant</span>
+
+<span class="sd">     Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    pairs : array</span>
+<span class="sd">        Array of pairs of atoms index</span>
+<span class="sd">    coefs : array</span>
+<span class="sd">        Array of pair bond length weights</span>
+<span class="sd">    dt : float</span>
+<span class="sd">        time steps in ASE Velocity Verlet integration</span>
+<span class="sd">    tol : float</span>
+<span class="sd">        If difference between weighted sum of bondlengths and fixed bond length is less than `tol`</span>
+<span class="sd">        calculation is stoped.</span>
+<span class="sd">    target: float</span>
+<span class="sd">        Fixed Bondlength value</span>
+<span class="sd">    maxiter : int</span>
+<span class="sd">        maximum number of iteration</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pairs</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">coefs</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">dt</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="mf">1e-6</span><span class="p">,</span> <span class="n">target</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">maxiter</span> <span class="o">=</span> <span class="mi">1000</span><span class="p">,</span> <span class="n">scale</span> <span class="o">=</span> <span class="mf">2.0</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">pairs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">pairs</span><span class="p">)</span>
@@ -102,6 +119,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">dt</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;time steps in ASE Velocity Verlet integration&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dt</span> <span class="ow">is</span> <span class="kc">None</span> <span class="p">:</span>
             <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="s2">&quot;Please set the &#39;dt&#39; firstly.&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dt</span>
@@ -113,8 +131,23 @@
     <span class="k">def</span> <span class="nf">get_removed_dof</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atoms</span><span class="p">):</span>
         <span class="k">return</span> <span class="mi">1</span>
 
-    <span class="k">def</span> <span class="nf">adjust_positions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atoms</span><span class="p">,</span> <span class="n">new</span><span class="p">):</span>
+<div class="viewcode-block" id="FixBondLComb.adjust_positions"><a class="viewcode-back" href="../../../source/qmlearn.api.html#qmlearn.api.constraints.FixBondLComb.adjust_positions">[docs]</a>    <span class="k">def</span> <span class="nf">adjust_positions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atoms</span><span class="p">,</span> <span class="n">new</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Keep adjusting atomic positions while keeping </span>
+<span class="sd">           weighted sum of fix bond length constant</span>
 
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        atoms : ASE atom object</span>
+<span class="sd">        </span>
+<span class="sd">        new : array</span>
+<span class="sd">            positions of atoms which will change until converged</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        RuntimeError</span>
+<span class="sd">            If calculation is not converged within max number of iteration </span>
+<span class="sd">            a RuntimeError will raised</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">masses</span> <span class="o">=</span> <span class="n">atoms</span><span class="o">.</span><span class="n">get_masses</span><span class="p">()[:,</span> <span class="kc">None</span><span class="p">]</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">target</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -142,10 +175,11 @@
         <span class="c1">#-----------------------------------------------------------------------</span>
         <span class="c1"># Due to ASE use Velocity Verlet integration</span>
         <span class="n">p</span> <span class="o">=</span> <span class="n">atoms</span><span class="o">.</span><span class="n">get_momenta</span><span class="p">()</span> <span class="o">+</span> <span class="n">lmd</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">dt</span>
-        <span class="n">atoms</span><span class="o">.</span><span class="n">set_momenta</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">apply_constraint</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span>
+        <span class="n">atoms</span><span class="o">.</span><span class="n">set_momenta</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">apply_constraint</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span></div>
         <span class="c1">#-----------------------------------------------------------------------</span>
 
-    <span class="k">def</span> <span class="nf">adjust_momenta</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atoms</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
+<div class="viewcode-block" id="FixBondLComb.adjust_momenta"><a class="viewcode-back" href="../../../source/qmlearn.api.html#qmlearn.api.constraints.FixBondLComb.adjust_momenta">[docs]</a>    <span class="k">def</span> <span class="nf">adjust_momenta</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atoms</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Update momentum of atoms using velocity verlet algorithm&quot;&quot;&quot;</span>
         <span class="n">masses</span> <span class="o">=</span> <span class="n">atoms</span><span class="o">.</span><span class="n">get_masses</span><span class="p">()[:,</span> <span class="kc">None</span><span class="p">]</span>
         <span class="n">vel</span> <span class="o">=</span> <span class="n">p</span> <span class="o">/</span> <span class="n">masses</span>
 
@@ -162,17 +196,31 @@
             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s1">&#39;RATTLE algorithm not converge&#39;</span><span class="p">)</span>
         <span class="c1"># print(f&#39;bm_b converged at {i} step.&#39;, flush = True)</span>
         <span class="c1"># print(f&#39;bm_xi_b : {diff}&#39;, flush = True)</span>
-        <span class="n">p</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">vel</span><span class="o">*</span><span class="n">masses</span>
+        <span class="n">p</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">vel</span><span class="o">*</span><span class="n">masses</span></div>
 
     <span class="k">def</span> <span class="nf">adjust_forces</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atoms</span><span class="p">,</span> <span class="n">forces</span><span class="p">):</span>
         <span class="k">pass</span>
 
-    <span class="k">def</span> <span class="nf">get_prims</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atoms</span><span class="p">,</span> <span class="n">pos</span><span class="p">):</span>
+<div class="viewcode-block" id="FixBondLComb.get_prims"><a class="viewcode-back" href="../../../source/qmlearn.api.html#qmlearn.api.constraints.FixBondLComb.get_prims">[docs]</a>    <span class="k">def</span> <span class="nf">get_prims</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atoms</span><span class="p">,</span> <span class="n">pos</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Calculate weighted bond length of paired atoms</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        atoms : ASE atoms object</span>
+<span class="sd">        </span>
+<span class="sd">        pos : array</span>
+<span class="sd">            positions of atoms</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        float</span>
+<span class="sd">            weighted sum of paired bond length</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">value</span> <span class="o">=</span> <span class="mf">0.0</span>
         <span class="k">for</span> <span class="n">coef</span><span class="p">,</span> <span class="n">ip</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">coefs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">pairs</span><span class="p">)</span> <span class="p">:</span>
             <span class="n">_</span><span class="p">,</span> <span class="n">r</span> <span class="o">=</span> <span class="n">get_distances</span><span class="p">(</span><span class="n">pos</span><span class="p">[</span><span class="n">ip</span><span class="p">[</span><span class="mi">0</span><span class="p">]],</span> <span class="n">pos</span><span class="p">[</span><span class="n">ip</span><span class="p">[</span><span class="mi">1</span><span class="p">]],</span> <span class="n">cell</span> <span class="o">=</span> <span class="n">atoms</span><span class="o">.</span><span class="n">cell</span><span class="p">,</span> <span class="n">pbc</span> <span class="o">=</span> <span class="n">atoms</span><span class="o">.</span><span class="n">pbc</span><span class="p">)</span>
             <span class="n">value</span> <span class="o">+=</span> <span class="n">coef</span><span class="o">*</span><span class="n">r</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
-        <span class="k">return</span> <span class="n">value</span>
+        <span class="k">return</span> <span class="n">value</span></div>
 
     <span class="k">def</span> <span class="nf">get_prims_vel</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atoms</span><span class="p">,</span> <span class="n">vel</span><span class="p">,</span> <span class="n">jacobian</span><span class="p">):</span>
         <span class="n">value</span> <span class="o">=</span> <span class="mf">0.0</span>
@@ -181,7 +229,14 @@
             <span class="n">value</span> <span class="o">+=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">vel</span><span class="p">[</span><span class="n">ip</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span><span class="o">*</span><span class="n">jacobian</span><span class="p">[</span><span class="n">ip</span><span class="p">[</span><span class="mi">1</span><span class="p">]])</span>
         <span class="k">return</span> <span class="n">value</span>
 
-    <span class="k">def</span> <span class="nf">get_jacobian</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atoms</span><span class="p">,</span> <span class="n">pos</span><span class="p">,</span> <span class="n">jacobian</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="FixBondLComb.get_jacobian"><a class="viewcode-back" href="../../../source/qmlearn.api.html#qmlearn.api.constraints.FixBondLComb.get_jacobian">[docs]</a>    <span class="k">def</span> <span class="nf">get_jacobian</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atoms</span><span class="p">,</span> <span class="n">pos</span><span class="p">,</span> <span class="n">jacobian</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Calculate the Jacobian of positions of the paired atoms.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        array</span>
+<span class="sd">            Jacobian of postion of paired atoms</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">n</span> <span class="o">=</span> <span class="mi">2</span> <span class="c1"># bond</span>
         <span class="n">vectors</span> <span class="o">=</span> <span class="p">[</span><span class="n">pos</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">-</span> <span class="n">pos</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">pairs</span><span class="p">]</span>
         <span class="n">derivs</span> <span class="o">=</span> <span class="n">get_distances_derivatives</span><span class="p">(</span><span class="n">vectors</span><span class="p">,</span> <span class="n">cell</span><span class="o">=</span><span class="n">atoms</span><span class="o">.</span><span class="n">cell</span><span class="p">,</span> <span class="n">pbc</span><span class="o">=</span><span class="n">atoms</span><span class="o">.</span><span class="n">pbc</span><span class="p">)</span>
@@ -189,7 +244,7 @@
         <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">ip</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pairs</span><span class="p">):</span>
             <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
                 <span class="n">jacobian</span><span class="p">[</span><span class="n">ip</span><span class="p">[</span><span class="n">j</span><span class="p">]]</span> <span class="o">+=</span> <span class="n">derivs</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">coefs</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
-        <span class="k">return</span> <span class="n">jacobian</span>
+        <span class="k">return</span> <span class="n">jacobian</span></div>
 
     <span class="k">def</span> <span class="nf">output</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">write</span> <span class="o">=</span> <span class="kc">True</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">bm_nsteps</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="p">:</span> <span class="k">return</span> <span class="s1">&#39;&#39;</span>

@@ -24,7 +24,7 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-            <a href="../../../index.html" class="icon icon-home"> qmlearn
+            <a href="../../../source/index.html" class="icon icon-home"> qmlearn
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
@@ -35,8 +35,10 @@
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">QMLearn</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../modules.html#installation">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../source/modules.html">QMLearn Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../source/modules.html#installation">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../source/modules.html#contact">Contact</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../source/modules.html#tutorials">Tutorials</a></li>
 </ul>
 
         </div>
@@ -45,14 +47,14 @@
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../../../index.html">qmlearn</a>
+          <a href="../../../source/index.html">qmlearn</a>
       </nav>
 
       <div class="wy-nav-content">
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+      <li><a href="../../../source/index.html" class="icon icon-home"></a> &raquo;</li>
           <li><a href="../../index.html">Module code</a> &raquo;</li>
       <li>qmlearn.drivers.psi4</li>
       <li class="wy-breadcrumbs-aside">
@@ -78,7 +80,7 @@
         <span class="s1">&#39;mp2&#39;</span> <span class="p">:</span> <span class="s1">&#39;rhf+mp2&#39;</span><span class="p">,</span>
         <span class="p">}</span>
 
-<div class="viewcode-block" id="EnginePsi4"><a class="viewcode-back" href="../../../qmlearn.drivers.html#qmlearn.drivers.psi4.EnginePsi4">[docs]</a><span class="k">class</span> <span class="nc">EnginePsi4</span><span class="p">(</span><span class="n">Engine</span><span class="p">):</span>
+<div class="viewcode-block" id="EnginePsi4"><a class="viewcode-back" href="../../../source/qmlearn.drivers.html#qmlearn.drivers.psi4.EnginePsi4">[docs]</a><span class="k">class</span> <span class="nc">EnginePsi4</span><span class="p">(</span><span class="n">Engine</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot; PySCF calculator</span>
 
 <span class="sd">    Attributes</span>
@@ -108,7 +110,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_xcfunc</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
-<div class="viewcode-block" id="EnginePsi4.init"><a class="viewcode-back" href="../../../qmlearn.drivers.html#qmlearn.drivers.psi4.EnginePsi4.init">[docs]</a>    <span class="k">def</span> <span class="nf">init</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="EnginePsi4.init"><a class="viewcode-back" href="../../../source/qmlearn.drivers.html#qmlearn.drivers.psi4.EnginePsi4.init">[docs]</a>    <span class="k">def</span> <span class="nf">init</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="n">mol</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;mol&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
         <span class="n">mints</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;mints&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
         <span class="n">basis</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;basis&#39;</span><span class="p">,</span> <span class="s1">&#39;6-31g&#39;</span><span class="p">)</span>
@@ -143,7 +145,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">mol</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mints</span><span class="o">.</span><span class="n">basisset</span><span class="p">()</span><span class="o">.</span><span class="n">molecule</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">xc</span> <span class="o">=</span> <span class="n">xc</span></div>
 
-<div class="viewcode-block" id="EnginePsi4.init_mol"><a class="viewcode-back" href="../../../qmlearn.drivers.html#qmlearn.drivers.psi4.EnginePsi4.init_mol">[docs]</a>    <span class="k">def</span> <span class="nf">init_mol</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mol</span><span class="p">,</span> <span class="n">basis</span><span class="p">):</span>
+<div class="viewcode-block" id="EnginePsi4.init_mol"><a class="viewcode-back" href="../../../source/qmlearn.drivers.html#qmlearn.drivers.psi4.EnginePsi4.init_mol">[docs]</a>    <span class="k">def</span> <span class="nf">init_mol</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mol</span><span class="p">,</span> <span class="n">basis</span><span class="p">):</span>
         <span class="n">ase_atoms</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">mol</span><span class="p">,</span> <span class="n">Atoms</span><span class="p">):</span>
             <span class="n">ase_atoms</span> <span class="o">=</span> <span class="n">mol</span>
@@ -162,7 +164,7 @@
             <span class="n">mol</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">psi4</span><span class="o">.</span><span class="n">geometry</span><span class="p">(</span><span class="n">atom</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">mol</span></div>
 
-<div class="viewcode-block" id="EnginePsi4.run"><a class="viewcode-back" href="../../../qmlearn.drivers.html#qmlearn.drivers.psi4.EnginePsi4.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ao_repr</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="EnginePsi4.run"><a class="viewcode-back" href="../../../source/qmlearn.drivers.html#qmlearn.drivers.psi4.EnginePsi4.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ao_repr</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Caculate electronic properties using Psi4.</span>
 <span class="sd">        </span>
 <span class="sd">        Parameters</span>
@@ -208,7 +210,7 @@
         <span class="n">charges</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">charge</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">natom</span><span class="p">())]</span>
         <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">charges</span><span class="p">)</span>
 
-<div class="viewcode-block" id="EnginePsi4.calc_gamma"><a class="viewcode-back" href="../../../qmlearn.drivers.html#qmlearn.drivers.psi4.EnginePsi4.calc_gamma">[docs]</a>    <span class="k">def</span> <span class="nf">calc_gamma</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">orb</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">occs</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="EnginePsi4.calc_gamma"><a class="viewcode-back" href="../../../source/qmlearn.drivers.html#qmlearn.drivers.psi4.EnginePsi4.calc_gamma">[docs]</a>    <span class="k">def</span> <span class="nf">calc_gamma</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">orb</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">occs</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="s2">&quot;Sorry, not implemented yet.&quot;</span><span class="p">)</span></div>
 
     <span class="nd">@property</span>
@@ -235,7 +237,7 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">_xcfunc</span><span class="o">.</span><span class="n">initialize</span><span class="p">()</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_xcfunc</span>
 
-<div class="viewcode-block" id="EnginePsi4.calc_exc"><a class="viewcode-back" href="../../../qmlearn.drivers.html#qmlearn.drivers.psi4.EnginePsi4.calc_exc">[docs]</a>    <span class="k">def</span> <span class="nf">calc_exc</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gamma</span><span class="p">):</span>
+<div class="viewcode-block" id="EnginePsi4.calc_exc"><a class="viewcode-back" href="../../../source/qmlearn.drivers.html#qmlearn.drivers.psi4.EnginePsi4.calc_exc">[docs]</a>    <span class="k">def</span> <span class="nf">calc_exc</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gamma</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot; Function to calculate the Exchange Correlation energy.  </span>
 
 <span class="sd">        Parameters</span>
@@ -260,7 +262,7 @@
             <span class="n">exc</span> <span class="o">=</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">einsum</span><span class="p">(</span><span class="s1">&#39;pq,pq-&gt;&#39;</span><span class="p">,</span> <span class="n">eop</span><span class="p">,</span> <span class="n">gamma</span><span class="p">)</span><span class="o">*</span><span class="mf">0.25</span>
         <span class="k">return</span> <span class="n">exc</span></div>
 
-<div class="viewcode-block" id="EnginePsi4.calc_etotal"><a class="viewcode-back" href="../../../qmlearn.drivers.html#qmlearn.drivers.psi4.EnginePsi4.calc_etotal">[docs]</a>    <span class="k">def</span> <span class="nf">calc_etotal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gamma</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="EnginePsi4.calc_etotal"><a class="viewcode-back" href="../../../source/qmlearn.drivers.html#qmlearn.drivers.psi4.EnginePsi4.calc_etotal">[docs]</a>    <span class="k">def</span> <span class="nf">calc_etotal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gamma</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot; Function to calculate Total Energy.</span>
 
 <span class="sd">        Parameters</span>
@@ -283,7 +285,7 @@
         <span class="n">etotal</span> <span class="o">=</span> <span class="n">e1</span> <span class="o">+</span> <span class="n">exc</span> <span class="o">+</span> <span class="n">e_nuc</span>
         <span class="k">return</span> <span class="n">etotal</span></div>
 
-<div class="viewcode-block" id="EnginePsi4.calc_dipole"><a class="viewcode-back" href="../../../qmlearn.drivers.html#qmlearn.drivers.psi4.EnginePsi4.calc_dipole">[docs]</a>    <span class="k">def</span> <span class="nf">calc_dipole</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gamma</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="EnginePsi4.calc_dipole"><a class="viewcode-back" href="../../../source/qmlearn.drivers.html#qmlearn.drivers.psi4.EnginePsi4.calc_dipole">[docs]</a>    <span class="k">def</span> <span class="nf">calc_dipole</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gamma</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot; Get the total dipole moment.</span>
 
 <span class="sd">        Parameters</span>
@@ -304,7 +306,7 @@
             <span class="n">dip</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+=</span> <span class="n">nucdip</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
         <span class="k">return</span> <span class="n">dip</span></div>
 
-<div class="viewcode-block" id="EnginePsi4.calc_quadrupole"><a class="viewcode-back" href="../../../qmlearn.drivers.html#qmlearn.drivers.psi4.EnginePsi4.calc_quadrupole">[docs]</a>    <span class="k">def</span> <span class="nf">calc_quadrupole</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gamma</span><span class="p">,</span> <span class="n">traceless</span> <span class="o">=</span> <span class="kc">True</span><span class="p">):</span>
+<div class="viewcode-block" id="EnginePsi4.calc_quadrupole"><a class="viewcode-back" href="../../../source/qmlearn.drivers.html#qmlearn.drivers.psi4.EnginePsi4.calc_quadrupole">[docs]</a>    <span class="k">def</span> <span class="nf">calc_quadrupole</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gamma</span><span class="p">,</span> <span class="n">traceless</span> <span class="o">=</span> <span class="kc">True</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;  Function to calculate the total quadruple for XX, XY, XY, YY, YZ, ZZ components.</span>
 
 <span class="sd">        Parameters</span>
@@ -330,7 +332,7 @@
             <span class="n">quadp</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span> <span class="o">-=</span> <span class="n">trace</span>
         <span class="k">return</span> <span class="n">quadp</span></div>
 
-<div class="viewcode-block" id="EnginePsi4.calc_quadrupole_nuclear"><a class="viewcode-back" href="../../../qmlearn.drivers.html#qmlearn.drivers.psi4.EnginePsi4.calc_quadrupole_nuclear">[docs]</a>    <span class="k">def</span> <span class="nf">calc_quadrupole_nuclear</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mol</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="EnginePsi4.calc_quadrupole_nuclear"><a class="viewcode-back" href="../../../source/qmlearn.drivers.html#qmlearn.drivers.psi4.EnginePsi4.calc_quadrupole_nuclear">[docs]</a>    <span class="k">def</span> <span class="nf">calc_quadrupole_nuclear</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mol</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot; Function to calculate the nuclear quadruple for XX, XY, XY, YY, YZ, ZZ components.</span>
 
 <span class="sd">        Parameters</span>

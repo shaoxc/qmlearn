@@ -24,7 +24,7 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-            <a href="../../../index.html" class="icon icon-home"> qmlearn
+            <a href="../../../source/index.html" class="icon icon-home"> qmlearn
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
@@ -35,8 +35,10 @@
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">QMLearn</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../modules.html#installation">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../source/modules.html">QMLearn Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../source/modules.html#installation">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../source/modules.html#contact">Contact</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../source/modules.html#tutorials">Tutorials</a></li>
 </ul>
 
         </div>
@@ -45,14 +47,14 @@
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../../../index.html">qmlearn</a>
+          <a href="../../../source/index.html">qmlearn</a>
       </nav>
 
       <div class="wy-nav-content">
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+      <li><a href="../../../source/index.html" class="icon icon-home"></a> &raquo;</li>
           <li><a href="../../index.html">Module code</a> &raquo;</li>
       <li>qmlearn.drivers.core</li>
       <li class="wy-breadcrumbs-aside">
@@ -80,7 +82,7 @@
 
 <span class="kn">from</span> <span class="nn">qmlearn.utils.utils</span> <span class="kn">import</span> <span class="n">matrix_deviation</span>
 
-<div class="viewcode-block" id="Engine"><a class="viewcode-back" href="../../../qmlearn.drivers.html#qmlearn.drivers.core.Engine">[docs]</a><span class="k">class</span> <span class="nc">Engine</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<div class="viewcode-block" id="Engine"><a class="viewcode-back" href="../../../source/qmlearn.drivers.html#qmlearn.drivers.core.Engine">[docs]</a><span class="k">class</span> <span class="nc">Engine</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Abstract Base class for the External calculator.</span>
 <span class="sd">    Until now we have implemented: PySCF and Psi4.</span>
 
@@ -122,11 +124,11 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_eri</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_orb</span> <span class="o">=</span> <span class="kc">None</span>
 
-<div class="viewcode-block" id="Engine.init"><a class="viewcode-back" href="../../../qmlearn.drivers.html#qmlearn.drivers.core.Engine.init">[docs]</a>    <span class="k">def</span> <span class="nf">init</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="Engine.init"><a class="viewcode-back" href="../../../source/qmlearn.drivers.html#qmlearn.drivers.core.Engine.init">[docs]</a>    <span class="k">def</span> <span class="nf">init</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot; Initialize ABC class.&quot;&quot;&quot;</span>
         <span class="k">pass</span></div>
 
-<div class="viewcode-block" id="Engine.run"><a class="viewcode-back" href="../../../qmlearn.drivers.html#qmlearn.drivers.core.Engine.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="Engine.run"><a class="viewcode-back" href="../../../source/qmlearn.drivers.html#qmlearn.drivers.core.Engine.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot; ABC to check run function.&quot;&quot;&quot;</span>
         <span class="k">pass</span></div>
 
@@ -170,7 +172,7 @@
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot; Calculated number of electrons. &quot;&quot;&quot;</span>
         <span class="k">pass</span>
 
-<div class="viewcode-block" id="Engine.calc_gamma"><a class="viewcode-back" href="../../../qmlearn.drivers.html#qmlearn.drivers.core.Engine.calc_gamma">[docs]</a>    <span class="k">def</span> <span class="nf">calc_gamma</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">orb</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">occs</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="Engine.calc_gamma"><a class="viewcode-back" href="../../../source/qmlearn.drivers.html#qmlearn.drivers.core.Engine.calc_gamma">[docs]</a>    <span class="k">def</span> <span class="nf">calc_gamma</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">orb</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">occs</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Calculate the 1-body reduced density matrix (1-RDM).</span>
 
 <span class="sd">        Parameters</span>
@@ -186,7 +188,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">pass</span></div>
 
-<div class="viewcode-block" id="Engine.calc_ncharge"><a class="viewcode-back" href="../../../qmlearn.drivers.html#qmlearn.drivers.core.Engine.calc_ncharge">[docs]</a>    <span class="k">def</span> <span class="nf">calc_ncharge</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gamma</span><span class="p">,</span> <span class="n">ovlp</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="Engine.calc_ncharge"><a class="viewcode-back" href="../../../source/qmlearn.drivers.html#qmlearn.drivers.core.Engine.calc_ncharge">[docs]</a>    <span class="k">def</span> <span class="nf">calc_ncharge</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gamma</span><span class="p">,</span> <span class="n">ovlp</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot; Get calculated total number of electrons</span>
 
 <span class="sd">        Parameters</span>
@@ -206,7 +208,7 @@
         <span class="n">ncharge</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">einsum</span><span class="p">(</span><span class="s1">&#39;ji,ij-&gt;&#39;</span><span class="p">,</span> <span class="n">gamma</span><span class="p">,</span> <span class="n">ovlp</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">ncharge</span></div>
 
-<div class="viewcode-block" id="Engine.calc_ke"><a class="viewcode-back" href="../../../qmlearn.drivers.html#qmlearn.drivers.core.Engine.calc_ke">[docs]</a>    <span class="k">def</span> <span class="nf">calc_ke</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gamma</span><span class="p">,</span> <span class="n">kop</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="Engine.calc_ke"><a class="viewcode-back" href="../../../source/qmlearn.drivers.html#qmlearn.drivers.core.Engine.calc_ke">[docs]</a>    <span class="k">def</span> <span class="nf">calc_ke</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gamma</span><span class="p">,</span> <span class="n">kop</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot; Get Total kinetic energy</span>
 
 <span class="sd">        Parameters</span>
@@ -226,7 +228,7 @@
         <span class="n">ke</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">einsum</span><span class="p">(</span><span class="s1">&#39;ji,ij-&gt;&#39;</span><span class="p">,</span> <span class="n">gamma</span><span class="p">,</span> <span class="n">kop</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">ke</span></div>
 
-<div class="viewcode-block" id="Engine.calc_idempotency"><a class="viewcode-back" href="../../../qmlearn.drivers.html#qmlearn.drivers.core.Engine.calc_idempotency">[docs]</a>    <span class="k">def</span> <span class="nf">calc_idempotency</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gamma</span><span class="p">,</span> <span class="n">ovlp</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">kind</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+<div class="viewcode-block" id="Engine.calc_idempotency"><a class="viewcode-back" href="../../../source/qmlearn.drivers.html#qmlearn.drivers.core.Engine.calc_idempotency">[docs]</a>    <span class="k">def</span> <span class="nf">calc_idempotency</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gamma</span><span class="p">,</span> <span class="n">ovlp</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">kind</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot; Check idempotency of gamma  </span>
 
 <span class="sd">        .. math::</span>
@@ -263,7 +265,7 @@
             <span class="n">g</span> <span class="o">=</span> <span class="p">(</span><span class="mi">4</span><span class="o">*</span><span class="n">gamma</span><span class="nd">@ovlp@gamma@ovlp@gamma</span> <span class="o">-</span><span class="n">gamma</span><span class="nd">@ovlp@gamma@ovlp@gamma@ovlp@gamma</span><span class="p">)</span><span class="o">/</span><span class="mi">8</span>
         <span class="k">return</span> <span class="n">matrix_deviation</span><span class="p">(</span><span class="n">gamma</span><span class="p">,</span> <span class="n">g</span><span class="p">)</span></div></div>
 
-<div class="viewcode-block" id="atoms_rmsd"><a class="viewcode-back" href="../../../qmlearn.drivers.html#qmlearn.drivers.core.atoms_rmsd">[docs]</a><span class="k">def</span> <span class="nf">atoms_rmsd</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">atoms</span><span class="p">,</span> <span class="n">transform</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="p">:</span>
+<div class="viewcode-block" id="atoms_rmsd"><a class="viewcode-back" href="../../../source/qmlearn.drivers.html#qmlearn.drivers.core.atoms_rmsd">[docs]</a><span class="k">def</span> <span class="nf">atoms_rmsd</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">atoms</span><span class="p">,</span> <span class="n">transform</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="p">:</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot; Function to return RMSD : Root mean square deviation between atoms and target:transform atom object. And the target atom coordinates.</span>
 
 <span class="sd">    Parameters</span>
@@ -296,7 +298,7 @@
     <span class="n">rmsd</span> <span class="o">=</span> <span class="n">rmsd_coords</span><span class="p">(</span><span class="n">target</span><span class="o">.</span><span class="n">positions</span><span class="p">,</span> <span class="n">atoms</span><span class="o">.</span><span class="n">positions</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">rmsd</span><span class="p">,</span> <span class="n">atoms</span></div>
 
-<div class="viewcode-block" id="rmsd_coords"><a class="viewcode-back" href="../../../qmlearn.drivers.html#qmlearn.drivers.core.rmsd_coords">[docs]</a><span class="k">def</span> <span class="nf">rmsd_coords</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">pos</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="rmsd_coords"><a class="viewcode-back" href="../../../source/qmlearn.drivers.html#qmlearn.drivers.core.rmsd_coords">[docs]</a><span class="k">def</span> <span class="nf">rmsd_coords</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">pos</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot; Function to return RMSD : Root mean square deviation between pos and target atomic positions.</span>
 
 <span class="sd">    Parameters</span>
@@ -312,7 +314,7 @@
 <span class="sd">        RMSD between pos and target atomic positions  &quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">diff_coords</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">pos</span><span class="p">,</span> <span class="n">diff_method</span><span class="o">=</span><span class="s1">&#39;rmsd&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="diff_coords"><a class="viewcode-back" href="../../../qmlearn.drivers.html#qmlearn.drivers.core.diff_coords">[docs]</a><span class="k">def</span> <span class="nf">diff_coords</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">pos</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">weights</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">diff_method</span> <span class="o">=</span> <span class="s1">&#39;rmsd&#39;</span><span class="p">):</span>
+<div class="viewcode-block" id="diff_coords"><a class="viewcode-back" href="../../../source/qmlearn.drivers.html#qmlearn.drivers.core.diff_coords">[docs]</a><span class="k">def</span> <span class="nf">diff_coords</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">pos</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">weights</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">diff_method</span> <span class="o">=</span> <span class="s1">&#39;rmsd&#39;</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot; Function to return mean base on method error/deviation between pos and target atomic positions.</span>
 
 <span class="sd">    Parameters</span>
@@ -353,7 +355,7 @@
         <span class="n">rmsd</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">diff</span><span class="p">))</span><span class="o">/</span><span class="nb">len</span><span class="p">(</span><span class="n">diff</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">rmsd</span></div>
 
-<div class="viewcode-block" id="atoms2bestplane"><a class="viewcode-back" href="../../../qmlearn.drivers.html#qmlearn.drivers.core.atoms2bestplane">[docs]</a><span class="k">def</span> <span class="nf">atoms2bestplane</span><span class="p">(</span><span class="n">atoms</span><span class="p">,</span> <span class="n">direction</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="atoms2bestplane"><a class="viewcode-back" href="../../../source/qmlearn.drivers.html#qmlearn.drivers.core.atoms2bestplane">[docs]</a><span class="k">def</span> <span class="nf">atoms2bestplane</span><span class="p">(</span><span class="n">atoms</span><span class="p">,</span> <span class="n">direction</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot; Apply Principal Component Analysis (PCA) to atoms and re-oriente them.</span>
 
 <span class="sd">    Parameters</span>
@@ -378,7 +380,7 @@
         <span class="n">atoms</span> <span class="o">=</span> <span class="n">atoms2newdirection</span><span class="p">(</span><span class="n">atoms</span><span class="p">,</span> <span class="n">a</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">),</span> <span class="n">b</span><span class="o">=</span><span class="n">direction</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">atoms</span></div>
 
-<div class="viewcode-block" id="get_atoms_axes"><a class="viewcode-back" href="../../../qmlearn.drivers.html#qmlearn.drivers.core.get_atoms_axes">[docs]</a><span class="k">def</span> <span class="nf">get_atoms_axes</span><span class="p">(</span><span class="n">atoms</span><span class="p">):</span>
+<div class="viewcode-block" id="get_atoms_axes"><a class="viewcode-back" href="../../../source/qmlearn.drivers.html#qmlearn.drivers.core.get_atoms_axes">[docs]</a><span class="k">def</span> <span class="nf">get_atoms_axes</span><span class="p">(</span><span class="n">atoms</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot; Get PCA components of atomic positions.</span>
 <span class="sd">            </span>
 <span class="sd">    Parameters</span>
@@ -394,7 +396,7 @@
     <span class="n">axes</span> <span class="o">=</span> <span class="n">pca</span><span class="o">.</span><span class="n">components_</span>
     <span class="k">return</span> <span class="n">axes</span></div>
 
-<div class="viewcode-block" id="atoms2newdirection"><a class="viewcode-back" href="../../../qmlearn.drivers.html#qmlearn.drivers.core.atoms2newdirection">[docs]</a><span class="k">def</span> <span class="nf">atoms2newdirection</span><span class="p">(</span><span class="n">atoms</span><span class="p">,</span> <span class="n">a</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">),</span> <span class="n">b</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">)):</span>
+<div class="viewcode-block" id="atoms2newdirection"><a class="viewcode-back" href="../../../source/qmlearn.drivers.html#qmlearn.drivers.core.atoms2newdirection">[docs]</a><span class="k">def</span> <span class="nf">atoms2newdirection</span><span class="p">(</span><span class="n">atoms</span><span class="p">,</span> <span class="n">a</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">),</span> <span class="n">b</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">)):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot; Function to re-orientate the atom positions. </span>
 <span class="sd">    If Vector is None, the default rotation is around X-axis.</span>
 
@@ -417,7 +419,7 @@
     <span class="n">atoms</span><span class="o">.</span><span class="n">rotate</span><span class="p">(</span><span class="n">deg</span><span class="p">,</span><span class="n">c</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">atoms</span></div>
 
-<div class="viewcode-block" id="minimize_rmsd_operation"><a class="viewcode-back" href="../../../qmlearn.drivers.html#qmlearn.drivers.core.minimize_rmsd_operation">[docs]</a><span class="k">def</span> <span class="nf">minimize_rmsd_operation</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">atoms</span><span class="p">,</span> <span class="n">stereo</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">rotate_method</span> <span class="o">=</span> <span class="s1">&#39;kabsch&#39;</span><span class="p">,</span>
+<div class="viewcode-block" id="minimize_rmsd_operation"><a class="viewcode-back" href="../../../source/qmlearn.drivers.html#qmlearn.drivers.core.minimize_rmsd_operation">[docs]</a><span class="k">def</span> <span class="nf">minimize_rmsd_operation</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">atoms</span><span class="p">,</span> <span class="n">stereo</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">rotate_method</span> <span class="o">=</span> <span class="s1">&#39;kabsch&#39;</span><span class="p">,</span>
         <span class="n">reorder_method</span> <span class="o">=</span> <span class="s1">&#39;hungarian&#39;</span><span class="p">,</span> <span class="n">use_reflection</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">alpha</span> <span class="o">=</span> <span class="mf">0.2</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot; Function to create Rotation Matrix and Translation Vector</span>
 <span class="sd">    of reference atoms with respect to initialize atoms.</span>
@@ -510,7 +512,7 @@
     <span class="c1"># print(&#39;rmsd&#39;, rmsd)</span>
     <span class="k">return</span> <span class="n">rotate</span><span class="p">,</span> <span class="n">translate</span><span class="p">,</span> <span class="n">rmsd_final_indices</span></div>
 
-<div class="viewcode-block" id="get_match_rotate"><a class="viewcode-back" href="../../../qmlearn.drivers.html#qmlearn.drivers.core.get_match_rotate">[docs]</a><span class="k">def</span> <span class="nf">get_match_rotate</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">atoms</span><span class="p">,</span> <span class="n">rotate_method</span> <span class="o">=</span> <span class="s1">&#39;kabsch&#39;</span><span class="p">):</span>
+<div class="viewcode-block" id="get_match_rotate"><a class="viewcode-back" href="../../../source/qmlearn.drivers.html#qmlearn.drivers.core.get_match_rotate">[docs]</a><span class="k">def</span> <span class="nf">get_match_rotate</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">atoms</span><span class="p">,</span> <span class="n">rotate_method</span> <span class="o">=</span> <span class="s1">&#39;kabsch&#39;</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot; Rotate Atoms with a customize method</span>
 
 <span class="sd">    Parameters</span>
@@ -541,7 +543,7 @@
         <span class="n">rotate</span> <span class="o">=</span> <span class="n">rotate_method</span><span class="p">(</span><span class="n">atoms</span><span class="o">.</span><span class="n">positions</span><span class="p">,</span> <span class="n">target</span><span class="o">.</span><span class="n">positions</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">rotate</span></div>
 
-<div class="viewcode-block" id="reorder_atoms_indices"><a class="viewcode-back" href="../../../qmlearn.drivers.html#qmlearn.drivers.core.reorder_atoms_indices">[docs]</a><span class="k">def</span> <span class="nf">reorder_atoms_indices</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">atoms</span><span class="p">,</span> <span class="n">reorder_method</span><span class="o">=</span><span class="s1">&#39;hungarian&#39;</span><span class="p">):</span>
+<div class="viewcode-block" id="reorder_atoms_indices"><a class="viewcode-back" href="../../../source/qmlearn.drivers.html#qmlearn.drivers.core.reorder_atoms_indices">[docs]</a><span class="k">def</span> <span class="nf">reorder_atoms_indices</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">atoms</span><span class="p">,</span> <span class="n">reorder_method</span><span class="o">=</span><span class="s1">&#39;hungarian&#39;</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot; Reorder atoms indices</span>
 
 <span class="sd">    Parameters</span>

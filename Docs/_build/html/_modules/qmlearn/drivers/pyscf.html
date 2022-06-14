@@ -24,7 +24,7 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-            <a href="../../../index.html" class="icon icon-home"> qmlearn
+            <a href="../../../source/index.html" class="icon icon-home"> qmlearn
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
@@ -35,8 +35,10 @@
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">QMLearn</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../modules.html#installation">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../source/modules.html">QMLearn Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../source/modules.html#installation">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../source/modules.html#contact">Contact</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../source/modules.html#tutorials">Tutorials</a></li>
 </ul>
 
         </div>
@@ -45,14 +47,14 @@
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../../../index.html">qmlearn</a>
+          <a href="../../../source/index.html">qmlearn</a>
       </nav>
 
       <div class="wy-nav-content">
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+      <li><a href="../../../source/index.html" class="icon icon-home"></a> &raquo;</li>
           <li><a href="../../index.html">Module code</a> &raquo;</li>
       <li>qmlearn.drivers.pyscf</li>
       <li class="wy-breadcrumbs-aside">
@@ -86,7 +88,7 @@
         <span class="s1">&#39;fci&#39;</span> <span class="p">:</span> <span class="n">fci</span><span class="o">.</span><span class="n">FCI</span><span class="p">,</span>
         <span class="p">}</span>
 
-<div class="viewcode-block" id="EnginePyscf"><a class="viewcode-back" href="../../../qmlearn.drivers.html#qmlearn.drivers.pyscf.EnginePyscf">[docs]</a><span class="k">class</span> <span class="nc">EnginePyscf</span><span class="p">(</span><span class="n">Engine</span><span class="p">):</span>
+<div class="viewcode-block" id="EnginePyscf"><a class="viewcode-back" href="../../../source/qmlearn.drivers.html#qmlearn.drivers.pyscf.EnginePyscf">[docs]</a><span class="k">class</span> <span class="nc">EnginePyscf</span><span class="p">(</span><span class="n">Engine</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot; PySCF calculator</span>
 
 <span class="sd">    Attributes</span>
@@ -111,7 +113,7 @@
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="p">()</span>
 
-<div class="viewcode-block" id="EnginePyscf.init"><a class="viewcode-back" href="../../../qmlearn.drivers.html#qmlearn.drivers.pyscf.EnginePyscf.init">[docs]</a>    <span class="k">def</span> <span class="nf">init</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="EnginePyscf.init"><a class="viewcode-back" href="../../../source/qmlearn.drivers.html#qmlearn.drivers.pyscf.EnginePyscf.init">[docs]</a>    <span class="k">def</span> <span class="nf">init</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot; Function to initialize mf PySCF object</span>
 
 <span class="sd">        Parameters</span>
@@ -161,7 +163,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">mf</span> <span class="o">=</span> <span class="n">mf</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">mol</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mf</span><span class="o">.</span><span class="n">mol</span></div>
 
-<div class="viewcode-block" id="EnginePyscf.init_mol"><a class="viewcode-back" href="../../../qmlearn.drivers.html#qmlearn.drivers.pyscf.EnginePyscf.init_mol">[docs]</a>    <span class="k">def</span> <span class="nf">init_mol</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mol</span><span class="p">,</span> <span class="n">basis</span><span class="p">,</span> <span class="n">charge</span> <span class="o">=</span> <span class="mi">0</span><span class="p">):</span>
+<div class="viewcode-block" id="EnginePyscf.init_mol"><a class="viewcode-back" href="../../../source/qmlearn.drivers.html#qmlearn.drivers.pyscf.EnginePyscf.init_mol">[docs]</a>    <span class="k">def</span> <span class="nf">init_mol</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mol</span><span class="p">,</span> <span class="n">basis</span><span class="p">,</span> <span class="n">charge</span> <span class="o">=</span> <span class="mi">0</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot; Function to create PySCF atom object</span>
 
 <span class="sd">        Parameters</span>
@@ -198,7 +200,7 @@
             <span class="n">mol</span> <span class="o">=</span> <span class="n">gto</span><span class="o">.</span><span class="n">M</span><span class="p">(</span><span class="n">atom</span> <span class="o">=</span> <span class="n">atom</span><span class="p">,</span> <span class="n">basis</span><span class="o">=</span><span class="n">basis</span><span class="p">,</span> <span class="n">charge</span> <span class="o">=</span> <span class="n">charge</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">mol</span></div>
 
-<div class="viewcode-block" id="EnginePyscf.run"><a class="viewcode-back" href="../../../qmlearn.drivers.html#qmlearn.drivers.pyscf.EnginePyscf.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">properties</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;energy&#39;</span><span class="p">,</span> <span class="s1">&#39;forces&#39;</span><span class="p">),</span> <span class="n">ao_repr</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="EnginePyscf.run"><a class="viewcode-back" href="../../../source/qmlearn.drivers.html#qmlearn.drivers.pyscf.EnginePyscf.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">properties</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;energy&#39;</span><span class="p">,</span> <span class="s1">&#39;forces&#39;</span><span class="p">),</span> <span class="n">ao_repr</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot; Caculate electronic properties using PySCF.</span>
 
 <span class="sd">        Parameters</span>
@@ -299,14 +301,14 @@
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot; Natural atomic orbitals. &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">nao</span>
 
-<div class="viewcode-block" id="EnginePyscf.calc_gamma"><a class="viewcode-back" href="../../../qmlearn.drivers.html#qmlearn.drivers.pyscf.EnginePyscf.calc_gamma">[docs]</a>    <span class="k">def</span> <span class="nf">calc_gamma</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">orb</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">occs</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="EnginePyscf.calc_gamma"><a class="viewcode-back" href="../../../source/qmlearn.drivers.html#qmlearn.drivers.pyscf.EnginePyscf.calc_gamma">[docs]</a>    <span class="k">def</span> <span class="nf">calc_gamma</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">orb</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">occs</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">orb</span> <span class="ow">is</span> <span class="kc">None</span> <span class="p">:</span> <span class="n">orb</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">orb</span>
         <span class="k">if</span> <span class="n">occs</span> <span class="ow">is</span> <span class="kc">None</span> <span class="p">:</span> <span class="n">orb</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">occs</span>
         <span class="n">nm</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">orb</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="nb">len</span><span class="p">(</span><span class="n">occs</span><span class="p">))</span>
         <span class="n">gamma</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mf</span><span class="o">.</span><span class="n">make_rdm1</span><span class="p">(</span><span class="n">orb</span><span class="p">[:,</span> <span class="n">nm</span><span class="p">],</span> <span class="n">occs</span><span class="p">[:</span><span class="n">nm</span><span class="p">])</span>
         <span class="k">return</span> <span class="n">gamma</span></div>
 
-<div class="viewcode-block" id="EnginePyscf.calc_etotal"><a class="viewcode-back" href="../../../qmlearn.drivers.html#qmlearn.drivers.pyscf.EnginePyscf.calc_etotal">[docs]</a>    <span class="k">def</span> <span class="nf">calc_etotal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gamma</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="EnginePyscf.calc_etotal"><a class="viewcode-back" href="../../../source/qmlearn.drivers.html#qmlearn.drivers.pyscf.EnginePyscf.calc_etotal">[docs]</a>    <span class="k">def</span> <span class="nf">calc_etotal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gamma</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot; Get the total electronic energy based on 1-RDM.</span>
 <span class="sd">        </span>
 <span class="sd">        Parameters</span>
@@ -321,7 +323,7 @@
         <span class="n">etotal</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mf</span><span class="o">.</span><span class="n">energy_tot</span><span class="p">(</span><span class="n">gamma</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>  <span class="c1">#nuc + energy_elec(e1+coul) </span>
         <span class="k">return</span> <span class="n">etotal</span></div>
 
-<div class="viewcode-block" id="EnginePyscf.calc_etotal2"><a class="viewcode-back" href="../../../qmlearn.drivers.html#qmlearn.drivers.pyscf.EnginePyscf.calc_etotal2">[docs]</a>    <span class="k">def</span> <span class="nf">calc_etotal2</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gammat</span><span class="p">,</span> <span class="n">gamma1</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="EnginePyscf.calc_etotal2"><a class="viewcode-back" href="../../../source/qmlearn.drivers.html#qmlearn.drivers.pyscf.EnginePyscf.calc_etotal2">[docs]</a>    <span class="k">def</span> <span class="nf">calc_etotal2</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gammat</span><span class="p">,</span> <span class="n">gamma1</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot; Get the total electronic energy based on 2-RDM. </span>
 
 <span class="sd">        Parameters</span>
@@ -352,7 +354,7 @@
         
         <span class="k">return</span> <span class="n">etotal</span></div>
 
-<div class="viewcode-block" id="EnginePyscf.calc_dipole"><a class="viewcode-back" href="../../../qmlearn.drivers.html#qmlearn.drivers.pyscf.EnginePyscf.calc_dipole">[docs]</a>    <span class="k">def</span> <span class="nf">calc_dipole</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gamma</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span> 
+<div class="viewcode-block" id="EnginePyscf.calc_dipole"><a class="viewcode-back" href="../../../source/qmlearn.drivers.html#qmlearn.drivers.pyscf.EnginePyscf.calc_dipole">[docs]</a>    <span class="k">def</span> <span class="nf">calc_dipole</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gamma</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span> 
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot; Get the total dipole moment.</span>
 <span class="sd">        </span>
 <span class="sd">        Parameters</span>
@@ -367,7 +369,7 @@
         <span class="n">dip</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mf</span><span class="o">.</span><span class="n">dip_moment</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="p">,</span> <span class="n">gamma</span><span class="p">,</span> <span class="n">unit</span> <span class="o">=</span> <span class="s1">&#39;au&#39;</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">mf</span><span class="o">.</span><span class="n">verbose</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">dip</span></div>
 
-<div class="viewcode-block" id="EnginePyscf.run_forces"><a class="viewcode-back" href="../../../qmlearn.drivers.html#qmlearn.drivers.pyscf.EnginePyscf.run_forces">[docs]</a>    <span class="k">def</span> <span class="nf">run_forces</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="EnginePyscf.run_forces"><a class="viewcode-back" href="../../../source/qmlearn.drivers.html#qmlearn.drivers.pyscf.EnginePyscf.run_forces">[docs]</a>    <span class="k">def</span> <span class="nf">run_forces</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot; Function to calculate Forces with calculated 1-RDM</span>
 
 <span class="sd">        Returns</span>
@@ -388,7 +390,7 @@
         <span class="n">forces</span> <span class="o">=</span> <span class="o">-</span><span class="mf">1.0</span> <span class="o">*</span> <span class="n">gf</span><span class="o">.</span><span class="n">kernel</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">forces</span></div>
 
-<div class="viewcode-block" id="EnginePyscf.calc_forces"><a class="viewcode-back" href="../../../qmlearn.drivers.html#qmlearn.drivers.pyscf.EnginePyscf.calc_forces">[docs]</a>    <span class="k">def</span> <span class="nf">calc_forces</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gamma</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="EnginePyscf.calc_forces"><a class="viewcode-back" href="../../../source/qmlearn.drivers.html#qmlearn.drivers.pyscf.EnginePyscf.calc_forces">[docs]</a>    <span class="k">def</span> <span class="nf">calc_forces</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gamma</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot; Function to calculate Forces with a given 1-RDM</span>
 
 <span class="sd">        Parameters</span>
@@ -424,7 +426,7 @@
         <span class="n">quad</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">einsum</span><span class="p">(</span><span class="s1">&#39;mn, mn-&gt;&#39;</span><span class="p">,</span> <span class="n">gamma</span><span class="p">,</span> <span class="n">q</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">quad</span>
 
-<div class="viewcode-block" id="EnginePyscf.calc_quadrupole"><a class="viewcode-back" href="../../../qmlearn.drivers.html#qmlearn.drivers.pyscf.EnginePyscf.calc_quadrupole">[docs]</a>    <span class="k">def</span> <span class="nf">calc_quadrupole</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gamma</span><span class="p">,</span> <span class="n">traceless</span> <span class="o">=</span> <span class="kc">True</span><span class="p">):</span>
+<div class="viewcode-block" id="EnginePyscf.calc_quadrupole"><a class="viewcode-back" href="../../../source/qmlearn.drivers.html#qmlearn.drivers.pyscf.EnginePyscf.calc_quadrupole">[docs]</a>    <span class="k">def</span> <span class="nf">calc_quadrupole</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gamma</span><span class="p">,</span> <span class="n">traceless</span> <span class="o">=</span> <span class="kc">True</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot; Function to calculate the total quadruple for XX, XY, XY, YY, YZ, ZZ components.</span>
 
 <span class="sd">        Parameters</span>
@@ -456,7 +458,7 @@
             <span class="n">quadp</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span> <span class="o">-=</span> <span class="n">trace</span>
         <span class="k">return</span> <span class="n">quadp</span></div>
 
-<div class="viewcode-block" id="EnginePyscf.calc_quadrupole_nuclear"><a class="viewcode-back" href="../../../qmlearn.drivers.html#qmlearn.drivers.pyscf.EnginePyscf.calc_quadrupole_nuclear">[docs]</a>    <span class="k">def</span> <span class="nf">calc_quadrupole_nuclear</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mol</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="EnginePyscf.calc_quadrupole_nuclear"><a class="viewcode-back" href="../../../source/qmlearn.drivers.html#qmlearn.drivers.pyscf.EnginePyscf.calc_quadrupole_nuclear">[docs]</a>    <span class="k">def</span> <span class="nf">calc_quadrupole_nuclear</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mol</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot; Function to calculate the nuclear quadruple for XX, XY, XY, YY, YZ, ZZ components.</span>
 
 <span class="sd">        Parameters</span>
@@ -491,7 +493,7 @@
         <span class="n">mo</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mf</span><span class="o">.</span><span class="n">mo_coeff</span><span class="p">[:,:</span><span class="n">nocc</span><span class="p">]</span> <span class="o">@</span> <span class="n">vr</span><span class="o">.</span><span class="n">T</span>
         <span class="k">return</span> <span class="n">mo</span>
 
-<div class="viewcode-block" id="EnginePyscf.rotation2rotmat"><a class="viewcode-back" href="../../../qmlearn.drivers.html#qmlearn.drivers.pyscf.EnginePyscf.rotation2rotmat">[docs]</a>    <span class="k">def</span> <span class="nf">rotation2rotmat</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rotation</span><span class="p">,</span> <span class="n">mol</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="EnginePyscf.rotation2rotmat"><a class="viewcode-back" href="../../../source/qmlearn.drivers.html#qmlearn.drivers.pyscf.EnginePyscf.rotation2rotmat">[docs]</a>    <span class="k">def</span> <span class="nf">rotation2rotmat</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rotation</span><span class="p">,</span> <span class="n">mol</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot; Function to rotate the density matrix.</span>
 <span class="sd"> </span>
 <span class="sd">        Parameters</span>
@@ -509,11 +511,11 @@
         <span class="n">mol</span> <span class="o">=</span> <span class="n">mol</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">mol</span>
         <span class="k">return</span> <span class="n">rotation2rotmat</span><span class="p">(</span><span class="n">rotation</span><span class="p">,</span> <span class="n">mol</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="EnginePyscf.get_atom_naos"><a class="viewcode-back" href="../../../qmlearn.drivers.html#qmlearn.drivers.pyscf.EnginePyscf.get_atom_naos">[docs]</a>    <span class="k">def</span> <span class="nf">get_atom_naos</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mol</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="EnginePyscf.get_atom_naos"><a class="viewcode-back" href="../../../source/qmlearn.drivers.html#qmlearn.drivers.pyscf.EnginePyscf.get_atom_naos">[docs]</a>    <span class="k">def</span> <span class="nf">get_atom_naos</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mol</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
         <span class="n">mol</span> <span class="o">=</span> <span class="n">mol</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">mol</span>
         <span class="k">return</span> <span class="n">get_atom_naos</span><span class="p">(</span><span class="n">mol</span><span class="p">)</span></div></div>
 
-<div class="viewcode-block" id="gamma2gamma"><a class="viewcode-back" href="../../../qmlearn.drivers.html#qmlearn.drivers.pyscf.gamma2gamma">[docs]</a><span class="k">def</span> <span class="nf">gamma2gamma</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="gamma2gamma"><a class="viewcode-back" href="../../../source/qmlearn.drivers.html#qmlearn.drivers.pyscf.gamma2gamma">[docs]</a><span class="k">def</span> <span class="nf">gamma2gamma</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot; Function two assure 1-RDM to be the predicted one.</span>
 
 <span class="sd">    Returns</span>
@@ -534,7 +536,7 @@
         <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="s2">&quot;Please give one numpy.ndarray for gamma.&quot;</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">gamma</span></div>
 
-<div class="viewcode-block" id="gamma2rdm1e"><a class="viewcode-back" href="../../../qmlearn.drivers.html#qmlearn.drivers.pyscf.gamma2rdm1e">[docs]</a><span class="k">def</span> <span class="nf">gamma2rdm1e</span><span class="p">(</span><span class="n">mf</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="gamma2rdm1e"><a class="viewcode-back" href="../../../source/qmlearn.drivers.html#qmlearn.drivers.pyscf.gamma2rdm1e">[docs]</a><span class="k">def</span> <span class="nf">gamma2rdm1e</span><span class="p">(</span><span class="n">mf</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot; Function to calculate the energy density matrix (1-RDMe).</span>
 
 <span class="sd">    .. math::</span>
@@ -557,7 +559,7 @@
     <span class="n">dm1e</span> <span class="o">=</span> <span class="n">sinv</span><span class="nd">@f@gamma</span>
     <span class="k">return</span> <span class="n">dm1e</span></div>
 
-<div class="viewcode-block" id="rotation2rotmat"><a class="viewcode-back" href="../../../qmlearn.drivers.html#qmlearn.drivers.pyscf.rotation2rotmat">[docs]</a><span class="k">def</span> <span class="nf">rotation2rotmat</span><span class="p">(</span><span class="n">rotation</span><span class="p">,</span> <span class="n">mol</span><span class="p">):</span>
+<div class="viewcode-block" id="rotation2rotmat"><a class="viewcode-back" href="../../../source/qmlearn.drivers.html#qmlearn.drivers.pyscf.rotation2rotmat">[docs]</a><span class="k">def</span> <span class="nf">rotation2rotmat</span><span class="p">(</span><span class="n">rotation</span><span class="p">,</span> <span class="n">mol</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot; Function to rotate the density matrix.</span>
 
 <span class="sd">    Parameters</span>
@@ -586,7 +588,7 @@
         <span class="n">rotmat</span><span class="p">[</span><span class="n">aol</span><span class="p">[</span><span class="n">i</span><span class="p">]:</span><span class="n">aol</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">],</span><span class="n">aol</span><span class="p">[</span><span class="n">i</span><span class="p">]:</span><span class="n">aol</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">]]</span><span class="o">=</span><span class="n">r</span>
     <span class="k">return</span> <span class="n">rotmat</span></div>
 
-<div class="viewcode-block" id="get_atom_naos"><a class="viewcode-back" href="../../../qmlearn.drivers.html#qmlearn.drivers.pyscf.get_atom_naos">[docs]</a><span class="k">def</span> <span class="nf">get_atom_naos</span><span class="p">(</span><span class="n">mol</span><span class="p">):</span>
+<div class="viewcode-block" id="get_atom_naos"><a class="viewcode-back" href="../../../source/qmlearn.drivers.html#qmlearn.drivers.pyscf.get_atom_naos">[docs]</a><span class="k">def</span> <span class="nf">get_atom_naos</span><span class="p">(</span><span class="n">mol</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot; Function to get the number of atomic orbitals for a given angular momentum.</span>
 
 <span class="sd">    Parameters</span>

@@ -28,4 +28,4 @@ browse:
 	x-www-browser build/html/index.html
 
 upload: html
-	scp -r ./build/html/* web@dftpy.rutgers.edu:/home/web/dftpy/html/
+	scp -r ./build/html/* web@dftpy.rutgers.edu:/home/web/qmlearn/html/

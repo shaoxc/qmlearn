@@ -1,35 +1,9 @@
-# -*- coding: utf-8 -*-
-#
-# Configuration file for the Sphinx documentation builder.
-#
-# This file does only contain a selection of the most common options. For a
-# full list see the documentation:
-# http://www.sphinx-doc.org/en/master/config
-
-# -- Path setup --------------------------------------------------------------
-
-# If extensions (or modules to document with autodoc) are in another directory,
-# add these directories to sys.path here. If the directory is relative to the
-# documentation root, use os.path.abspath to make it absolute, like shown here.
-#
-import os
 import sys
-sys.path.insert(0, os.path.abspath('..'))
-
-
-# -- Project information -----------------------------------------------------
-
-project = 'qmlearn'
-copyright = '2022, Jessica and Musa'
-author = 'Jessica and Musa'
-
-# The short X.Y version
-version = ''
-# The full version, including alpha/beta/rc tags
-release = '0.8'
-
-
-# -- General configuration ---------------------------------------------------
+import sphinx_rtd_theme
+project = 'QMLearn'
+copyright = '2022, Pavanello Research Group'
+author = 'Pavanello Research Group'
+release = '0.0.1'
 
 extensions = [
     'sphinx.ext.autodoc',
@@ -48,55 +22,46 @@ extensions = [
     "nbsphinx"
 ]
 
-# Add any paths that contain templates here, relative to this directory.
-templates_path = ['_templates']
+templates_path = ['templates']
 numpydoc_show_class_members = True
 
 source_suffix = '.rst'
 
-master_doc = 'source/index'
+master_doc = 'index'
 
+nbsphinx_execute = 'never'
 language = None
 
-exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
-
-# The name of the Pygments (syntax highlighting) style to use.
-pygments_style = None
+exclude_patterns = ['build', 'Thumbs.db', '.DS_Store']
 
 
-# -- Options for HTML output -------------------------------------------------
 
 html_theme = 'sphinx_rtd_theme'
+# html_theme = 'sphinx_bootstrap_theme'
+html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
+html_favicon = 'static/qmlearn.ico'
+html_logo = 'static/qmlearn.png'
+html_style = 'custom.css'
+html_static_path = ['static']
+html_last_updated_fmt = '%A, %d %b %Y %H:%M:%S'
 
-# -- Options for HTMLHelp output ---------------------------------------------
-
-htmlhelp_basename = 'qmlearndoc'
-
-# -- Options for LaTeX output ------------------------------------------------
-
-latex_elements = {
-    # The paper size ('letterpaper' or 'a4paper').
-    #
-    # 'papersize': 'letterpaper',
-
-    # The font size ('10pt', '11pt' or '12pt').
-    #
-    # 'pointsize': '10pt',
-
-    # Additional stuff for the LaTeX preamble.
-    #
-    # 'preamble': '',
-
-    # Latex figure (float) alignment
-    #
-    # 'figure_align': 'htbp',
+html_theme_options = {
+    'prev_next_buttons_location': 'both',
 }
 
-#latex_documents = [
-#    (master_doc, 'qmlearn.tex', 'qmlearn Documentation',
-#     'Jessica and Musa', 'manual'),
-#]
+latex_show_urls = 'inline'
+latex_show_pagerefs = True
+latex_documents = [('index', not True)]
 
+
+#Add external links to source code
+def linkcode_resolve(domain, info):
+    print('info module', info)
+    if domain != 'py' or not info['module']:
+        return None
+
+    filename = info['module'].replace('.', '/')+'.py'
+    return "https ://gitlab.com/pavanello-research-group/qmlearn/tree/master/%s" % filename
 
 # -- Options for intersphinx extension ---------------------------------------
 

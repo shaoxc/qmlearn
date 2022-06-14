@@ -44,6 +44,8 @@ extensions = [
     'sphinx_rtd_theme',
     "numpydoc",
     "sphinx.ext.autosummary",
+    "sphinxcontrib.youtube",
+    "nbsphinx"
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -105,3 +107,7 @@ intersphinx_mapping = {'https://docs.python.org/': None}
 
 # If true, `todo` and `todoList` produce output, else they produce nothing.
 todo_include_todos = True
+
+
+
+

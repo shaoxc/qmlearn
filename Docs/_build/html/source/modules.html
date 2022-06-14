@@ -15,6 +15,7 @@
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
         <script src="../_static/doctools.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -84,7 +85,31 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="qmlearn-documentation">
+  
+<style>
+/* CSS overrides for sphinx_rtd_theme */
+
+/* 24px margin */
+.nbinput.nblast.container,
+.nboutput.nblast.container {
+    margin-bottom: 19px;  /* padding has already 5px */
+}
+
+/* ... except between code cells! */
+.nblast.container + .nbinput.container {
+    margin-top: -19px;
+}
+
+.admonition > p:before {
+    margin-right: 4px;  /* make room for the exclamation icon */
+}
+
+/* Fix math alignment, see https://github.com/rtfd/sphinx_rtd_theme/pull/686 */
+.math {
+    text-align: unset;
+}
+</style>
+<section id="qmlearn-documentation">
 <h1>QMLearn Documentation<a class="headerlink" href="#qmlearn-documentation" title="Permalink to this headline"></a></h1>
 <div class="toctree-wrapper compound">
 <ul>
@@ -156,17 +181,24 @@
 <li class="toctree-l3"><a class="reference internal" href="tutorials/database/database.html">Creating a database on a Jupyter Notebook!</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="tutorials.html#creating-a-qmmodel-fitting-the-model">Creating a QMModel: Fitting the model</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="tutorials.html#creating-a-qmmodel-fitting-the-model-and-predicting">Creating a QMModel: Fitting the Model and Predicting</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="tutorials/train/train.html">Fitting the model on a Jupyter Notebook!</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="tutorials.html#using-a-qmmodel-predicting-chemical-properties">Using a QMModel: Predicting Chemical Properties</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="tutorials.html#using-a-qmmodel-performing-geometry-optimization">Using a QMModel: Performing Geometry Optimization</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="tutorials/predict/predict.html">Predicting chemical properties on a Jupyter Notebook!</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="tutorials.html#video-tutorials">Video Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials.html#video-tutorials">Video Tutorials</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="tutorials.html#qmlearn-installation">QMLearn Installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials.html#code-architecture">Code Architecture</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials.html#id2">Creating a Database</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials.html#id3">Creating a QMModel: Fitting the Model and Predicting</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials.html#id4">Using a QMModel: Performing Geometry Optimization</a></li>
+</ul>
+</li>
 </ul>
 </div>
 </section>

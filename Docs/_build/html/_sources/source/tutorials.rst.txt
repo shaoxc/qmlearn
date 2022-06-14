@@ -11,16 +11,16 @@ Creating a Database
 
    tutorials/database/database
 
-Creating a QMModel: Fitting the model
--------------------------------------
+Creating a QMModel: Fitting the Model and Predicting
+----------------------------------------------------
 
 .. toctree::
    :maxdepth: 1
 
    tutorials/train/train
 
-Using a QMModel: Predicting Chemical Properties
------------------------------------------------
+Using a QMModel: Performing Geometry Optimization
+------------------------------------------------
 
 .. toctree::
    :maxdepth: 1
@@ -30,12 +30,45 @@ Using a QMModel: Predicting Chemical Properties
 Video Tutorials
 ===============
 
-* Installation_
-* Code_ Architecture_
+QMLearn Installation
+--------------------
 
-.. _Installation: https://youtu.be/aG5vqBpNfZw
-.. _Architecture: https://youtu.be/WoHENfVD4cE
-.. _Code: https://youtu.be/WoHENfVD4cE
+..  youtube:: aG5vqBpNfZw
+   :align: center
+   :aspect: 16:9
+   
+
+Code Architecture
+-----------------
+
+..  youtube:: WoHENfVD4cE
+   :align: center
+   :aspect: 16:9
+
+
+Creating a Database
+-------------------
+
+..  youtube:: CDeEbsPkLhM
+   :align: center
+   :aspect: 16:9
+
+
+Creating a QMModel: Fitting the Model and Predicting
+----------------------------------------------------
+
+..  youtube:: 5GPem7jsgB0
+   :align: center
+   :aspect: 16:9
+
+Using a QMModel: Performing Geometry Optimization
+-------------------------------------------------
+
+..  youtube:: q15Kp4rkdsA
+   :align: center
+   :aspect: 16:9
+
+
 
 
 

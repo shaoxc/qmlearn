@@ -1,9 +1,12 @@
 import sys
+import os
 import sphinx_rtd_theme
 project = 'QMLearn'
 copyright = '2022, Pavanello Research Group'
 author = 'Pavanello Research Group'
 release = '0.0.1'
+
+sys.path.insert(0, os.path.abspath('..'))
 
 extensions = [
     'sphinx.ext.autodoc',

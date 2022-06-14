@@ -4,7 +4,7 @@ Tutorials
 =========
 
 Creating a Database
-----------------------
+-------------------
 
 .. toctree::
    :maxdepth: 1
@@ -20,7 +20,7 @@ Creating a QMModel: Fitting the Model and Predicting
    tutorials/train/train
 
 Using a QMModel: Performing Geometry Optimization
-------------------------------------------------
+-------------------------------------------------
 
 .. toctree::
    :maxdepth: 1

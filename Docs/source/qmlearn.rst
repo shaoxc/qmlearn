@@ -1,4 +1,4 @@
-qmlearn package
+API QMLearn
 ===============
 
 Subpackages

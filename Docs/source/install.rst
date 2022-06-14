@@ -1,5 +1,8 @@
-Requirements
+Installation
 ============
+
+Requirements
+------------
 
 * Python_ 3.8 or newer
 * NumPy_ 1.11.0 or newer
@@ -18,7 +21,7 @@ Requirements
 .. _PySCF : https://pyscf.org/
 
 Installation from source
-========================
+------------------------
 
 You can get the source from gitlab like this::
 

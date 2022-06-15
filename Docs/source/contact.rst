@@ -6,6 +6,8 @@ Feel free to contact the developers:
  - `Michele Pavanello <https://sasn.rutgers.edu/about-us/faculty-staff/michele-pavanello>`_
  - `Jessica Martinez <https://sites.rutgers.edu/prg/people/jessica-martinez/>`_ 
  - `Md Rajib Khan Musam <https://sites.rutgers.edu/prg/people/rajib-musa-kahn/>`_
+ - `Lukas Paetow <https://www.uni-muenster.de/Chemie.oc/neugebauer/group.html>`_
+ - `Mark E Tuckerman <https://wp.nyu.edu/tuckerman_group/current/>`_
 
 GitLab
 ------

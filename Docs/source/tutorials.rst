@@ -1,74 +1,76 @@
 .. _tutorials:
 
 Tutorials
-=========
-
-Creating a Database
--------------------
-
-.. toctree::
-   :maxdepth: 1
-
-   tutorials/database/database
-
-Creating a QMModel: Fitting the Model and Predicting
-----------------------------------------------------
-
-.. toctree::
-   :maxdepth: 1
-
-   tutorials/train/train
-
-Using a QMModel: Performing Geometry Optimization
--------------------------------------------------
-
-.. toctree::
-   :maxdepth: 1
-
-   tutorials/predict/predict
+===============
 
 Video Tutorials
----------------
 
-QMLearn Installation
-~~~~~~~~~~~~~~~~~~~~~~
+.. _introqmlearn:
+
+1. Intro to QMLearn
+-------------------
+
+..  youtube:: zRBijIt1Prs
+   :align: center
+   :aspect: 16:9
+
+2. Creating a Database
+----------------------
+
+..  youtube:: Ngiw-6-RoiE
+   :align: center
+   :aspect: 16:9
+
+
+3. Creating a QMModel: Fitting the Model and Predicting
+-------------------------------------------------------
+
+..  youtube:: M-tQ0p9W000
+   :align: center
+   :aspect: 16:9
+
+4. Using a QMModel: Performing Geometry Optimization
+----------------------------------------------------
+
+..  youtube:: IDpilj9CwHI
+   :align: center
+   :aspect: 16:9
+
+.. _installqmlearn:
+
+5. QMLearn Installation
+-----------------------
 
 ..  youtube:: aG5vqBpNfZw
    :align: center
    :aspect: 16:9
-   
 
-Code Architecture
-~~~~~~~~~~~~~~~~~
+.. _tutorials:
 
-..  youtube:: WoHENfVD4cE
-   :align: center
-   :aspect: 16:9
+Jupyter-Notebook Tutorials
+--------------------------
 
+.. _tutorials:
 
-Creating a Database
-~~~~~~~~~~~~~~~~~~~~~~
+===================
+Creating a database
+===================
 
-..  youtube:: CDeEbsPkLhM
-   :align: center
-   :aspect: 16:9
+Check out `this notebook <1_create_training.ipynb>`_.
 
+.. _tutorials:
 
+====================================================
 Creating a QMModel: Fitting the Model and Predicting
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+====================================================
 
-..  youtube:: 5GPem7jsgB0
-   :align: center
-   :aspect: 16:9
+Check out `this notebook <3_predict_model.ipynb>`_.
 
+.. _tutorials:
+
+=================================================
 Using a QMModel: Performing Geometry Optimization
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+=================================================
 
-..  youtube:: q15Kp4rkdsA
-   :align: center
-   :aspect: 16:9
-
-
-
-
+Check out `this notebook <2_test_qml.ipynb>`_.
 

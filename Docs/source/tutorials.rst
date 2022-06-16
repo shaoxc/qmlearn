@@ -25,7 +25,7 @@ Video Tutorials
 3. Creating a QMModel: Fitting the Model and Predicting
 -------------------------------------------------------
 
-..  youtube:: M-tQ0p9W000
+..  youtube:: M2hEjksZATM
    :align: center
    :aspect: 16:9
 

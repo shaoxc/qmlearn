@@ -2,7 +2,7 @@
 *Quantum Machine Learning*
 by learning one-body reduced density matrices in the AO basis.
 
-![QM-Learn code and workflow](./Docs/figure3.png)
+![QM-Learn code and workflow](./Docs/static/figure3.png)
 
 # Contributors
  - Xuecheng Shao, Lukas Paetow, Md Rajib Khan Musa, Jessica A. Martinez B. and Michele Pavanello @ [PRG](https://sites.rutgers.edu/prg/) at [Rutgers University-Newark](http://sasn.rutgers.edu).

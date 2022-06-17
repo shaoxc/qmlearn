@@ -32,3 +32,5 @@ or simpler::
 
     $ python -m pip install git+https://gitlab.com/pavanello-research-group/qmlearn.git
 
+You can find a Video Tutorial :ref:`here <installqmlearn>`.
+

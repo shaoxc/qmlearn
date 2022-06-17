@@ -22,7 +22,8 @@ extensions = [
     "numpydoc",
     "sphinx.ext.autosummary",
     "sphinxcontrib.youtube",
-    "nbsphinx"
+    "nbsphinx",
+    'sphinx_panels',
 ]
 
 templates_path = ['templates']

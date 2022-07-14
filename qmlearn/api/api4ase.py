@@ -4,6 +4,29 @@ from ase.units import Ha, Bohr
 
 
 class QMLCalculator(Calculator):
+    r""" Mean QML calculator
+
+    Attributes
+    ----------
+    qmmodel : QMMol object
+        Reference QMMol object 
+        
+    method : str
+        Options
+
+        | 'gamma' : Use QMLearn learning proccess to predict the desire property.
+        | 'engine' : Use PySCF engine to predict the desire property.
+
+    properties : list:str
+        Options
+
+        | 'energy' : Energy 
+        | 'forces' : Forces 
+        | 'dipole' : Dipole 
+        | 'stress' : Stress 
+        | 'gamma' : 1-RDM  
+
+    """
     implemented_properties = ['energy', 'forces', 'dipole', 'stress', 'gamma']
 
     def __init__(self, qmmodel = None, second_learn = {}, method = 'gamma',
@@ -18,6 +41,7 @@ class QMLCalculator(Calculator):
 
     @property
     def refqmmol(self):
+        r"""QMMol object. """
         if self._refqmmol is None :
             if hasattr(self.qmmodel, 'refqmmol'):
                 return self.qmmodel.refqmmol
@@ -41,6 +65,19 @@ class QMLCalculator(Calculator):
         self._properties = value
 
     def calculate(self, atoms=None, properties=('energy'), system_changes=all_changes):
+        r""" Function to calculate the desire properties. 
+ 
+        Parameters
+        ----------
+        properties : list:str
+            Options
+ 
+            | Energy : 'energy'
+            | Forces : 'forces'
+            | Dipole : 'dipole'
+            | Stress : 'stress'
+            | 1-RDM : 'gamma'
+        """
         properties = set(properties) | self.properties
         Calculator.calculate(self,atoms=atoms,properties=properties,system_changes=system_changes)
         atoms = atoms or self.atoms
@@ -56,6 +93,19 @@ class QMLCalculator(Calculator):
                 raise AttributeError(f"Sorry, not support '{self.method}' now.")
 
     def calc_with_gamma(self, qmmol, properties = ['energy']):
+        r""" Function to calculate the desire properties using QMLearn learning process.
+ 
+        Parameters
+        ----------
+        properties : list:str
+            Options
+ 
+            | Energy : 'energy'
+            | Forces : 'forces'
+            | Dipole : 'dipole'
+            | Stress : 'stress'
+            | 1-RDM : 'gamma'
+        """
         shape = self.qmmodel.refqmmol.vext.shape
         gamma = self.qmmodel.predict(qmmol).reshape(shape)
         m2 = self.second_learn.get('gamma', None)
@@ -102,6 +152,19 @@ class QMLCalculator(Calculator):
             self.results['gamma'] = gamma
 
     def calc_with_engine(self, qmmol, properties = ('energy')):
+        r""" Function to calculate the desire properties using PySCF engine.
+ 
+        Parameters
+        ----------
+        properties : list:str
+            Options
+ 
+            | Energy : 'energy'
+            | Forces : 'forces'
+            | Dipole : 'dipole'
+            | Stress : 'stress'
+            | 1-RDM : 'gamma'
+        """
         qmmol.engine.run(properties = properties)
         if 'energy' in properties :
             energy = qmmol.engine.etotal

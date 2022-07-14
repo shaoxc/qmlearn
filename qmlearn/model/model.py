@@ -8,6 +8,30 @@ from qmlearn.drivers.mol import QMMol
 
 
 class QMModel(object):
+    """ QMModel class is wrapper around sklearn regression model classes. It provide method to
+    fit and predict based on provided training and testing data    
+
+    Attributes
+    ----------
+    mmodels : dict, optional
+        Set of machine learning algorithms used for training , If not provided
+        by default Kernel Ridge Rigression (KRR) will be used to learn :math:`{\gamma}` from :math:`V_{ext}` and 
+        linear regression to learn :math:`{\delta}E`, and :math:`{\delta}{\gamma}`
+
+    method : {'gamma'}, str
+        Determine which property to learn from external potentials :math:`V_{ext}`. As of now only 
+        :math:`{\gamma}` can be learned from :math:`V_{ext}`. And then all other properties
+        calculated from :math:`{\gamma}`
+    
+    ncharge: int, optional
+        Total number of electrons.
+    
+    nspin: int, optional
+        Total spin as defined in PySCF (num. alpha electrons - num. beta electrons). 
+    
+    refqmmol: QMMol object
+        Reference QMMol object
+    """
     def __init__(self, mmodels = None, method='gamma', ncharge=None, nspin = 1, occs = None, refqmmol = None, **kwargs):
         self._method = method
         self.mmodels = mmodels or {}
@@ -52,6 +76,30 @@ class QMModel(object):
         return self._method
 
     def fit(self, X, y, model = None, method = None):
+        """ Fit model 
+
+        Parameters
+        ----------
+        X : array
+            Training data
+        y : array
+            Target values
+            
+        model : QMModel obj, optional
+            Regression model (i.e., KernelRidge, LinearRegression), If not provided will take from
+            mmodels dictionary.
+        method : {'gamma', 'd_gamma', 'd_energy', 'd_forces'} 
+
+            | 'gamma' -> learn :math:`{\delta\gamma}` using :math:`V_{ext}`
+            | 'd_gamma' -> learn :math:`{\delta\gamma}` based on predicted :math:`{\gamma}`.
+            | 'd_energy' -> learn :math:`{\delta}E` based on predicted :math:`{\gamma}`
+            | 'd_forces' -> learn :math:`{\delta}F` based on predicted :math:`{\gamma}`
+
+        Returns
+        -------
+        QMModel
+            return trained QMModel object
+        """
         if model is None :
             method = method or self.method
             model = self.mmodels[method]
@@ -67,7 +115,24 @@ class QMModel(object):
         return model
 
     def predict(self, x, model = None, method = None, **kwargs):
-        #
+        """ Predict using trained QMModel 
+
+        Parameters
+        ----------
+        x : array
+            Training data
+       
+       method : {'gamma', 'd_gamma', 'd_energy', 'd_forces'} 
+            | 'gamma' -> predict :math:`{\delta\gamma}` using :math:`V_{ext}`
+            | 'd_gamma' -> predict :math:`{\gamma}+{\delta\gamma}` based on predicted :math:`{\gamma}`.
+            | 'd_energy' -> predict :math:`E+{\delta}E` based on predicted :math:`{\gamma}`
+            | 'd_forces' -> predict :math:`F+{\delta}F` based on predicted :math:`{\gamma}`
+
+        Returns
+        -------
+        y : array
+            Predicted target values
+        """
         x = [self.translate_input(x, **kwargs).ravel()]
         if model is None :
             method = method or self.method
@@ -78,11 +143,21 @@ class QMModel(object):
         return y
 
     def convert_back(self, y, prop = 'gamma', qmmol = None, **kwargs):
+        """Convert back the predicted properties to the original reference frame of the molecule 
+
+        Returns
+        -------
+        y : array
+            Predicted target values in original refrence frame of the molecule
+        """
         qmmol = qmmol or self.qmmol
         y = qmmol.convert_back(y, prop = prop, **kwargs)
         return y
 
     def translate_input(self, x, **kwargs):
+        """Return external potential :math:`V_{ext}` from x. x could be numpy ndarray, ASE Atoms object,
+         or QMMol object   
+        """
         if isinstance(x, np.ndarray) :
             out = x
         elif isinstance(x, Atoms) :

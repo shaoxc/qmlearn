@@ -4,8 +4,9 @@ from scipy.linalg import eig
 from scipy.spatial.transform import Rotation
 from ase import Atoms, io
 from pyscf.pbc.tools.pyscf_ase import atoms_from_ase
-from pyscf import gto, dft, scf, mp, fci, ci
+from pyscf import gto, dft, scf, mp, fci, ci, ao2mo
 from pyscf.symm import Dmatrix
+from functools import reduce
 
 from qmlearn.drivers.core import Engine
 
@@ -20,11 +21,56 @@ methods_pyscf = {
         }
 
 class EnginePyscf(Engine):
+    r""" PySCF calculator
+
+    Attributes
+    ----------
+
+    vext : ndarray
+        External Potential.
+    gamma : ndarray
+        1-body reduced density matrix (1-RDM).
+    gammat : ndarray
+        2-body reduced density matrix (2-RDM).
+    etotal : float
+        Total electronic energy (Atomic Units a.u.)
+    forces : ndarray
+        Atomic forces (Atomic Units a.u.)
+    ovlp : ndarray
+        Overlap Matrix.
+    kop : ndarray
+        Kinetic Energy Operator.
+    """
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.init()
 
     def init(self, **kwargs):
+        r""" Function to initialize mf PySCF object
+
+        Parameters
+        ----------
+        mol : :obj: PySCF or ASE atom object
+            Molecular geometry. Coordinates in Angstroms.
+        basis : dict or str
+            To define basis set.
+        xc : dict or str
+            To define xchange-correlation functional
+        verbose :int
+            Printing level
+        method : str
+
+            | DFT : 'dft'
+            | HF : 'hf'
+            | RKS : 'rks'
+            | RHF : 'rhf
+            | MP2 : 'mp2'
+            | CISD : 'cisd'
+            | FCI : 'fci'
+
+        charge : int
+            Total charge of the molecule
+        """
         mol = self.options.get('mol', None)
         mf = self.options.get('mf', None)
         basis = self.options.get('basis', '6-31g')
@@ -50,6 +96,26 @@ class EnginePyscf(Engine):
         self.mol = self.mf.mol
 
     def init_mol(self, mol, basis, charge = 0):
+        r""" Function to create PySCF atom object
+
+        Parameters
+        ----------
+        mol : list or str (From PySCF) or ASE atom object
+            To define molecluar structure.  The internal format is
+
+            | atom = [[atom1, (x, y, z)],
+            |         [atom2, (x, y, z)],
+            |         ...
+            |         [atomN, (x, y, z)]]
+
+        basis:  dict or str
+            To define basis set.
+
+        Returns
+        -------
+        atoms : :obj: PySCF atom object
+           Molecular Structure, basis, and charge definition into gto PySCF atom object
+        """
         ase_atoms = None
         if isinstance(mol, Atoms):
             ase_atoms = mol
@@ -67,10 +133,28 @@ class EnginePyscf(Engine):
         return mol
 
     def run(self, properties = ('energy', 'forces'), ao_repr = True, **kwargs):
+        r""" Caculate electronic properties using PySCF.
+
+        Parameters
+        ----------
+        properties : str
+            
+            | Total electronic energy : 'energy'
+            | Total atomic forces : 'forces'
+
+        If 'energy' is choosen the following properties are also calculated:
+
+            | 1-RDM (1-body reduced density matrix) : 'gamma'
+            | 2-RDM (2-body reduced density matrix) : 'gammat'
+            | Occupation number : 'occs'
+            | Molecular orbitals : 'orb'
+
+        """
         if 'energy' in properties or self._gamma is None :
             # (dft.uks.UKS, dft.rks.RKS, scf.uhf.UHF, scf.hf.RHF))
             self.mf.run()
             self.occs = self.mf.get_occ()
+            mf0=self.mf.run()
             #
             if '+' in self.method :
                 mf2 = methods_pyscf[self.method.split('+')[1]](self.mf)
@@ -80,9 +164,19 @@ class EnginePyscf(Engine):
             else :
                 mf = self.mf
 
-            self._orb = mf.mo_coeff
-            self._gamma = mf.make_rdm1(ao_repr = ao_repr, **kwargs)
-            self._etotal = mf.e_tot
+            if '+' in self.method and self.method.split('+')[1] == 'fci':
+               cisolver = mf
+               e, ci = cisolver.kernel()  #To get 2RDM, gammat. You need the cisolver.make_rdm12 function.
+               rdm_1, rdm_2 = cisolver.make_rdm12(fcivec=ci,norb=np.shape(mf0.get_occ())[0],nelec=self.mol.nelec)
+               self._gamma, self._gammat = fci.rdm.reorder_rdm(rdm1=rdm_1,rdm2=rdm_2) #Call reorder_rdm to transform to the normal rdm2a
+               #self._gamma, self._gammat = cisolver.make_rdm12(fcivec=ci,norb=np.shape(mf0.get_occ())[0],nelec=self.mol.nelec)
+               h1=mf0.get_hcore()
+               self._orb = mf0.mo_coeff
+               self._etotal = cisolver.e_tot
+            else :
+               self._orb = mf.mo_coeff
+               self._gamma = mf.make_rdm1(ao_repr = ao_repr, **kwargs)
+               self._etotal = mf.e_tot
 
         if 'forces' in properties :
             self._forces = self.run_forces()
@@ -92,6 +186,12 @@ class EnginePyscf(Engine):
         if self._gamma is None:
             self.run(properties = ('energy'))
         return self._gamma
+
+    @property
+    def gammat(self):
+        if self._gammat is None:
+            self.run(properties = ('energy'))
+        return self._gammat
 
     @property
     def etotal(self):
@@ -125,10 +225,12 @@ class EnginePyscf(Engine):
 
     @property
     def nelectron(self):
+        r""" Total number of electrons. """
         return self.mol.nelectron
 
     @property
     def nao(self):
+        r""" Natural atomic orbitals. """
         return self.mol.nao
 
     def calc_gamma(self, orb=None, occs=None):
@@ -139,18 +241,81 @@ class EnginePyscf(Engine):
         return gamma
 
     def calc_etotal(self, gamma, **kwargs):
-        etotal = self.mf.energy_tot(gamma, **kwargs)
+        r""" Get the total electronic energy based on 1-RDM.
+        
+        Parameters
+        ----------
+        gamma : ndarray
+            1-RDM
+
+        Returns
+        -------
+        etotal : float
+            Total electronic energy. """
+        etotal = self.mf.energy_tot(gamma, **kwargs)  #nuc + energy_elec(e1+coul) 
         return etotal
 
-    def calc_dipole(self, gamma, **kwargs):
+    def calc_etotal2(self, gammat, gamma1=None, **kwargs):
+        r""" Get the total electronic energy based on 2-RDM. 
+
+        Parameters
+        ----------
+        gamma : ndarray
+            1-RDM
+        gammat : ndarray
+            2-RDM
+        
+        Returns
+        -------
+        etotal : float
+            Total electronic energy. """
+
+        self.mf.run() #HF to get orb and occ
+        orb = self.mf.mo_coeff
+        occs = self.mf.get_occ()
+        
+        nmo = len(occs)   
+        h1e = reduce(np.dot,(orb.T, self.mf.get_hcore(), orb))
+        h2e = ao2mo.kernel(self.mf._eri, orb)
+        h2e = ao2mo.restore(1, h2e, nmo)
+        
+        etotal = (np.einsum('ij,ji', h1e, gamma1) + np.einsum('ijkl,ijkl', h2e, gammat) * .5)
+        #etotal = (self.mf.energy_elec(gamma1) + np.einsum('ijkl,ijkl', h2e, gammat) * .5)
+        #etotal = (np.einsum('ijkl,ijkl', h2e, gammat) * .5)
+        etotal += self.mol.energy_nuc()
+        
+        return etotal
+
+    def calc_dipole(self, gamma, **kwargs): 
+        r""" Get the total dipole moment.
+        
+        Parameters
+        ----------
+        gamma : ndarray
+            1-RDM
+
+        Returns
+        -------
+        dip : list
+            The dipole moment on x, y and z component."""
         dip = self.mf.dip_moment(self.mol, gamma, unit = 'au', verbose=self.mf.verbose)
         return dip
 
     def run_forces(self, **kwargs):
+        r""" Function to calculate Forces with calculated 1-RDM
+
+        Returns
+        -------
+        forces : ndarray
+           Total atomic forces. """
         if '+' in self.method :
-            mf = self.mf2
+            if self.method.split('+')[1] == 'fci':  #With FCI method Forces can't be obtained from FCI object. I approximated using RHF object. 
+               mf = self.mf
+            else:
+               mf = self.mf2
         else :
             mf = self.mf
+
         gf = mf.nuc_grad_method()
         gf.verbose = mf.verbose
         gf.grid_response = True
@@ -158,6 +323,18 @@ class EnginePyscf(Engine):
         return forces
 
     def calc_forces(self, gamma, **kwargs):
+        r""" Function to calculate Forces with a given 1-RDM
+
+        Parameters
+        ----------
+        gamma : ndarray
+            1-RDM
+
+        Returns
+        -------
+        forces : ndarray
+           Total atomic forces for a given 1-RDM. """
+
         # only for rhf and rks
         if self.method.split('+')[0] not in ['rhf', 'rks'] or '+' in self.method :
             raise AttributeError(f"Sorry the calc_forces not support '{self.method}'")
@@ -182,6 +359,18 @@ class EnginePyscf(Engine):
         return quad
 
     def calc_quadrupole(self, gamma, traceless = True):
+        r""" Function to calculate the total quadruple for XX, XY, XY, YY, YZ, ZZ components.
+
+        Parameters
+        ----------
+        gamma : ndarray
+            1-RDM
+
+        Returns
+        -------
+        quadrupol : ndarray
+           An array containing a quadruple per component."""
+
         # XX, XY, XZ, YY, YZ, ZZ
         with self.mol.with_common_orig((0,0,0)):
             q = self.mol.intor('int1e_rr', comp=9).reshape((3,3,*gamma.shape))
@@ -202,6 +391,18 @@ class EnginePyscf(Engine):
         return quadp
 
     def calc_quadrupole_nuclear(self, mol = None):
+        r""" Function to calculate the nuclear quadruple for XX, XY, XY, YY, YZ, ZZ components.
+
+        Parameters
+        ----------
+        gamma : ndarray
+            1-RDM
+
+        Returns
+        -------
+        quadrupol : ndarray
+           An array containing the nuclear quadruple per component."""
+
         mol = mol or self.mol
         charges = mol.atom_charges()
         pos = mol.atom_coords()
@@ -225,6 +426,20 @@ class EnginePyscf(Engine):
         return mo
 
     def rotation2rotmat(self, rotation, mol = None):
+        r""" Function to rotate the density matrix.
+ 
+        Parameters
+        ----------
+        rotation : ndarray
+            Rotation Matrix
+        mol : :obj: PySCF mol object
+            Molecluar structure
+ 
+        Returns
+        -------
+        rotmat : ndarray
+        Rotated density matrix """
+
         mol = mol or self.mol
         return rotation2rotmat(rotation, mol)
 
@@ -233,6 +448,12 @@ class EnginePyscf(Engine):
         return get_atom_naos(mol)
 
 def gamma2gamma(*args, **kwargs):
+    r""" Function two assure 1-RDM to be the predicted one.
+
+    Returns
+    -------
+    gamma : ndarray
+        1-RDM """
     gamma = None
     for v in args :
         if isinstance(v, np.ndarray):
@@ -248,6 +469,21 @@ def gamma2gamma(*args, **kwargs):
     return gamma
 
 def gamma2rdm1e(mf, *args, **kwargs):
+    r""" Function to calculate the energy density matrix (1-RDMe).
+
+    .. math::
+        \hat{D} = \sum_{i=1}^{occ} \epsilon_{i} \left|i\right> \left< i \right| \\
+        \left< \mu |\hat{D}| \nu \right> = \sum_{\sigma \tau} F_{\mu \sigma} S_{\sigma \tau}^{-1} P_{\tau \mu}
+
+    Parameters
+    ----------
+    mf : :obj: PySCF object
+        SCF class of PySCF
+
+    Returns
+    -------
+    dm1e : ndarray
+        Energy density matrix """
     gamma = gamma2gamma(*args, **kwargs)
     s = mf.get_ovlp()
     sinv = np.linalg.inv(s)
@@ -256,6 +492,17 @@ def gamma2rdm1e(mf, *args, **kwargs):
     return dm1e
 
 def rotation2rotmat(rotation, mol):
+    r""" Function to rotate the density matrix.
+
+    Parameters
+    ----------
+    rotation : ndarray
+        Rotation Matrix
+
+    Returns
+    -------
+    rotmat : ndarray
+        Rotated density matrix """
     alpha, beta, gamma = Rotation.from_matrix(rotation).as_euler('zyz')*-1.0
     angl = []
     for ib in range(mol.nbas):
@@ -274,6 +521,17 @@ def rotation2rotmat(rotation, mol):
     return rotmat
 
 def get_atom_naos(mol):
+    r""" Function to get the number of atomic orbitals for a given angular momentum.
+
+    Parameters
+    ----------
+    mol : :obj: PySCF mol object
+        Molecluar structure.
+
+    Returns
+    -------
+    naos : ndarray
+        Number of atomic orbitals. """
     angl = []
     atomids = []
     for ib in range(mol.nbas):

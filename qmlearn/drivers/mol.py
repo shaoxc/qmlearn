@@ -9,10 +9,65 @@ qm_engines = {
         }
 
 class QMMol(object):
+    r""" Class to create qmlearn mol object. 
+    
+    Attributes
+    ----------
+    atoms : :obj: PySCF or ASE atom object
+        Molecular geometry
+    engine_name : str
+        Options:
+
+        | PySCF (Default) : 'pyscf'
+        | Psi4 : 'psi4'
+
+    method : str
+
+        | PySCF:
+        | DFT : 'dft'
+        | HF : 'hf'
+        | RKS : 'rks'
+        | RHF : 'rhf
+        | MP2 : 'mp2'
+        | CISD : 'cisd'
+        | FCI : 'fci'
+
+        | Psi4:
+        | HF('rhf+hf')  : 'hf'
+        | RHF('rhf+hf') : 'rhf
+        | SCF('rks+scf') : 'scf'
+        | RKS('rks+scf') : 'rks'
+        | MP2('rhf+mp2') : 'mp2'
+
+    basis : dict or str
+        To define basis set.
+    xc : dict or str
+        To define xchange-correlation functional
+    charge : int
+        Total electronic charge.
+    rotate_method : str
+        
+        | None : 'none'
+        | Kabsch : 'kabsch'
+        | Quaternion : 'quaternion'
+
+    reorder_method : str
+
+        | 'hungarian'
+        | 'inertia-hungarian'
+        | 'brute'
+        | 'distance'
+
+    use_reflection : bool
+        If True it applies a reflection on your molecule.
+
+    """
+
     engine_calcs = [
             'calc_gamma',
             'calc_ncharge',
             'calc_etotal',
+            'calc_etotal2',
             'calc_ke',
             'calc_dipole',
             'calc_quadrupole',
@@ -131,6 +186,17 @@ class QMMol(object):
         return self
 
     def duplicate(self, atoms, **kwargs):
+        r""" Function to create a duplicate image of Atomic coordinates ('refatoms')
+
+        Parameters
+        ----------
+        atoms : :obj: PySCF or ASE atom object
+            Molecular geometry
+
+        Returns
+        -------
+        obj : :obj: PySCF or ASE atom object
+            Reference atoms. """
         for k, v in self.init_kwargs.items():
             if k == 'self' or k in kwargs :
                 continue
@@ -144,6 +210,7 @@ class QMMol(object):
         return obj
 
     def run(self, **kwargs):
+        r"""Function to run the External Calculator."""
         self.engine.run(**kwargs)
 
     def __getattr__(self, attr):
@@ -158,17 +225,39 @@ class QMMol(object):
 
     @property
     def rotmat(self):
+        r""" Rotated density matrix """
         if self._rotmat is None :
             self._rotmat = self.rotation2rotmat(self.op_rotate)
         return self._rotmat
 
     @property
     def atom_naos(self):
+        r""" Number of atomic orbitals. """
+
         if self._atom_naos is None :
             self._atom_naos = self.get_atom_naos()
         return self._atom_naos
 
     def convert_back(self, y, prop = 'gamma', rotate = True, reorder = True, **kwargs):
+        r""" Function to rotate gamma or forces base on initial coordinates.
+
+        Parameters
+        ----------
+        pro : str
+            Options
+
+            | 1-RDM : 'gamma'
+            | Forces : 'forces'
+
+        y : ndarray
+            Predicted gamma or forces matrix to be rotated.
+        
+        Returns
+        -------
+        y : ndarray
+           Rotated gamma or forces matrix.
+
+        """
         nao = self.nao
         #
         if np.allclose(self.op_rotate, self.op_rotate_inv) : rotate = False

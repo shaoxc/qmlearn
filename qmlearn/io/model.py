@@ -4,6 +4,26 @@ from qmlearn.model.model import QMModel
 from qmlearn.io.hdf5 import DBHDF5
 
 def db2qmmodel(filename, names = '*', mmodels = None):
+    """Train QMModel to learn :math:`{\gamma}` in terms of :math:`V_{ext}` from training data
+    then an additional layer of training learn :math:`{\delta}E` and :math:`{\delta}{\gamma}` 
+    based on previously learned :math:`{\gamma}`.
+    
+    Parameters
+    ----------
+    filename : str
+        Name of database file
+    names : str, optional
+        name of database, by default '*'
+    mmodels : dict, optional
+        set of machine learning models used for training , If not provided
+        by default KKR will be used to learn gamma and linear regression for
+        delta learning
+
+    Returns
+    -------
+    model : obj
+        trained model
+    """
     db = DBHDF5(filename)
     if isinstance(names, str):
         prefix = names

@@ -2,9 +2,24 @@ import numpy as np
 from ase.geometry import get_distances_derivatives, get_distances
 
 class FixBondLComb:
-    """
-    This is similar to ASE FixBondLengths, but with linear combination of bond lengths.
+    """This is similar to ASE FixBondLengths, but with linear combination of bond lengths.
     sum_i(bond_length_i * coefs_i) = constant
+
+     Parameters
+    ----------
+    pairs : array
+        Array of pairs of atoms index
+    coefs : array
+        Array of pair bond length weights
+    dt : float
+        time steps in ASE Velocity Verlet integration
+    tol : float
+        If difference between weighted sum of bondlengths and fixed bond length is less than `tol`
+        calculation is stoped.
+    target: float
+        Fixed Bondlength value
+    maxiter : int
+        maximum number of iteration
     """
     def __init__(self, pairs = None, coefs = None, dt = None, tol=1e-6, target=None, maxiter = 1000, scale = 2.0):
         self.pairs = np.array(pairs)
@@ -36,6 +51,7 @@ class FixBondLComb:
 
     @property
     def dt(self):
+        """time steps in ASE Velocity Verlet integration"""
         if self._dt is None :
             raise AttributeError("Please set the 'dt' firstly.")
         return self._dt
@@ -48,7 +64,22 @@ class FixBondLComb:
         return 1
 
     def adjust_positions(self, atoms, new):
+        """Keep adjusting atomic positions while keeping 
+           weighted sum of fix bond length constant
 
+        Parameters
+        ----------
+        atoms : ASE atom object
+        
+        new : array
+            positions of atoms which will change until converged
+
+        Raises
+        ------
+        RuntimeError
+            If calculation is not converged within max number of iteration 
+            a RuntimeError will raised
+        """
         masses = atoms.get_masses()[:, None]
 
         if self.target is None:
@@ -80,6 +111,7 @@ class FixBondLComb:
         #-----------------------------------------------------------------------
 
     def adjust_momenta(self, atoms, p):
+        """Update momentum of atoms using velocity verlet algorithm"""
         masses = atoms.get_masses()[:, None]
         vel = p / masses
 
@@ -102,6 +134,20 @@ class FixBondLComb:
         pass
 
     def get_prims(self, atoms, pos):
+        """Calculate weighted bond length of paired atoms
+
+        Parameters
+        ----------
+        atoms : ASE atoms object
+        
+        pos : array
+            positions of atoms
+
+        Returns
+        -------
+        float
+            weighted sum of paired bond length
+        """
         value = 0.0
         for coef, ip in zip(self.coefs, self.pairs) :
             _, r = get_distances(pos[ip[0]], pos[ip[1]], cell = atoms.cell, pbc = atoms.pbc)
@@ -116,6 +162,13 @@ class FixBondLComb:
         return value
 
     def get_jacobian(self, atoms, pos, jacobian = None):
+        """Calculate the Jacobian of positions of the paired atoms.
+
+        Returns
+        -------
+        array
+            Jacobian of postion of paired atoms
+        """
         n = 2 # bond
         vectors = [pos[j] - pos[i] for i, j in self.pairs]
         derivs = get_distances_derivatives(vectors, cell=atoms.cell, pbc=atoms.pbc)

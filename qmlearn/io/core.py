@@ -1,4 +1,6 @@
 class DB(object):
+    r"""Abstract base class to create and manipulate database
+    """
     def __init__(self, filename, mode = 'a', **kwargs):
         pass
 

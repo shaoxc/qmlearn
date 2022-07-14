@@ -13,6 +13,29 @@ methods_psi4 = {
         }
 
 class EnginePsi4(Engine):
+    r""" PySCF calculator
+
+    Attributes
+    ----------
+
+    vext : ndarray
+        External Potential.
+    gamma : ndarray
+        1-body reduced density matrix (1-RDM).
+    etotal : float
+        Total electronic energy.
+    ovlp : ndarray
+        Overlap Matrix.
+    kop : ndarray
+        Kinetic Energy Operator.
+    nelectron : int
+        Total number of electrons.
+    xcfunc : str
+        Exchange correlation Functional.
+    eri : ndarray
+        2-electron integrals: 8-fold or 4-fold ERIs or complex integral array with N^4 elements
+        (N is the number of orbitals).
+    """
     def __init__(self, **kwargs):
         import psi4
         self.psi4 = psi4
@@ -74,6 +97,14 @@ class EnginePsi4(Engine):
         return mol
 
     def run(self, ao_repr = True, **kwargs):
+        r"""Caculate electronic properties using Psi4.
+        
+        Parameters
+        ----------
+        etotal : Total electronic energy
+        wfn : Wavefunction of the system
+        gamma : 1-RDM
+        """
         etotal, wfn = self.psi4.energy(self.psi4_method, molecule=self.mol, dft_functional = self.xc, return_wfn=True)
         self.gamma = wfn.Da_subset('AO').np + wfn.Db_subset('AO').np
         self.wfn = wfn
@@ -99,12 +130,15 @@ class EnginePsi4(Engine):
 
     @property
     def eri(self):
+        r"""2-electron integrals: 8-fold or 4-fold ERIs or complex integral array with N^4 elements (N is the number of orbitals).
+        """
         if self._eri is None:
             self._eri = self.mints.ao_eri().np
         return self._eri
 
     @property
     def nelectron(self):
+        r""" Total number of electrons. """
         charges = [self.mol.charge(i) for i in range(self.mol.natom())]
         return np.sum(charges)
 
@@ -113,6 +147,13 @@ class EnginePsi4(Engine):
 
     @property
     def xcfunc(self):
+        r""" Function to define Exchange Correlation functional if it is not given. 
+
+        Parameters
+        ----------
+        gamma : ndarray
+            1-RDM
+        """
         if self._xcfunc is None:
             build_superfunctional = self.psi4.procrouting.dft.superfunctionals.build_superfunctional
             method = self.method.split('+')[0]
@@ -129,6 +170,18 @@ class EnginePsi4(Engine):
         return self._xcfunc
 
     def calc_exc(self, gamma):
+        r""" Function to calculate the Exchange Correlation energy.  
+
+        Parameters
+        ----------
+        gamma : ndarray
+            1-RDM
+
+        Returns
+        -------
+        exc : float
+            Exchane Correlation energy.
+        """
         # only for restricted formalism
         if self.xcfunc is not None :
             D = self.psi4.core.Matrix.from_array(gamma/2.0)
@@ -142,6 +195,18 @@ class EnginePsi4(Engine):
         return exc
 
     def calc_etotal(self, gamma, **kwargs):
+        r""" Function to calculate Total Energy.
+
+        Parameters
+        ----------
+        gamma : ndarray
+            1-RDM
+
+        Returns
+        -------
+        etotal : float
+            Total energy.
+        """
         # only for restricted formalism
         e_nuc = self.mol.nuclear_repulsion_energy()
         jop = np.einsum('pqrs,rs->pq', self.eri, gamma)*0.5
@@ -153,6 +218,18 @@ class EnginePsi4(Engine):
         return etotal
 
     def calc_dipole(self, gamma, **kwargs):
+        r""" Get the total dipole moment.
+
+        Parameters
+        ----------
+        gamma : ndarray
+            1-RDM
+
+        Returns
+        -------
+        dip : ndarray
+            The dipole moment on x, y and z component.
+        """
         nucdip = self.mol.nuclear_dipole()
         ao_dipole = self.mints.ao_dipole()
         dip = np.zeros(3)
@@ -162,6 +239,18 @@ class EnginePsi4(Engine):
         return dip
 
     def calc_quadrupole(self, gamma, traceless = True):
+        r"""  Function to calculate the total quadruple for XX, XY, XY, YY, YZ, ZZ components.
+
+        Parameters
+        ----------
+        gamma : ndarray
+            1-RDM
+
+        Returns
+        -------
+        quadp : ndarray
+            An array containing a quadruple per component.
+        """
         # XX, XY, XZ, YY, YZ, ZZ
         quadrupole = self.mints.ao_quadrupole()
         quadp = np.zeros(6)
@@ -176,6 +265,17 @@ class EnginePsi4(Engine):
         return quadp
 
     def calc_quadrupole_nuclear(self, mol = None):
+        r""" Function to calculate the nuclear quadruple for XX, XY, XY, YY, YZ, ZZ components.
+
+        Parameters
+        ----------
+        gamma : ndarray
+            1-RDM
+
+        Returns
+        -------
+        quadrupol : ndarray
+           An array containing the nuclear quadruple per component."""
         mol = mol or self.mol
         pos = mol.geometry().np
         charges = [mol.charge(i) for i in range(self.mol.natom())]

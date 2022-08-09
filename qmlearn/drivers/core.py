@@ -1,5 +1,4 @@
 import numpy as np
-import itertools as it
 from ase.build.rotate import rotation_matrix_from_points
 from ase.geometry import get_distances
 from sklearn.decomposition import PCA
@@ -13,6 +12,7 @@ from rmsd.calculate_rmsd import (
     )
 
 from qmlearn.utils.utils import matrix_deviation
+from qmlearn.data import REFLECTION
 
 class Engine(object):
     r"""Abstract Base class for the External calculator.
@@ -224,10 +224,15 @@ def atoms_rmsd(target, atoms, transform = True, **kwargs) :
     """
     if transform :
         op_rotate, op_translate, op_indices = minimize_rmsd_operation(target, atoms, **kwargs)
-        positions = np.dot(atoms.positions,op_rotate)+op_translate
-        atoms = atoms[op_indices]
-        atoms.set_positions(positions[op_indices])
-    rmsd = rmsd_coords(target.positions, atoms.positions)
+        if op_rotate is not None :
+            positions = np.dot(atoms.positions,op_rotate)+op_translate
+            atoms = atoms[op_indices]
+            atoms.set_positions(positions[op_indices])
+            rmsd = rmsd_coords(target.positions, atoms.positions)
+        else :
+            rmsd = 0.0
+    else :
+        rmsd = rmsd_coords(target.positions, atoms.positions)
     return rmsd, atoms
 
 def rmsd_coords(target, pos, **kwargs):
@@ -352,7 +357,7 @@ def atoms2newdirection(atoms, a=(0,0,1), b=(1,0,0)):
     return atoms
 
 def minimize_rmsd_operation(target, atoms, stereo = True, rotate_method = 'kabsch',
-        reorder_method = 'hungarian', use_reflection = True, alpha = 0.2):
+        reorder_method = 'hungarian', use_reflection = True, rmsd_cut = None):
     r""" Function to create Rotation Matrix and Translation Vector
     of reference atoms with respect to initialize atoms.
 
@@ -401,22 +406,17 @@ def minimize_rmsd_operation(target, atoms, stereo = True, rotate_method = 'kabsc
     atoms1 = target.copy()
     atoms1.positions[:] = pos_t
     atoms2 = atoms.copy()
-    # axes1 = np.abs(get_atoms_axes(atoms1))
     #-----------------------------------------------------------------------
     if use_reflection :
-        srot=np.zeros((48,3,3))
-        mr = np.array(list(it.product([1,-1], repeat=3)))
-        i=0
-        for swap in it.permutations(range(3)):
-            for ijk in mr:
-                srot[i][tuple([(0,1,2),swap])]= ijk
-                i+=1
+        if stereo :
+            srot = REFLECTION.srot_stereo
+        else :
+            srot = REFLECTION.srot
     else :
         srot=[np.eye(3)]
     #-----------------------------------------------------------------------
     rmsd_final_min = np.inf
     for ia, rot in enumerate(srot):
-        if stereo and np.linalg.det(rot) < 0.0 : continue
         atoms2.set_positions(np.dot(pos, rot))
         atoms2.set_chemical_symbols(atoms.get_chemical_symbols())
         #
@@ -425,11 +425,8 @@ def minimize_rmsd_operation(target, atoms, stereo = True, rotate_method = 'kabsc
         rotate = get_match_rotate(atoms1, atoms2, rotate_method = rotate_method)
         atoms2.positions[:] = np.dot(atoms2.positions[:], rotate)
         rmsd = diff_coords(atoms1.positions, atoms2.positions, diff_method = 'mae')
-        # if rmsd < 0.3 :
-            # print('r0', rmsd, ia, rmsd_final_min)
-            # atoms2.write('try_' + str(ia) + '.xyz')
-        # axes2 = np.abs(get_atoms_axes(atoms2))
-        # rmsd += rmsd_coords(axes1, axes2)*alpha
+        if rmsd_cut is not None :
+            if rmsd < rmsd_cut : return [None]*3
         if rmsd < rmsd_final_min :
             rmsd_final_min = rmsd
             rmsd_final_rotate = rotate
@@ -443,6 +440,28 @@ def minimize_rmsd_operation(target, atoms, stereo = True, rotate_method = 'kabsc
     # rmsd = rmsd_coords(target.positions, positions[rmsd_final_indices])
     # print('rmsd', rmsd)
     return rotate, translate, rmsd_final_indices
+
+def reflect_atoms(atoms, stereo = True, tol=1E-8, **kwargs):
+    r""" Function to create all reflection atoms"""
+    pos_t = atoms.get_positions()
+    c_t = np.mean(pos_t, axis=0)
+    pos_t = pos_t - c_t
+    #-----------------------------------------------------------------------
+    atoms0 = atoms.copy()
+    atoms0.positions[:] = pos_t
+    #-----------------------------------------------------------------------
+    if stereo :
+        srot = REFLECTION.srot_stereo
+    else :
+        srot = REFLECTION.srot
+    data = []
+    for ia, rot in enumerate(srot):
+        atoms1 = atoms0.copy()
+        atoms1.positions[:] = np.dot(atoms1.positions, rot)
+        rmsd = diff_coords(atoms0.positions, atoms1.positions, diff_method = 'mae')
+        if rmsd > tol :
+            data.append(atoms1)
+    return data
 
 def get_match_rotate(target, atoms, rotate_method = 'kabsch'):
     r""" Rotate Atoms with a customize method

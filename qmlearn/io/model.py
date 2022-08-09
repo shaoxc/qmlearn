@@ -29,11 +29,11 @@ def db2qmmodel(filename, names = '*', mmodels = None):
         prefix = names
         names = dict.fromkeys(['qmmol', 'atoms', 'properties'])
         names['qmmol'] = db.get_names(prefix + '/qmmol*')[0]
-        names['atoms'] = db.get_names(prefix + '/train_atoms*')[0]
+        # names['atoms'] = db.get_names(prefix + '/train_atoms*')[0]
         names['properties'] = db.get_names(prefix + '/train_prop*')[0]
         print(f'Guess DB names : {names}', flush = True)
     refqmmol = db.read_qmmol(names['qmmol'])
-    train_atoms = db.read_images(names['atoms'])
+    # train_atoms = db.read_images(names['atoms'])
     properties = db.read_properties(names['properties'])
     db.close()
     #
@@ -54,9 +54,8 @@ def db2qmmodel(filename, names = '*', mmodels = None):
     if 'd_gamma' in mmodels :
         shape = y[0].shape
         gammas = []
-        for i, mol in enumerate(train_atoms):
-            # Do not rotate the molecule
-            gamma = model.predict(mol, refatoms=mol).reshape(shape)
+        for i, vext in enumerate(X):
+            gamma = model.predict(vext).reshape(shape)
             gammas.append(gamma)
         y = gammas
         model.fit(y, properties['gamma'], method = 'd_gamma')

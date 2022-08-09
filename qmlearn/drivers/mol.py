@@ -87,6 +87,9 @@ class QMMol(object):
         # Save all the kwargs for duplicate
         self.init_kwargs = locals()
         self.init()
+        #
+        for key in self.engine_calcs :
+            setattr(self, key, getattr(self.engine, key))
 
     def init(self):
         # Draw the arguments
@@ -213,16 +216,6 @@ class QMMol(object):
         r"""Function to run the External Calculator."""
         self.engine.run(**kwargs)
 
-    def __getattr__(self, attr):
-        if attr in dir(self):
-            return object.__getattribute__(self, attr)
-        elif attr in self.engine_calcs :
-            if not hasattr(self.engine, attr):
-                raise AttributeError(f"Sorry, the {self.engine_name} engine not support the {attr} now.")
-            return getattr(self.engine, attr)
-        else :
-            raise AttributeError(f"'{self.__class__.__name__}' object has no attribute '{attr}'.")
-
     @property
     def rotmat(self):
         r""" Rotated density matrix """
@@ -276,6 +269,11 @@ class QMMol(object):
             if rotate : y = np.dot(y, self.op_rotate_inv)
             if reorder :
                 y = y[self.op_indices_inv]
+        elif 'dipole' == prop :
+            if rotate : y = np.dot(y, self.op_rotate_inv)
+        elif 'quadrupole' == prop :
+            if rotate :
+                raise AttributeError(f"{prop} not support rotation.")
         else :
             # others just return it self
             pass

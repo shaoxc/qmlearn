@@ -77,6 +77,8 @@ class QMMol(object):
             'get_atom_naos',
             'vext',
             'ovlp',
+            'ovlp_x',
+            'ovlp_x_inv',
             'nao',
             ]
 
@@ -278,3 +280,17 @@ class QMMol(object):
             # others just return it self
             pass
         return y
+
+    def purify_gamma(self, gamma = None, tol = 0.5):
+        ovlp_x = self.engine.ovlp_x
+        ovlp_x_inv = self.engine.ovlp_x_inv
+        occs, orbs = np.linalg.eigh(ovlp_x@gamma@ovlp_x)
+        occs = np.abs(occs)
+        occs_i = np.rint(occs)
+        if np.all(np.abs(occs_i-occs) > tol):
+            if tol < 0.49 :
+                raise ValueError(f'The tol = {tol} is too small, try a bigger one.')
+            else :
+                raise ValueError('The density matrix is too bad.')
+        gamma = ovlp_x_inv@np.einsum('ik,jk->ij', orbs, orbs*occs_i)@ovlp_x_inv
+        return gamma

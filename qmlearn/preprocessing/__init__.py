@@ -47,20 +47,23 @@ def get_train_atoms(traj=None, nsamples=None, skip = 0, tol=0.01, direction = No
 
 
 class AtomsCreater(object):
-    def __init__(self, vibrations = None, temperature = 300, random_seed = None, maximum = 1E8):
+    def __init__(self, modes= None, frequencies=None, energies=None, atoms=None, temperature = 300, random_seed = None, maximum = 1E8):
         self.temperature = temperature*units.kB
-        self.vibrations = vibrations
+        self.modes = np.asarray(modes)
         self.maximum = maximum
+        self.atoms = atoms
         self.random_seed = random_seed
+        if energies is None:
+            if frequencies is None:
+                raise ValueError("Please provide the vibrational frequencies or energies")
+            energies = frequencies*units.invcm
+        self.energies = energies
         #
-        if hasattr(self.vibrations, 'get_vibrations'):
-            self.vibrations = self.vibrations.get_vibrations()
         self._initial()
 
     def _initial(self):
-        vibrations = self.vibrations
+        atoms = self.atoms
         #
-        atoms = vibrations.get_atoms().copy()
         pos = PCA().fit_transform(atoms.positions)
         if np.all(pos[:, 1] < 1E-8): # linear molecule
             nstart = 5
@@ -68,41 +71,30 @@ class AtomsCreater(object):
             nstart = 6
         #
         indices = np.arange(nstart, 3*len(atoms))
-        modes = vibrations.get_modes(all_atoms=True)[indices].copy()
-        energies = np.abs(vibrations.get_energies())[indices].copy()
-
-        for i in range(len(modes)):
-            modes[i] /= np.sqrt(np.abs(energies[i]))
+        d = len(indices)
+        if len(self.modes) == 3*len(atoms):
+            self.modes = self.modes[indices]
+            self.energies = self.energies[indices]
+        elif len(self.modes) != d:
+            raise ValueError("The wrong number of normal modes.")
         #
-        self.modes = modes
-        self.atoms = atoms
+        uc = units._hbar * units.m / np.sqrt(units._e * units._amu)
+        emode_ev = uc**2
+        mid = self.temperature*len(atoms)*2*emode_ev
+        chi_mid = d*(1-2/(9*d))**3
+        sigma = np.sqrt(mid/chi_mid)
         #
+        self.sigma = sigma
         self.random = np.random.default_rng(self.random_seed)
-        d = len(self.modes)
-        self.sigma = np.sqrt(self.temperature/(d*(1-2/(9*d))**3))
+        #
 
     def get_new_atoms(self, sigma = None):
         sigma = sigma or self.sigma
         d = len(self.modes)
         atoms = self.atoms.copy()
         coef = self.random.normal(0, sigma, size = (d, 1))[:,0]
+        coef /= self.energies
         for c,m in zip(coef, self.modes):
-            atoms.positions += c*m
-        return atoms
-
-    def _get_new_atoms_v1(self):
-        atoms = self.atoms.copy()
-        for i, m in enumerate(self.modes):
-            c = self.randoms.normal(0, self.sigma)
-            atoms.positions += c*m
-        return atoms
-
-    def _get_new_atoms_v0(self):
-        atoms = self.atoms.copy()
-        modes = self.modes
-        coef = np.random.random((1, len(modes)))[0]
-        coef -= 0.5
-        for c,m in zip(coef, modes):
             atoms.positions += c*m
         return atoms
 

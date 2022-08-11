@@ -55,6 +55,8 @@ class Engine(object):
         self._ovlp = None
         self._eri = None
         self._orb = None
+        self._ovlp_x = None
+        self._ovlp_x_inv = None
 
     def init(self, *args, **kwargs):
         r""" Initialize ABC class."""
@@ -103,6 +105,18 @@ class Engine(object):
     def ncharge0(self):
         r""" Calculated number of electrons. """
         pass
+
+    @property
+    def ovlp_x(self):
+        if self._ovlp_x is None :
+            self.init_ovlp_x()
+        return self._ovlp_x
+
+    @property
+    def ovlp_x_inv(self):
+        if self._ovlp_x_inv is None :
+            self.init_ovlp_x()
+        return self._ovlp_x_inv
 
     def calc_gamma(self, orb=None, occs=None):
         r"""Calculate the 1-body reduced density matrix (1-RDM).
@@ -196,6 +210,12 @@ class Engine(object):
         if kind==3:
             g = (4*gamma@ovlp@gamma@ovlp@gamma -gamma@ovlp@gamma@ovlp@gamma@ovlp@gamma)/8
         return matrix_deviation(gamma, g)
+
+    def init_ovlp_x(self, ovlp = None):
+        ovlp = ovlp or self.ovlp
+        svel, svec = np.linalg.eigh(ovlp)
+        self._ovlp_x = np.einsum('ik,jk->ij', svec, svec*np.sqrt(svel))
+        self._ovlp_x_inv = np.einsum('ik,jk->ij', svec, svec/np.sqrt(svel))
 
 def atoms_rmsd(target, atoms, transform = True, **kwargs) :
     r""" Function to return RMSD : Root mean square deviation between atoms and target:transform atom object. And the target atom coordinates.

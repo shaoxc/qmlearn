@@ -129,7 +129,7 @@ def _build_train_atoms(images, data = [], nsamples = 30, tol = 0.01, **kwargs):
     print(f'Get {len(data)} samples at {istep + 1} step.', flush = True)
     return data
 
-def build_train_atoms(images, nsamples = 30, tol = 0.01, maxtry = 20, **kwargs):
+def _build_train_atoms_v1(images, nsamples = 30, tol = 0.01, maxtry = 20, **kwargs):
     images = iter(images)
     data=[next(images)]
 
@@ -158,3 +158,33 @@ def build_train_atoms(images, nsamples = 30, tol = 0.01, maxtry = 20, **kwargs):
         ns = len(data)
         raise AttributeError(f"Only found {ns} samples, try increase `maxtry` or change the inputs.")
     return data
+
+def build_train_atoms(images, nsamples = 30, tol = 0.01, use_reflection = False, rotate_method = 'kabsch', data = None, **kwargs):
+    images = iter(images)
+    if data is None : data=[next(images)]
+
+    for istep, atoms in enumerate(images):
+        print('istep', istep, len(data))
+        for ia, a in enumerate(data):
+            rmsd, _ = atoms_rmsd(a, atoms, rmsd_cut = tol, use_reflection = use_reflection, rotate_method = rotate_method, **kwargs)
+            if rmsd < tol : break
+        else :
+            data.append(atoms)
+            if len(data) == nsamples: break
+    #-----------------------------------------------------------------------
+    print('Find a reference atoms :', flush = True)
+    diffs = []
+    refatoms = data[0]
+    for atoms in data[1:] :
+        rmsd, _ = atoms_rmsd(refatoms, atoms, rmsd_cut = tol, use_reflection = use_reflection, rotate_method = rotate_method, **kwargs)
+        diffs.append(rmsd)
+    diffs = np.asarray(diffs)
+    index = np.argmax(diffs)+1
+    refatoms = data.pop(index)
+    new = [refatoms]
+    for atoms in data:
+        rmsd, atoms = atoms_rmsd(refatoms, atoms, rotate_method = rotate_method, **kwargs)
+        new.append(atoms)
+    #-----------------------------------------------------------------------
+    print(f'Get {len(new)} samples at {istep + 1} step.', flush = True)
+    return new

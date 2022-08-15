@@ -244,13 +244,10 @@ def atoms_rmsd(target, atoms, transform = True, **kwargs) :
     """
     if transform :
         op_rotate, op_translate, op_indices = minimize_rmsd_operation(target, atoms, **kwargs)
-        if op_rotate is not None :
-            positions = np.dot(atoms.positions,op_rotate)+op_translate
-            atoms = atoms[op_indices]
-            atoms.set_positions(positions[op_indices])
-            rmsd = rmsd_coords(target.positions, atoms.positions)
-        else :
-            rmsd = 0.0
+        positions = np.dot(atoms.positions,op_rotate)+op_translate
+        atoms = atoms[op_indices]
+        atoms.set_positions(positions[op_indices])
+        rmsd = rmsd_coords(target.positions, atoms.positions)
     else :
         rmsd = rmsd_coords(target.positions, atoms.positions)
     return rmsd, atoms
@@ -394,7 +391,7 @@ def minimize_rmsd_operation(target, atoms, stereo = True, rotate_method = 'kabsc
         | 'brute'
         | 'distance'
 
-    rotate_metod: str
+    rotate_method: str
         
         | None : 'none'
         | Kabsch : 'kabsch'
@@ -445,20 +442,16 @@ def minimize_rmsd_operation(target, atoms, stereo = True, rotate_method = 'kabsc
         rotate = get_match_rotate(atoms1, atoms2, rotate_method = rotate_method)
         atoms2.positions[:] = np.dot(atoms2.positions[:], rotate)
         rmsd = diff_coords(atoms1.positions, atoms2.positions, diff_method = 'mae')
-        if rmsd_cut is not None :
-            if rmsd < rmsd_cut : return [None]*3
         if rmsd < rmsd_final_min :
             rmsd_final_min = rmsd
             rmsd_final_rotate = rotate
             rmsd_final_reflection = rot
             rmsd_final_indices = indices
-        # print('rmsd', rmsd, rmsd_final_min)
+        if rmsd_cut is not None :
+            if rmsd < rmsd_cut : break
     rotate = np.dot(rmsd_final_reflection, rmsd_final_rotate)
     translate = c_t - np.dot(c, rotate)
     # print('rmsd_final_min', rmsd_final_min)
-    # positions = np.dot(atoms.positions, rotate) + translate
-    # rmsd = rmsd_coords(target.positions, positions[rmsd_final_indices])
-    # print('rmsd', rmsd)
     return rotate, translate, rmsd_final_indices
 
 def reflect_atoms(atoms, stereo = True, tol=1E-8, **kwargs):
@@ -492,7 +485,7 @@ def get_match_rotate(target, atoms, rotate_method = 'kabsch'):
         References atoms
     atoms : :obj: ASE atoms object
         Initialize atoms
-    rotate_metod: str
+    rotate_method: str
         
         | None : 'none'
         | Kabsch : 'kabsch'

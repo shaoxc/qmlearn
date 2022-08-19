@@ -123,6 +123,9 @@ class DBHDF5(object):
         qmmol = qmmol or self.qmmol
         if qmmol is None :
             raise AttributeError(f"Please set 'qmmol' for {self.__class__.__name__}.")
+        #
+        if self.qmmol is None : self.qmmol = qmmol
+        #
         if name is None : name = qmmol.method+'/qmmol'
         if name in self.fh :
             self.group = self.fh[name].parent

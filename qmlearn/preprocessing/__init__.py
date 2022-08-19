@@ -166,7 +166,10 @@ def build_train_atoms(images, nsamples = 30, tol = 0.01, use_reflection = False,
     for istep, atoms in enumerate(images):
         print('istep', istep, len(data))
         for ia, a in enumerate(data):
-            rmsd, _ = atoms_rmsd(a, atoms, rmsd_cut = tol, use_reflection = use_reflection, rotate_method = rotate_method, **kwargs)
+            if ia == 0 :
+                rmsd, atoms = atoms_rmsd(a, atoms, rmsd_cut = tol, use_reflection = use_reflection, rotate_method = rotate_method, **kwargs)
+            else :
+                rmsd, _ = atoms_rmsd(a, atoms, transform = False)
             if rmsd < tol : break
         else :
             data.append(atoms)
@@ -188,3 +191,46 @@ def build_train_atoms(images, nsamples = 30, tol = 0.01, use_reflection = False,
     #-----------------------------------------------------------------------
     print(f'Get {len(new)} samples at {istep + 1} step.', flush = True)
     return new
+
+def build_properties(images, properties = None, refqmmol = None, qmmol_options = {}, **kwargs):
+    data = {k: [] for k in properties}
+    for i, atoms in enumerate(images):
+        data = append_properties(atoms, data = data, properties = properties,
+                refqmmol = refqmmol, qmmol_options = qmmol_options, **kwargs)
+    return data
+
+def append_properties(atoms, data = None, properties = None, refqmmol = None, qmmol_options = {}, **kwargs):
+    from qmlearn.drivers.mol import QMMol
+    #
+    if data is None :
+        if properties is None : properties = ['vext', 'gamma', 'energy', 'forces', 'dipole']
+        data= {k: [] for k in properties}
+    properties = list(data.keys())
+    #
+    if isinstance(atoms, QMMol):
+        qmmol = atoms
+    elif refqmmol is not None :
+        qmmol = refqmmol.duplicate(atoms, refatoms=atoms)
+    else :
+        qmmol = QMMol(atoms = atoms, **qmmol_options)
+    #
+    qmmol.run()
+    #
+    for key in properties :
+        if key == 'vext' :
+            data[key].append(qmmol.engine.vext)
+        elif key == 'gamma' :
+            data[key].append(qmmol.engine.gamma)
+        elif key == 'energy' :
+            data[key].append(qmmol.engine.etotal)
+        elif key == 'forces' :
+            data[key].append(qmmol.engine.forces)
+        elif key == 'dipole' :
+            data[key].append(qmmol.calc_dipole(qmmol.engine.gamma))
+        elif key == 'ke' :
+            data[key].append(qmmol.calc_ke(qmmol.engine.gamma))
+        elif key == 'ovlp' :
+            data[key].append(qmmol.engine.ovlp)
+        else :
+            raise ValueError(f'Sorry, not support the property {key} now')
+    return data

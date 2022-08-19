@@ -108,9 +108,13 @@ class QMLCalculator(Calculator):
         """
         shape = self.qmmodel.refqmmol.vext.shape
         gamma = self.qmmodel.predict(qmmol).reshape(shape)
+        #
+        gamma = qmmol.purify_gamma(gamma)
+        #
         m2 = self.second_learn.get('gamma', None)
         if m2 :
             gamma2 = self.qmmodel.predict(gamma, method = m2).reshape(shape)
+            gamma2 = qmmol.purify_gamma(gamma2)
         else :
             gamma2 = gamma
 

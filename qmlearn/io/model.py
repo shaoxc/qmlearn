@@ -1,13 +1,13 @@
 from sklearn.linear_model import LinearRegression
 from sklearn.kernel_ridge import KernelRidge
 from qmlearn.model.model import QMModel
-from qmlearn.io.hdf5 import DBHDF5
+from qmlearn.io import read_db
 
 def db2qmmodel(filename, names = '*', mmodels = None):
-    """Train QMModel to learn :math:`{\gamma}` in terms of :math:`V_{ext}` from training data
-    then an additional layer of training learn :math:`{\delta}E` and :math:`{\delta}{\gamma}` 
+    r"""Train QMModel to learn :math:`{\gamma}` in terms of :math:`V_{ext}` from training data
+    then an additional layer of training learn :math:`{\delta}E` and :math:`{\delta}{\gamma}`
     based on previously learned :math:`{\gamma}`.
-    
+
     Parameters
     ----------
     filename : str
@@ -24,18 +24,10 @@ def db2qmmodel(filename, names = '*', mmodels = None):
     model : obj
         trained model
     """
-    db = DBHDF5(filename)
-    if isinstance(names, str):
-        prefix = names
-        names = dict.fromkeys(['qmmol', 'atoms', 'properties'])
-        names['qmmol'] = db.get_names(prefix + '/qmmol*')[0]
-        # names['atoms'] = db.get_names(prefix + '/train_atoms*')[0]
-        names['properties'] = db.get_names(prefix + '/train_prop*')[0]
-        print(f'Guess DB names : {names}', flush = True)
-    refqmmol = db.read_qmmol(names['qmmol'])
-    # train_atoms = db.read_images(names['atoms'])
-    properties = db.read_properties(names['properties'])
-    db.close()
+    data = read_db(filename, names=names)
+    refqmmol = data['qmmol']
+    train_atoms = data['atoms']
+    properties = data['properties']
     #
     X = properties['vext']
     y = properties['gamma']
@@ -51,18 +43,27 @@ def db2qmmodel(filename, names = '*', mmodels = None):
     model = QMModel(mmodels=mmodels, refqmmol = refqmmol)
     model.fit(X, y)
     #
-    if 'd_gamma' in mmodels :
+    for k in mmodels :
+        if k.startswith('d_'):
+            delta_learn = True
+            break
+    else :
+        delta_learn = False
+    #
+    if delta_learn :
         shape = y[0].shape
         gammas = []
-        for i, vext in enumerate(X):
-            gamma = model.predict(vext).reshape(shape)
+        for i, a in enumerate(train_atoms):
+            gamma = model.predict(a, refatoms=a).reshape(shape)
+            #
+            gamma = model.qmmol.purify_gamma(gamma)
+            #
             gammas.append(gamma)
         y = gammas
-        model.fit(y, properties['gamma'], method = 'd_gamma')
-    for k in mmodels :
-        if not k.startswith('d_') or k in ['d_gamma'] : continue
-        key = k[2:]
-        if key not in properties :
-            print(f"!WARN : '{key}' not in the database", flush = True)
-        model.fit(y, properties[key], method = k)
+        for k in mmodels :
+            if not k.startswith('d_') : continue
+            key = k[2:]
+            if key not in properties :
+                print(f"!WARN : '{key}' not in the database", flush = True)
+            model.fit(y, properties[key], method = k)
     return model

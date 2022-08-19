@@ -129,7 +129,7 @@ class EnginePyscf(Engine):
         if isinstance(atom, gto.Mole):
             mol = atom
         else :
-            mol = gto.M(atom = atom, basis=basis, charge = charge)
+            mol = gto.M(atom = atom, basis=basis, charge = charge, parse_arg = False)
         return mol
 
     def run(self, properties = ('energy', 'forces'), ao_repr = True, **kwargs):

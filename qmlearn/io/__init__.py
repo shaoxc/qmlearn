@@ -2,6 +2,7 @@ import os
 import numpy as np
 from ase import Atoms, io
 from qmlearn.io.hdf5 import DBHDF5
+from qmlearn.utils import tenumerate
 
 def read_images(traj, format=None, index=None):
     if index is None :
@@ -58,7 +59,7 @@ def write_db(output, qmmol, images, properties, prefix = 'train', names = None):
     db.close()
 
 def merge_db(filenames, names = '*', output = None):
-    for i, filename in enumerate(filenames):
+    for i, filename in tenumerate(filenames):
         data = read_db(filename, names=names)
         if i == 0 :
             qmmol = data['qmmol']

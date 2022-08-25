@@ -1,5 +1,7 @@
 import numpy as np
 import hashlib
+from tqdm import tqdm, trange
+from tqdm.contrib import tenumerate
 
 def dict_update(d, u):
     import collections.abc

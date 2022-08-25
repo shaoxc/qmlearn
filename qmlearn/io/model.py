@@ -2,6 +2,7 @@ from sklearn.linear_model import LinearRegression
 from sklearn.kernel_ridge import KernelRidge
 from qmlearn.model.model import QMModel
 from qmlearn.io import read_db
+from qmlearn.utils import tenumerate
 
 def db2qmmodel(filename, names = '*', mmodels = None):
     r"""Train QMModel to learn :math:`{\gamma}` in terms of :math:`V_{ext}` from training data
@@ -51,15 +52,17 @@ def db2qmmodel(filename, names = '*', mmodels = None):
         delta_learn = False
     #
     if delta_learn :
+        print('Start predicting:', flush = True)
         shape = y[0].shape
         gammas = []
-        for i, a in enumerate(train_atoms):
+        for i, a in tenumerate(train_atoms):
             gamma = model.predict(a, refatoms=a).reshape(shape)
             #
             gamma = model.qmmol.purify_gamma(gamma)
             #
             gammas.append(gamma)
         y = gammas
+        print('Start delta learning:', flush = True)
         for k in mmodels :
             if not k.startswith('d_') : continue
             key = k[2:]

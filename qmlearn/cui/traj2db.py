@@ -2,25 +2,21 @@
 # coding: utf-8
 import os
 import argparse
+from collections import OrderedDict
 from qmlearn.drivers.mol import QMMol
 from qmlearn.io import read_images, write_db, merge_db
 from qmlearn.preprocessing import append_properties
-
-try:
-    from tqdm import tqdm
-    import builtins
-
-    def enumerate(x):
-        return builtins.enumerate(tqdm(x))
-except Exception:
-    pass
+from qmlearn.utils import tenumerate
 
 def get_args():
-    parser = argparse.ArgumentParser(description='eDFTpy IO:\n System convert by eDFTpy.\n Atoms is convert by ASE.',
-        usage='use "%(prog)s --help" for more information',
-        formatter_class=argparse.RawTextHelpFormatter)
+    parser = argparse.ArgumentParser(
+            description='QMLearn traj2db:\n Create the QMLearn database from trajectory file',
+            usage='use "%(prog)s --help" for more information',
+            formatter_class=argparse.RawTextHelpFormatter)
+    parser.add_argument('--traj2db', dest='traj2db', action='store_true', default=False,
+            help='Create the QMLearn database from trajectory file')
 
-    parser.add_argument('traj', nargs = '+', help = 'Structure file contains train atoms. Supported format:\n'
+    parser.add_argument('trajs', nargs = '+', help = 'Structure file contains train atoms. Supported format:\n'
             'traj, xyz, extxyz, hdf5')
     parser.add_argument('-o', '--output', dest='output', type=str, action='store',
             default=None, help='The output file')
@@ -29,7 +25,7 @@ def get_args():
     parser.add_argument('--basis', dest='basis', type=str, action='store',
             default='6-31g', help='basis set for engine')
     parser.add_argument('--charge', dest='charge', type=int, action='store',
-            default=1, help='Total number of electrons in the system')
+            default=0, help='Total number of electrons in the system')
     parser.add_argument('--method', dest='method', type=str, action='store',
             default='rks', help='The method for the engine')
     parser.add_argument('--istart', dest='istart', type=int, action='store',
@@ -53,17 +49,19 @@ def run(args):
     charge = args.charge
     output = args.output
     properties = args.properties
-    traj = args.traj
+    trajs = args.trajs
     istart = args.istart
     iend = args.iend
     merge = args.merge
     #-----------------------------------------------------------------------
-    if not output : output = os.path.splitext(traj)[0]+'_qmldb.hdf5'
+    trajs = list(OrderedDict.fromkeys(trajs))
+    print(f'Input files are : {trajs}')
+    if not output : output = os.path.splitext(trajs[0])[0]+'_qmldb.hdf5'
     if os.path.isfile(output):
         raise ValueError(f"The {output} already exist.")
 
     if merge :
-        return merge_db(traj, output=output)
+        return merge_db(trajs, output=output)
 
     properties.extend(['vext', 'gamma', 'energy', 'forces', 'dipole'])
     index = slice(istart, iend)
@@ -74,9 +72,9 @@ def run(args):
             'charge' : charge,
             }
 
-    train_atoms=read_images(traj[0], index=index)
+    train_atoms=read_images(trajs[0], index=index)
     data= {k: [] for k in properties}
-    for i, atoms in enumerate(train_atoms):
+    for i, atoms in tenumerate(train_atoms):
         qmmol = QMMol(atoms = atoms, **qmmol_options)
         if i == 0 : refqmmol = qmmol
         data = append_properties(qmmol, data = data)

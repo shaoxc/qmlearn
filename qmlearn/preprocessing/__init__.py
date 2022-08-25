@@ -2,6 +2,7 @@ import numpy as np
 import ase.units as units
 from qmlearn.drivers.core import atoms_rmsd, atoms2bestplane
 from qmlearn.io import read_images
+from qmlearn.utils import tenumerate
 from sklearn.decomposition import PCA
 
 def get_train_atoms(traj=None, nsamples=None, skip = 0, tol=0.01, direction = None, transform = True, refatoms = None):
@@ -159,7 +160,7 @@ def _build_train_atoms_v1(images, nsamples = 30, tol = 0.01, maxtry = 20, **kwar
         raise AttributeError(f"Only found {ns} samples, try increase `maxtry` or change the inputs.")
     return data
 
-def build_train_atoms(images, nsamples = 30, tol = 0.01, use_reflection = False, rotate_method = 'kabsch', data = None, **kwargs):
+def _build_train_atoms_v2(images, nsamples = 30, tol = 0.01, use_reflection = False, rotate_method = 'kabsch', data = None, **kwargs):
     images = iter(images)
     if data is None : data=[next(images)]
 
@@ -192,9 +193,32 @@ def build_train_atoms(images, nsamples = 30, tol = 0.01, use_reflection = False,
     print(f'Get {len(new)} samples at {istep + 1} step.', flush = True)
     return new
 
+def build_train_atoms(images, nsamples = 30, tol = 0.01, use_reflection = False, rotate_method = 'kabsch', data = None, refatoms = None, **kwargs):
+    images = iter(images)
+    if data is None :
+        if refatoms is not None :
+            data = [refatoms.copy()]
+        else :
+            data=[next(images)]
+
+    print("Start build")
+    for istep, atoms in enumerate(images):
+        print('istep', istep, len(data), end = '\r')
+        for ia, a in enumerate(data):
+            if ia == 0 :
+                rmsd, atoms = atoms_rmsd(a, atoms, rmsd_cut = tol, use_reflection = use_reflection, rotate_method = rotate_method, **kwargs)
+            else :
+                rmsd, _ = atoms_rmsd(a, atoms, transform = False)
+            if rmsd < tol : break
+        else :
+            data.append(atoms)
+            if len(data) == nsamples: break
+    print(f'Get {len(data)} samples at {istep + 1} step.', flush = True)
+    return data
+
 def build_properties(images, properties = None, refqmmol = None, qmmol_options = {}, **kwargs):
     data = {k: [] for k in properties}
-    for i, atoms in enumerate(images):
+    for i, atoms in tenumerate(images):
         data = append_properties(atoms, data = data, properties = properties,
                 refqmmol = refqmmol, qmmol_options = qmmol_options, **kwargs)
     return data

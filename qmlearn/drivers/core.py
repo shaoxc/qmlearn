@@ -374,7 +374,7 @@ def atoms2newdirection(atoms, a=(0,0,1), b=(1,0,0)):
     return atoms
 
 def minimize_rmsd_operation(target, atoms, stereo = True, rotate_method = 'kabsch',
-        reorder_method = 'hungarian', use_reflection = True, rmsd_cut = None):
+        reorder_method = 'inertia-hungarian', use_reflection = True, rmsd_cut = None):
     r""" Function to create Rotation Matrix and Translation Vector
     of reference atoms with respect to initialize atoms.
 
@@ -388,7 +388,7 @@ def minimize_rmsd_operation(target, atoms, stereo = True, rotate_method = 'kabsc
 
         | 'hungarian'
         | 'inertia-hungarian'
-        | 'brute'
+        | 'brute' : best but very slow
         | 'distance'
 
     rotate_method: str

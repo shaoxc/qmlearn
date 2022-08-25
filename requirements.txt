@@ -5,3 +5,4 @@ scikit-learn>=0.24.2
 importlib-metadata>=0.12;python_version<"3.8"
 rmsd==1.4
 pyscf>=2.0.0
+tqdm

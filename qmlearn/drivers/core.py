@@ -388,7 +388,7 @@ def minimize_rmsd_operation(target, atoms, stereo = True, rotate_method = 'kabsc
 
         | 'hungarian'
         | 'inertia-hungarian'
-        | 'brute' : best but very slow
+        | 'brute'
         | 'distance'
 
     rotate_method: str
@@ -441,7 +441,8 @@ def minimize_rmsd_operation(target, atoms, stereo = True, rotate_method = 'kabsc
         atoms2 = atoms2[indices]
         rotate = get_match_rotate(atoms1, atoms2, rotate_method = rotate_method)
         atoms2.positions[:] = np.dot(atoms2.positions[:], rotate)
-        rmsd = diff_coords(atoms1.positions, atoms2.positions, diff_method = 'mae')
+        rmsd = diff_coords(atoms1.positions, atoms2.positions)
+        # print('ia', ia, rmsd, indices)
         if rmsd < rmsd_final_min :
             rmsd_final_min = rmsd
             rmsd_final_rotate = rotate
@@ -528,7 +529,7 @@ def reorder_atoms_indices(target, atoms, reorder_method='hungarian'):
     indices : ndarray
         Reordered atom indices """
     if reorder_method is None or reorder_method == 'none':
-        indices = slice(None)
+        indices = np.arange(len(atoms))
     else :
         if not hasattr(reorder_method, '__call__'):
             if reorder_method == 'hungarian' :

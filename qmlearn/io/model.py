@@ -4,7 +4,7 @@ from qmlearn.model.model import QMModel
 from qmlearn.io import read_db
 from qmlearn.utils import tenumerate
 
-def db2qmmodel(filename, names = '*', mmodels = None):
+def db2qmmodel(filename, names = '*', mmodels = None, qmmol_options = None):
     r"""Train QMModel to learn :math:`{\gamma}` in terms of :math:`V_{ext}` from training data
     then an additional layer of training learn :math:`{\delta}E` and :math:`{\delta}{\gamma}`
     based on previously learned :math:`{\gamma}`.
@@ -27,6 +27,9 @@ def db2qmmodel(filename, names = '*', mmodels = None):
     """
     data = read_db(filename, names=names)
     refqmmol = data['qmmol']
+    if qmmol_options :
+        refqmmol.init_kwargs.update(qmmol_options)
+        refqmmol = refqmmol.__class__(**refqmmol.init_kwargs)
     train_atoms = data['atoms']
     properties = data['properties']
     #
@@ -52,7 +55,7 @@ def db2qmmodel(filename, names = '*', mmodels = None):
         delta_learn = False
     #
     if delta_learn :
-        print('Start predicting:', flush = True)
+        print('Start predicting...', flush = True)
         shape = y[0].shape
         gammas = []
         for i, a in tenumerate(train_atoms):
@@ -62,11 +65,12 @@ def db2qmmodel(filename, names = '*', mmodels = None):
             #
             gammas.append(gamma)
         y = gammas
-        print('Start delta learning:', flush = True)
+        print('Start delta learning...', flush = True)
         for k in mmodels :
             if not k.startswith('d_') : continue
             key = k[2:]
             if key not in properties :
                 print(f"!WARN : '{key}' not in the database", flush = True)
             model.fit(y, properties[key], method = k)
+    print('Finish the reading.', flush = True)
     return model

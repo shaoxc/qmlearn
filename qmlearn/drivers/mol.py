@@ -88,6 +88,9 @@ class QMMol(object):
             **kwargs):
         # Save all the kwargs for duplicate
         self.init_kwargs = locals()
+        self.init_kwargs.pop('self', None)
+        self.init_kwargs.pop('kwargs', None)
+        self.init_kwargs.update(kwargs)
         self.init()
         #
         for key in self.engine_calcs :

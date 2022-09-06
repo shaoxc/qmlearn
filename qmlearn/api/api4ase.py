@@ -30,7 +30,7 @@ class QMLCalculator(Calculator):
     implemented_properties = ['energy', 'forces', 'dipole', 'stress', 'gamma']
 
     def __init__(self, qmmodel = None, second_learn = {}, method = 'gamma',
-            label='QMLearn', atoms=None, directory='.', refqmmol = None, properties = ('energy'),
+            label='QMLearn', atoms=None, directory='.', refqmmol = None, properties = ('energy', ),
             **kwargs):
         Calculator.__init__(self, label = label, atoms = atoms, directory = directory, **kwargs)
         self.qmmodel = qmmodel
@@ -57,14 +57,17 @@ class QMLCalculator(Calculator):
     @property
     def properties(self):
         if not isinstance(self._properties, set):
-            self._properties = set(self._properties)
+            if isinstance(self._properties, str):
+                self._properties = (self._properties, )
+            else :
+                self._properties = set(self._properties)
         return self._properties
 
     @properties.setter
     def properties(self, value):
         self._properties = value
 
-    def calculate(self, atoms=None, properties=('energy'), system_changes=all_changes):
+    def calculate(self, atoms=None, properties=('energy', ), system_changes=all_changes):
         r""" Function to calculate the desire properties. 
  
         Parameters

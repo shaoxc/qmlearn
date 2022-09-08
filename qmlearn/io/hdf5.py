@@ -307,6 +307,9 @@ class DBHDF5(object):
             v = v.decode('UTF-8')
         elif isinstance(v, np.ndarray) and len(v) > 0 and isinstance(v[0], bytes):
             v = v.astype(str)
+        # convert numpy scalar types to python types
+        if isinstance(v, np.generic):
+            v = v.item()
         return v
 
     def close(self):

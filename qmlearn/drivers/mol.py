@@ -85,7 +85,7 @@ class QMMol(object):
     def __init__(self, atoms = None, engine_name = 'pyscf', method = 'rks', basis = '6-31g',
             xc = None, occs=None, refatoms = None, engine_options = {}, charge = None, engine = None,
             stereo = True, rotate_method = 'kabsch', reorder_method = 'inertia-hungarian', use_reflection = True,
-            **kwargs):
+            ignore_hydrogen = False, **kwargs):
         # Save all the kwargs for duplicate
         self.init_kwargs = locals()
         self.init_kwargs.pop('self', None)
@@ -114,6 +114,7 @@ class QMMol(object):
         rotate_method=self.init_kwargs.get('rotate_method', None)
         reorder_method=self.init_kwargs.get('reorder_method', None)
         use_reflection=self.init_kwargs.get('use_reflection', True)
+        ignore_hydrogen=self.init_kwargs.get('ignore_hydrogen', False)
         #-----------------------------------------------------------------------
         self.op_rotate = np.eye(3)
         self.op_translate = np.zeros(3)
@@ -139,8 +140,8 @@ class QMMol(object):
                     raise e
             if refatoms is not atoms :
                 self.op_rotate, self.op_translate, self.op_indices = minimize_rmsd_operation(refatoms, atoms,
-                        stereo = stereo, rotate_method = rotate_method,
-                        reorder_method = reorder_method, use_reflection = use_reflection)
+                        stereo = stereo, rotate_method = rotate_method, reorder_method = reorder_method,
+                        use_reflection = use_reflection, ignore_hydrogen = ignore_hydrogen)
                 atoms = atoms[self.op_indices]
                 atoms.set_positions(np.dot(atoms.positions,self.op_rotate)+self.op_translate)
                 atoms_change = atoms

@@ -374,7 +374,7 @@ def atoms2newdirection(atoms, a=(0,0,1), b=(1,0,0)):
     return atoms
 
 def minimize_rmsd_operation(target, atoms, stereo = True, rotate_method = 'kabsch',
-        reorder_method = 'inertia-hungarian', use_reflection = True, rmsd_cut = None):
+        reorder_method = 'inertia-hungarian', use_reflection = True, rmsd_cut = None, ignore_hydrogen = False):
     r""" Function to create Rotation Matrix and Translation Vector
     of reference atoms with respect to initialize atoms.
 
@@ -400,6 +400,9 @@ def minimize_rmsd_operation(target, atoms, stereo = True, rotate_method = 'kabsc
     use_reflection : bool
         If True it applies a reflection on your molecule.
 
+    ignore_hydrogen : bool
+        If True will ignore the hydrogen atoms, and the reorder_method will not working.
+
     Returns
     -------
     rotate : ndarray
@@ -410,19 +413,25 @@ def minimize_rmsd_operation(target, atoms, stereo = True, rotate_method = 'kabsc
         Reorderred atom indices 
     """
     # return _minimize_rmsd_operation_v0(target, atoms)
-    pos_t = target.get_positions()
+    #
+    if ignore_hydrogen :
+        atoms1 = target[~(target.symbols == 'H')]
+        atoms2 = atoms[~(atoms.symbols == 'H')]
+        reorder_method = 'none'
+    else :
+        atoms1 = target.copy()
+        atoms2 = atoms.copy()
+    symbols = atoms2.get_chemical_symbols()
+    #
+    pos_t = atoms1.get_positions()
     c_t = np.mean(pos_t, axis=0)
-    # c_t = target.get_center_of_mass()
     pos_t = pos_t - c_t
 
-    pos = atoms.get_positions()
+    pos = atoms2.get_positions()
     c = np.mean(pos, axis=0)
-    # c = atoms.get_center_of_mass()
     pos = pos - c
     #-----------------------------------------------------------------------
-    atoms1 = target.copy()
     atoms1.positions[:] = pos_t
-    atoms2 = atoms.copy()
     #-----------------------------------------------------------------------
     if use_reflection :
         if stereo :
@@ -435,7 +444,7 @@ def minimize_rmsd_operation(target, atoms, stereo = True, rotate_method = 'kabsc
     rmsd_final_min = np.inf
     for ia, rot in enumerate(srot):
         atoms2.set_positions(np.dot(pos, rot))
-        atoms2.set_chemical_symbols(atoms.get_chemical_symbols())
+        atoms2.set_chemical_symbols(symbols)
         #
         indices = reorder_atoms_indices(atoms1, atoms2, reorder_method=reorder_method)
         atoms2 = atoms2[indices]
@@ -453,6 +462,7 @@ def minimize_rmsd_operation(target, atoms, stereo = True, rotate_method = 'kabsc
     rotate = np.dot(rmsd_final_reflection, rmsd_final_rotate)
     translate = c_t - np.dot(c, rotate)
     # print('rmsd_final_min', rmsd_final_min)
+    if ignore_hydrogen : rmsd_final_indices = np.arange(len(atoms))
     return rotate, translate, rmsd_final_indices
 
 def reflect_atoms(atoms, stereo = True, tol=1E-8, **kwargs):

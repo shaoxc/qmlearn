@@ -30,6 +30,7 @@ def db2qmmodel(filename, names = '*', mmodels = None, qmmol_options = None):
     if qmmol_options :
         refqmmol.init_kwargs.update(qmmol_options)
         refqmmol = refqmmol.__class__(**refqmmol.init_kwargs)
+        print("New options of QMMOL :\n", refqmmol.init_kwargs)
     train_atoms = data['atoms']
     properties = data['properties']
     #

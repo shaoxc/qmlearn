@@ -77,7 +77,10 @@ class AtomsCreater(object):
             self.modes = self.modes[indices]
             self.energies = self.energies[indices]
         elif len(self.modes) != d:
-            raise ValueError("The wrong number of normal modes.")
+            if np.all(pos[:, 1] < 1E-8) and len(self.modes) == d - 1:
+                print("WARN: This is a linear molecule and missing one mode.")
+            else :
+                raise ValueError("The wrong number of normal modes.")
         #
         uc = units._hbar * units.m / np.sqrt(units._e * units._amu)
         emode_ev = uc**2

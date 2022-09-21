@@ -84,7 +84,7 @@ class QMMol(object):
 
     def __init__(self, atoms = None, engine_name = 'pyscf', method = 'rks', basis = '6-31g',
             xc = None, occs=None, refatoms = None, engine_options = {}, charge = None, engine = None,
-            stereo = True, rotate_method = 'kabsch', reorder_method = 'inertia-hungarian', use_reflection = True,
+            stereo = True, rotate_method = 'kabsch', reorder_method = 'none', use_reflection = True,
             ignore_hydrogen = False, **kwargs):
         # Save all the kwargs for duplicate
         self.init_kwargs = locals()

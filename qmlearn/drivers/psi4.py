@@ -98,7 +98,7 @@ class EnginePsi4(Engine):
 
     def run(self, ao_repr = True, **kwargs):
         r"""Caculate electronic properties using Psi4.
-        
+
         Parameters
         ----------
         etotal : Total electronic energy
@@ -147,7 +147,7 @@ class EnginePsi4(Engine):
 
     @property
     def xcfunc(self):
-        r""" Function to define Exchange Correlation functional if it is not given. 
+        r""" Function to define Exchange Correlation functional if it is not given.
 
         Parameters
         ----------
@@ -170,7 +170,7 @@ class EnginePsi4(Engine):
         return self._xcfunc
 
     def calc_exc(self, gamma):
-        r""" Function to calculate the Exchange Correlation energy.  
+        r""" Function to calculate the Exchange Correlation energy.
 
         Parameters
         ----------

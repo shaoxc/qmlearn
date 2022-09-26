@@ -138,7 +138,7 @@ class EnginePyscf(Engine):
         Parameters
         ----------
         properties : str
-            
+
             | Total electronic energy : 'energy'
             | Total atomic forces : 'forces'
 
@@ -165,18 +165,18 @@ class EnginePyscf(Engine):
                 mf = self.mf
 
             if '+' in self.method and self.method.split('+')[1] == 'fci':
-               cisolver = mf
-               e, ci = cisolver.kernel()  #To get 2RDM, gammat. You need the cisolver.make_rdm12 function.
-               rdm_1, rdm_2 = cisolver.make_rdm12(fcivec=ci,norb=np.shape(mf0.get_occ())[0],nelec=self.mol.nelec)
-               self._gamma, self._gammat = fci.rdm.reorder_rdm(rdm1=rdm_1,rdm2=rdm_2) #Call reorder_rdm to transform to the normal rdm2a
-               #self._gamma, self._gammat = cisolver.make_rdm12(fcivec=ci,norb=np.shape(mf0.get_occ())[0],nelec=self.mol.nelec)
-               h1=mf0.get_hcore()
-               self._orb = mf0.mo_coeff
-               self._etotal = cisolver.e_tot
+                cisolver = mf
+                e, ci = cisolver.kernel()  #To get 2RDM, gammat. You need the cisolver.make_rdm12 function.
+                rdm_1, rdm_2 = cisolver.make_rdm12(fcivec=ci,norb=np.shape(mf0.get_occ())[0],nelec=self.mol.nelec)
+                self._gamma, self._gammat = fci.rdm.reorder_rdm(rdm1=rdm_1,rdm2=rdm_2) #Call reorder_rdm to transform to the normal rdm2a
+                #self._gamma, self._gammat = cisolver.make_rdm12(fcivec=ci,norb=np.shape(mf0.get_occ())[0],nelec=self.mol.nelec)
+                h1=mf0.get_hcore()
+                self._orb = mf0.mo_coeff
+                self._etotal = cisolver.e_tot
             else :
-               self._orb = mf.mo_coeff
-               self._gamma = mf.make_rdm1(ao_repr = ao_repr, **kwargs)
-               self._etotal = mf.e_tot
+                self._orb = mf.mo_coeff
+                self._gamma = mf.make_rdm1(ao_repr = ao_repr, **kwargs)
+                self._etotal = mf.e_tot
 
         if 'forces' in properties :
             self._forces = self.run_forces()
@@ -242,7 +242,7 @@ class EnginePyscf(Engine):
 
     def calc_etotal(self, gamma, **kwargs):
         r""" Get the total electronic energy based on 1-RDM.
-        
+
         Parameters
         ----------
         gamma : ndarray
@@ -252,11 +252,11 @@ class EnginePyscf(Engine):
         -------
         etotal : float
             Total electronic energy. """
-        etotal = self.mf.energy_tot(gamma, **kwargs)  #nuc + energy_elec(e1+coul) 
+        etotal = self.mf.energy_tot(gamma, **kwargs)  #nuc + energy_elec(e1+coul)
         return etotal
 
     def calc_etotal2(self, gammat, gamma1=None, **kwargs):
-        r""" Get the total electronic energy based on 2-RDM. 
+        r""" Get the total electronic energy based on 2-RDM.
 
         Parameters
         ----------
@@ -264,7 +264,7 @@ class EnginePyscf(Engine):
             1-RDM
         gammat : ndarray
             2-RDM
-        
+
         Returns
         -------
         etotal : float
@@ -273,22 +273,22 @@ class EnginePyscf(Engine):
         self.mf.run() #HF to get orb and occ
         orb = self.mf.mo_coeff
         occs = self.mf.get_occ()
-        
-        nmo = len(occs)   
+
+        nmo = len(occs)
         h1e = reduce(np.dot,(orb.T, self.mf.get_hcore(), orb))
         h2e = ao2mo.kernel(self.mf._eri, orb)
         h2e = ao2mo.restore(1, h2e, nmo)
-        
+
         etotal = (np.einsum('ij,ji', h1e, gamma1) + np.einsum('ijkl,ijkl', h2e, gammat) * .5)
         #etotal = (self.mf.energy_elec(gamma1) + np.einsum('ijkl,ijkl', h2e, gammat) * .5)
         #etotal = (np.einsum('ijkl,ijkl', h2e, gammat) * .5)
         etotal += self.mol.energy_nuc()
-        
+
         return etotal
 
-    def calc_dipole(self, gamma, **kwargs): 
+    def calc_dipole(self, gamma, **kwargs):
         r""" Get the total dipole moment.
-        
+
         Parameters
         ----------
         gamma : ndarray
@@ -309,7 +309,7 @@ class EnginePyscf(Engine):
         forces : ndarray
            Total atomic forces. """
         if '+' in self.method :
-            if self.method.split('+')[1] == 'fci':  #With FCI method Forces can't be obtained from FCI object. I approximated using RHF object. 
+            if self.method.split('+')[1] == 'fci':  #With FCI method Forces can't be obtained from FCI object. I approximated using RHF object.
                mf = self.mf
             else:
                mf = self.mf2
@@ -427,14 +427,14 @@ class EnginePyscf(Engine):
 
     def rotation2rotmat(self, rotation, mol = None):
         r""" Function to rotate the density matrix.
- 
+
         Parameters
         ----------
         rotation : ndarray
             Rotation Matrix
         mol : :obj: PySCF mol object
             Molecluar structure
- 
+
         Returns
         -------
         rotmat : ndarray

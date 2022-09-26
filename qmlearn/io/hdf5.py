@@ -51,7 +51,7 @@ class DBHDF5(object):
 
     def get_all_names(self, fh = None, attr = None):
         r"""Return a list of all databases in the database file
-        
+
         Attributes
         ----------
 
@@ -59,7 +59,7 @@ class DBHDF5(object):
             Filehandler object for database file
         mode : {'a','r','w'} str
             mode of operation (i.e. append, read, or write) for the database
-        
+
         Returns
         -------
          names : list
@@ -88,18 +88,18 @@ class DBHDF5(object):
 
     def get_names(self, name = '*'):
         r"""Return a list of database name based on pattern
-        
+
         Attributes
         ----------
 
         name : str
-            pattern of database names. 
+            pattern of database names.
             Only support '*', '?', '[seq]' and '[!seq]' with fnmatch
-        
+
         Returns
         -------
          names : list
-            return list of all database from the database file    
+            return list of all database from the database file
         """
         sch = ['*', '?', '[']
         if any(x in name for x in sch):
@@ -110,7 +110,7 @@ class DBHDF5(object):
 
     def write_qmmol(self, qmmol = None, name = None, **kwargs):
         r"""Write qmmol object in the database
-        
+
         Attributes
         ----------
 
@@ -147,12 +147,12 @@ class DBHDF5(object):
 
     def read_qmmol(self, name, **kwargs):
         r"""read qmmol object from the database
-        
+
         Attributes
         ----------
         name : str
             name of the database file
-        
+
         Returns
         -------
          qmmol : obj
@@ -177,16 +177,16 @@ class DBHDF5(object):
 
     def write_properties(self, properties = None, prefix = 'train', name = None, **kwargs):
         r"""Write properties (i.e. gamma, energy, forces, Vext) to the database
-        
+
         Attributes
         ----------
         properties : dict
-            Dictionary of properties calulate with Pyscf, Psi4numpy or any other 
+            Dictionary of properties calulate with Pyscf, Psi4numpy or any other
             external engine
-        
+
         prefix : {'train', 'test'} str
             determine wheter to write properties in the training or testing database
-        
+
         name : str
             name of the database file
         """
@@ -205,12 +205,12 @@ class DBHDF5(object):
 
     def read_properties(self, name, **kwargs):
         r"""read properties from database file
-        
+
         Attributes
         ----------
         name : str
             name of the database file
-        
+
         Returns
         -------
          properties : dict
@@ -220,15 +220,15 @@ class DBHDF5(object):
 
     def write_images(self, images = None, prefix = 'train', name = None, **kwargs):
         r""" Write atomic structure in the database
-        
+
         Attributes
         ----------
         images : list
             List of ASE Atoms objects
-        
+
         prefix : {'train', 'test'} str
             determine wheter to write properties in the training or testing database
-        
+
         name : str
             name of the database file
         """
@@ -246,12 +246,12 @@ class DBHDF5(object):
 
     def read_images(self, name = None, **kwargs):
         r""" Read atomic structure from the database
-        
+
         Attributes
         ----------
         name : str
             name of the database file
-        
+
         Returns
         -------
         images : list

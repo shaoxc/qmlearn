@@ -64,20 +64,20 @@ class FixBondLComb:
         return 1
 
     def adjust_positions(self, atoms, new):
-        """Keep adjusting atomic positions while keeping 
+        """Keep adjusting atomic positions while keeping
            weighted sum of fix bond length constant
 
         Parameters
         ----------
         atoms : ASE atom object
-        
+
         new : array
             positions of atoms which will change until converged
 
         Raises
         ------
         RuntimeError
-            If calculation is not converged within max number of iteration 
+            If calculation is not converged within max number of iteration
             a RuntimeError will raised
         """
         masses = atoms.get_masses()[:, None]
@@ -139,7 +139,7 @@ class FixBondLComb:
         Parameters
         ----------
         atoms : ASE atoms object
-        
+
         pos : array
             positions of atoms
 
@@ -190,4 +190,3 @@ class FixBondLComb:
         # bmat = self.get_jacobian(atoms, atoms.positions)
         # zet = np.sum(bmat*bmat/masses)
         # # 'lambda', '|z|^(-1/2)', 'kTG'
-

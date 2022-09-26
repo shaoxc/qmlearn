@@ -9,8 +9,8 @@ qm_engines = {
         }
 
 class QMMol(object):
-    r""" Class to create qmlearn mol object. 
-    
+    r""" Class to create qmlearn mol object.
+
     Attributes
     ----------
     atoms : :obj: PySCF or ASE atom object
@@ -46,7 +46,7 @@ class QMMol(object):
     charge : int
         Total electronic charge.
     rotate_method : str
-        
+
         | None : 'none'
         | Kabsch : 'kabsch'
         | Quaternion : 'quaternion'
@@ -250,7 +250,7 @@ class QMMol(object):
 
         y : ndarray
             Predicted gamma or forces matrix to be rotated.
-        
+
         Returns
         -------
         y : ndarray

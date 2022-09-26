@@ -9,8 +9,8 @@ class QMLCalculator(Calculator):
     Attributes
     ----------
     qmmodel : QMMol object
-        Reference QMMol object 
-        
+        Reference QMMol object
+
     method : str
         Options
 
@@ -20,11 +20,11 @@ class QMLCalculator(Calculator):
     properties : list:str
         Options
 
-        | 'energy' : Energy 
-        | 'forces' : Forces 
-        | 'dipole' : Dipole 
-        | 'stress' : Stress 
-        | 'gamma' : 1-RDM  
+        | 'energy' : Energy
+        | 'forces' : Forces
+        | 'dipole' : Dipole
+        | 'stress' : Stress
+        | 'gamma' : 1-RDM
 
     """
     implemented_properties = ['energy', 'forces', 'dipole', 'stress', 'gamma']
@@ -68,13 +68,13 @@ class QMLCalculator(Calculator):
         self._properties = value
 
     def calculate(self, atoms=None, properties=('energy', ), system_changes=all_changes):
-        r""" Function to calculate the desire properties. 
- 
+        r""" Function to calculate the desire properties.
+
         Parameters
         ----------
         properties : list:str
             Options
- 
+
             | Energy : 'energy'
             | Forces : 'forces'
             | Dipole : 'dipole'
@@ -97,12 +97,12 @@ class QMLCalculator(Calculator):
 
     def calc_with_gamma(self, qmmol, properties = ['energy']):
         r""" Function to calculate the desire properties using QMLearn learning process.
- 
+
         Parameters
         ----------
         properties : list:str
             Options
- 
+
             | Energy : 'energy'
             | Forces : 'forces'
             | Dipole : 'dipole'
@@ -160,12 +160,12 @@ class QMLCalculator(Calculator):
 
     def calc_with_engine(self, qmmol, properties = ('energy')):
         r""" Function to calculate the desire properties using PySCF engine.
- 
+
         Parameters
         ----------
         properties : list:str
             Options
- 
+
             | Energy : 'energy'
             | Forces : 'forces'
             | Dipole : 'dipole'

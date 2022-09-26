@@ -140,8 +140,8 @@ class Engine(object):
         Parameters
         ----------
         gamma : ndarray
-            1-RDM 
-        ovlp : ndarray 
+            1-RDM
+        ovlp : ndarray
             Overlap Matrix
 
         Returns
@@ -161,7 +161,7 @@ class Engine(object):
         ----------
         gamma : ndarray
             1-RDM
-        kop : ndarray 
+        kop : ndarray
             Kinetic energy operator
 
         Returns
@@ -175,10 +175,10 @@ class Engine(object):
         return ke
 
     def calc_idempotency(self, gamma, ovlp=None, kind=1):
-        r""" Check idempotency of gamma  
+        r""" Check idempotency of gamma
 
         .. math::
-           \gamma S \gamma = 2 \gamma 
+           \gamma S \gamma = 2 \gamma
 
         Parameters
         ----------
@@ -191,7 +191,7 @@ class Engine(object):
         ----------
         kind :  int
 
-            | 1 : Level 1 
+            | 1 : Level 1
             | 2 : Level 2
             | 3 : Level 3
 
@@ -232,7 +232,7 @@ def atoms_rmsd(target, atoms, transform = True, **kwargs) :
     keep : bool
         If True keep a copy of atoms.
     transform : bool
-        If True minimize rotation and translation between refatoms and atoms. 
+        If True minimize rotation and translation between refatoms and atoms.
         (See ASE documentation: Minimize RMSD between atoms and target.)
 
     Returns
@@ -282,10 +282,10 @@ def diff_coords(target, pos = None, weights = None, diff_method = 'rmsd'):
     ----------
     diff_method : str
 
-        | RMSD(root-mean-square deviation) : 'rsmd'  
-        | RMSE(root-mean-square error) : 'rmse'  
-        | MSD(mean-square deviation) : 'msd'  
-        | MSE(mean-square error) : 'mse' 
+        | RMSD(root-mean-square deviation) : 'rsmd'
+        | RMSE(root-mean-square error) : 'rmse'
+        | MSD(mean-square deviation) : 'msd'
+        | MSE(mean-square error) : 'mse'
         | MAE(mean absolute error) : 'mae'
 
     Returns
@@ -315,7 +315,7 @@ def atoms2bestplane(atoms, direction = None):
     Parameters
     ----------
     atoms : :obj: ASE atoms object
-       Atoms coordinates 
+       Atoms coordinates
 
     Attributes
     ----------
@@ -325,7 +325,7 @@ def atoms2bestplane(atoms, direction = None):
     Returns
     -------
     atoms : ndarray
-        Reoriented atom positions 
+        Reoriented atom positions
     """
     pca = PCA()
     pos = pca.fit_transform(atoms.positions)
@@ -336,7 +336,7 @@ def atoms2bestplane(atoms, direction = None):
 
 def get_atoms_axes(atoms):
     r""" Get PCA components of atomic positions.
-            
+
     Parameters
     ----------
     atoms : :obj: ASE object
@@ -351,13 +351,13 @@ def get_atoms_axes(atoms):
     return axes
 
 def atoms2newdirection(atoms, a=(0,0,1), b=(1,0,0)):
-    r""" Function to re-orientate the atom positions. 
+    r""" Function to re-orientate the atom positions.
     If Vector is None, the default rotation is around X-axis.
 
     Parameters
     ----------
     atoms : :obj: ASE atom object
-    
+
     Returns
     -------
     atoms : ndarray
@@ -392,7 +392,7 @@ def minimize_rmsd_operation(target, atoms, stereo = True, rotate_method = 'kabsc
         | 'distance'
 
     rotate_method: str
-        
+
         | None : 'none'
         | Kabsch : 'kabsch'
         | Quaternion : 'quaternion'
@@ -410,7 +410,7 @@ def minimize_rmsd_operation(target, atoms, stereo = True, rotate_method = 'kabsc
     translate : ndarray
         Translation Vector
     rmsd_final_indices : ndarry
-        Reorderred atom indices 
+        Reorderred atom indices
     """
     # return _minimize_rmsd_operation_v0(target, atoms)
     #
@@ -497,7 +497,7 @@ def get_match_rotate(target, atoms, rotate_method = 'kabsch'):
     atoms : :obj: ASE atoms object
         Initialize atoms
     rotate_method: str
-        
+
         | None : 'none'
         | Kabsch : 'kabsch'
         | Quaternion : 'quaternion'

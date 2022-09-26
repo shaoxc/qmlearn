@@ -184,10 +184,11 @@ class QMModel(object):
 
 class MQMModel(QMModel):
     def __init__(self, mmodels = None, method='gamma', ncharge=None, nspin = 1, occs = None, refqmmol = None,
-            fragments = None, qmmodels = None, **kwargs):
+            fragments = None, qmmodels = None, dft_fragments = False, **kwargs):
         super().__init__(mmodels=mmodels, method=method, ncharge=ncharge, nspin=nspin, occs=occs, refqmmol=refqmmol, **kwargs)
         self._fragments = fragments
         self._qmmodels = qmmodels
+        self._dft_fragments = dft_fragments
 
     @property
     def qmmodels(self):
@@ -209,7 +210,15 @@ class MQMModel(QMModel):
     def fragments(self, value):
         self._fragments = value
 
-    def translate_input(self, x, convert = True, **kwargs):
+    @property
+    def dft_fragments(self):
+        return self._dft_fragments
+
+    @dft_fragments.setter
+    def dft_fragments(self, value):
+        self._dft_fragments = value
+
+    def translate_input(self, x, convert = True, offdiag = False, **kwargs):
         if isinstance(x, np.ndarray) :
             out = x
         elif isinstance(x, Atoms) :
@@ -223,7 +232,8 @@ class MQMModel(QMModel):
             self.qmmol = x
             out = self.qmmol.vext
             block = self.get_block_vext(x, convert = convert)
-            out = out - sla.block_diag(*block)
+            if offdiag :
+                out = out - sla.block_diag(*block)
         return out
 
     def get_block_vext(self, qmmol, convert = True, **kwargs):
@@ -232,22 +242,66 @@ class MQMModel(QMModel):
         self.sub_qmmols = []
         block = []
         for i, index in enumerate(self.fragments):
-            a = self.qmmodels[i].refqmmol.duplicate(qmmol.atoms[index], **kwargs)
-            self.sub_qmmols.append(a)
-            if convert :
-                v = a.convert_back(a.vext, prop = 'gamma')
-            else :
+            frag = qmmol.atoms[index]
+            if self.dft_fragments :
+                if hasattr(self.qmmodels[i], 'refqmmol'):
+                    refqmmol = self.qmmodels[i].refqmmol
+                else :
+                    refqmmol = self.qmmodels[i]
+                a = refqmmol.duplicate(frag, refatoms=frag, **kwargs)
                 v = a.vext
+            else :
+                a = self.qmmodels[i].refqmmol.duplicate(frag, **kwargs)
+                if convert :
+                    v = a.convert_back(a.vext, prop = 'gamma')
+                else :
+                    v = a.vext
+            self.sub_qmmols.append(a)
             block.append(v)
         return block
 
-    def predict(self, x, method = None, convert=True, split=True, **kwargs):
+    def predict(self, x, method = None, convert=True, split=False, **kwargs):
         x = self.translate_input(x, convert = convert, **kwargs).ravel()
         method = method or self.method
         model = self.mmodels[method]
         y = model.predict([x])[0]
         y = np.asarray(y)
-        block = self.predict_block(method=method, convert=convert)
+        if 'gamma' in method :
+            block = self.predict_block_gamma(method=method, convert=convert)
+            y_frags = sla.block_diag(*block)
+            if y.size > 1 : y = y.reshape(y_frags.shape)
+            if split:
+                y = (y_frags, y)
+            else :
+                y = y_frags + y
+        return y
+
+    def predict_block_gamma(self, x=None, method=None, convert =True, **kwargs):
+        if x is not None :
+            # This one just to make sure the 'sub_qmmols' were calculated.
+            x = self.translate_input(x, convert = convert, **kwargs).ravel()
+        method = method or self.method
+        block = []
+        for i, mol in enumerate(self.sub_qmmols) :
+            if self.dft_fragments :
+                y0 = mol.engine.gamma
+            else :
+                x0 = mol.vext
+                y0 = self.qmmodels[i].predict(x0, method=method)
+                y0 = y0.reshape(x0.shape)
+                mol.gamma = y0
+                if convert :
+                    y0 = mol.convert_back(y0, prop = method)
+            block.append(y0)
+        return block
+
+    def predict_diff_v1(self, x, method = None, convert=True, split=False, **kwargs):
+        x = self.translate_input(x, convert = convert, **kwargs).ravel()
+        method = method or self.method
+        model = self.mmodels[method]
+        y = model.predict([x])[0]
+        y = np.asarray(y)
+        block = self.predict_block_v1(method=method, convert=convert)
         if 'gamma' in method :
             y_frags = sla.block_diag(*block)
         elif 'force' in method :
@@ -263,7 +317,7 @@ class MQMModel(QMModel):
         else:
             return y + y_frags
 
-    def predict_block(self, x=None, method=None, convert =True, **kwargs):
+    def predict_block_v1(self, x=None, method=None, convert =True, **kwargs):
         if x is not None :
             # This one just to make sure the 'sub_qmmols' were calculated.
             x = self.translate_input(x, convert = convert, **kwargs).ravel()

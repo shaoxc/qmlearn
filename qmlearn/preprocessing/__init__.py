@@ -48,7 +48,8 @@ def get_train_atoms(traj=None, nsamples=None, skip = 0, tol=0.01, direction = No
 
 
 class AtomsCreater(object):
-    def __init__(self, modes= None, frequencies=None, energies=None, atoms=None, temperature = 300, random_seed = None, maximum = 1E8):
+    def __init__(self, modes= None, frequencies=None, energies=None, atoms=None, temperature = 300, random_seed = None,
+            maximum = 1E8, types = None):
         self.temperature = temperature*units.kB
         self.modes = np.asarray(modes)
         self.maximum = maximum
@@ -59,6 +60,7 @@ class AtomsCreater(object):
                 raise ValueError("Please provide the vibrational frequencies or energies")
             energies = frequencies*units.invcm
         self.energies = energies
+        self.types = types
         #
         self._initial()
 
@@ -81,6 +83,12 @@ class AtomsCreater(object):
                 print("WARN: This is a linear molecule and missing one mode.")
             else :
                 raise ValueError("The wrong number of normal modes.")
+        d = len(self.modes)
+        #
+        if self.types is None :
+            self.types = np.zeros(d)
+        else :
+            self.types = self.types[-d:]
         #
         uc = units._hbar * units.m / np.sqrt(units._e * units._amu)
         emode_ev = uc**2
@@ -97,9 +105,14 @@ class AtomsCreater(object):
         d = len(self.modes)
         atoms = self.atoms.copy()
         coef = self.random.normal(0, sigma, size = (d, 1))[:,0]
-        coef /= self.energies
-        for c,m in zip(coef, self.modes):
-            atoms.positions += c*m
+        for i, c in enumerate(coef):
+            if self.types[i] == 0 :
+                c = c/self.energies[i]
+            elif self.types[i] == 1 :
+                c = np.sign(c)*abs(c)**0.5/self.energies[i]**0.25
+            else :
+                raise ValueError(f'{self.types[i]} type of mode not support yet')
+            atoms.positions += c*self.modes[i]
         return atoms
 
     def __iter__(self):

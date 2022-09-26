@@ -58,7 +58,7 @@ class QMLCalculator(Calculator):
     def properties(self):
         if not isinstance(self._properties, set):
             if isinstance(self._properties, str):
-                self._properties = (self._properties, )
+                self._properties = {self._properties,}
             else :
                 self._properties = set(self._properties)
         return self._properties

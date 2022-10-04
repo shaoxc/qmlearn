@@ -4,7 +4,7 @@ from scipy.linalg import eig
 from scipy.spatial.transform import Rotation
 from ase import Atoms, io
 from pyscf.pbc.tools.pyscf_ase import atoms_from_ase
-from pyscf import gto, dft, scf, mp, fci, ci, ao2mo
+from pyscf import gto, dft, scf, mp, fci, ci, cc, ao2mo
 from pyscf.symm import Dmatrix
 from functools import reduce
 
@@ -18,6 +18,8 @@ methods_pyscf = {
         'mp2' : mp.MP2,
         'cisd': ci.CISD,
         'fci' : fci.FCI,
+        'ccsd' : cc.CCSD,
+        'ccsd(t)' : cc.CCSD,
         }
 
 class EnginePyscf(Engine):
@@ -80,7 +82,7 @@ class EnginePyscf(Engine):
         charge = self.options.get('charge', None)
         #
         if isinstance(self.method, str):
-            if self.method in ['mp2', 'cisd', 'fci'] :
+            if self.method in ['mp2', 'cisd', 'fci', 'ccsd', 'ccsd(t)'] :
                 self.method = 'rhf+' + self.method
         if self.method.count('+') > 1 :
             raise AttributeError("Sorry, only support two methods at the same time.")
@@ -154,7 +156,6 @@ class EnginePyscf(Engine):
             # (dft.uks.UKS, dft.rks.RKS, scf.uhf.UHF, scf.hf.RHF))
             self.mf.run()
             self.occs = self.mf.get_occ()
-            mf0=self.mf.run()
             #
             if '+' in self.method :
                 mf2 = methods_pyscf[self.method.split('+')[1]](self.mf)
@@ -165,18 +166,25 @@ class EnginePyscf(Engine):
                 mf = self.mf
 
             if '+' in self.method and self.method.split('+')[1] == 'fci':
-                cisolver = mf
-                e, ci = cisolver.kernel()  #To get 2RDM, gammat. You need the cisolver.make_rdm12 function.
-                rdm_1, rdm_2 = cisolver.make_rdm12(fcivec=ci,norb=np.shape(mf0.get_occ())[0],nelec=self.mol.nelec)
-                self._gamma, self._gammat = fci.rdm.reorder_rdm(rdm1=rdm_1,rdm2=rdm_2) #Call reorder_rdm to transform to the normal rdm2a
-                #self._gamma, self._gammat = cisolver.make_rdm12(fcivec=ci,norb=np.shape(mf0.get_occ())[0],nelec=self.mol.nelec)
-                h1=mf0.get_hcore()
+                cisolver = self.mf2
+                mf0 = self.mf
+                e, ci = cisolver.kernel()
+                norb = self.occs.shape[0]
+                if 'gammat' in properties :
+                    rdm_1, rdm_2 = cisolver.make_rdm12(fcivec=ci, norb=norb, nelec=self.mol.nelec)
+                    self._gamma, self._gammat = fci.rdm.reorder_rdm(rdm1=rdm_1, rdm2=rdm_2) # Call reorder_rdm to transform to the normal rdm2a
+                else :
+                    self._gamma = cisolver.make_rdm1(fcivec=ci, norb=norb, nelec=self.mol.nelec)
                 self._orb = mf0.mo_coeff
                 self._etotal = cisolver.e_tot
             else :
                 self._orb = mf.mo_coeff
                 self._gamma = mf.make_rdm1(ao_repr = ao_repr, **kwargs)
                 self._etotal = mf.e_tot
+                if '+' in self.method and self.method.split('+')[1] == 'ccsd(t)':
+                    ccsd_t = self.mf2.ccsd_t()
+                    # print('ccst(t)', self._etotal, ccsd_t)
+                    self._etotal =self._etotal + ccsd_t
 
         if 'forces' in properties :
             self._forces = self.run_forces()
@@ -252,7 +260,7 @@ class EnginePyscf(Engine):
         -------
         etotal : float
             Total electronic energy. """
-        etotal = self.mf.energy_tot(gamma, **kwargs)  #nuc + energy_elec(e1+coul)
+        etotal = self.mf.energy_tot(gamma, **kwargs)  # nuc + energy_elec(e1+coul)
         return etotal
 
     def calc_etotal2(self, gammat, gamma1=None, **kwargs):
@@ -270,7 +278,7 @@ class EnginePyscf(Engine):
         etotal : float
             Total electronic energy. """
 
-        self.mf.run() #HF to get orb and occ
+        self.mf.run() # HF to get orb and occ
         orb = self.mf.mo_coeff
         occs = self.mf.get_occ()
 
@@ -309,10 +317,10 @@ class EnginePyscf(Engine):
         forces : ndarray
            Total atomic forces. """
         if '+' in self.method :
-            if self.method.split('+')[1] == 'fci':  #With FCI method Forces can't be obtained from FCI object. I approximated using RHF object.
-               mf = self.mf
+            if self.method.split('+')[1] == 'fci':  # With FCI method Forces can't be obtained from FCI object. I approximated using RHF object.
+                mf = self.mf
             else:
-               mf = self.mf2
+                mf = self.mf2
         else :
             mf = self.mf
 

@@ -203,6 +203,16 @@ class DBHDF5(object):
         group = self.fh.create_group(name)
         self._write_dict(group, properties)
 
+    def update_properties(self, properties = None, name = None, **kwargs):
+        if name not in self.fh :
+            raise ValueError(f'{name} not in the database')
+        group = self.fh[name]
+        for k,v in properties.items():
+            sname = name + '/' + k
+            if sname in self.fh :
+                del self.fh[sname]
+        self._write_dict(group, properties)
+
     def read_properties(self, name, **kwargs):
         r"""read properties from database file
 

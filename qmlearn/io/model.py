@@ -25,7 +25,10 @@ def db2qmmodel(filename, names = '*', mmodels = None, qmmol_options = None):
     model : obj
         trained model
     """
-    data = read_db(filename, names=names)
+    if isinstance(filename, dict):
+        data = filename
+    else :
+        data = read_db(filename, names=names)
     refqmmol = data['qmmol']
     if qmmol_options :
         refqmmol.init_kwargs.update(qmmol_options)
@@ -58,13 +61,16 @@ def db2qmmodel(filename, names = '*', mmodels = None, qmmol_options = None):
     if delta_learn :
         print('Start predicting...', flush = True)
         shape = y[0].shape
-        gammas = []
-        for i, a in tenumerate(train_atoms):
-            gamma = model.predict(a, refatoms=a).reshape(shape)
-            #
-            gamma = model.qmmol.purify_gamma(gamma)
-            #
-            gammas.append(gamma)
+        if 'gamma_pp' in properties:
+            gammas = properties['gamma_pp']
+        else :
+            gammas = []
+            for i, a in tenumerate(train_atoms):
+                gamma = model.predict(a, refatoms=a).reshape(shape)
+                #
+                gamma = model.qmmol.purify_gamma(gamma)
+                #
+                gammas.append(gamma)
         y = gammas
         print('Start delta learning...', flush = True)
         for k in mmodels :

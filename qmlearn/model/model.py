@@ -32,9 +32,11 @@ class QMModel(object):
     refqmmol: QMMol object
         Reference QMMol object
     """
-    def __init__(self, mmodels = None, method='gamma', ncharge=None, nspin = 1, occs = None, refqmmol = None, **kwargs):
+    def __init__(self, mmodels = None, method='gamma', ncharge=None, nspin = 1, occs = None,
+            refqmmol = None, purify_gamma = True, **kwargs):
         self._method = method
         self.mmodels = mmodels or {}
+        self.purify_gamma = purify_gamma
         #
         if self.method not in self.mmodels :
             self.mmodels[self.method] = KernelRidge(alpha=0.1,kernel='linear')

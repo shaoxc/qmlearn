@@ -4,7 +4,7 @@ from qmlearn.model.model import QMModel
 from qmlearn.io import read_db
 from qmlearn.utils import tenumerate
 
-def db2qmmodel(filename, names = '*', mmodels = None, qmmol_options = None):
+def db2qmmodel(filename, names = '*', mmodels = None, qmmol_options = None, purify_gamma = True):
     r"""Train QMModel to learn :math:`{\gamma}` in terms of :math:`V_{ext}` from training data
     then an additional layer of training learn :math:`{\delta}E` and :math:`{\delta}{\gamma}`
     based on previously learned :math:`{\gamma}`.
@@ -48,7 +48,7 @@ def db2qmmodel(filename, names = '*', mmodels = None, qmmol_options = None):
             'd_forces': LinearRegression(),
         }
         print(f'Guess mmodels: {mmodels}', flush = True)
-    model = QMModel(mmodels=mmodels, refqmmol = refqmmol)
+    model = QMModel(mmodels=mmodels, refqmmol = refqmmol, purify_gamma = purify_gamma)
     model.fit(X, y)
     #
     for k in mmodels :
@@ -67,9 +67,8 @@ def db2qmmodel(filename, names = '*', mmodels = None, qmmol_options = None):
             gammas = []
             for i, a in tenumerate(train_atoms):
                 gamma = model.predict(a, refatoms=a).reshape(shape)
-                #
-                gamma = model.qmmol.purify_gamma(gamma)
-                #
+                if model.purify_gamma :
+                    gamma = model.qmmol.purify_gamma(gamma)
                 gammas.append(gamma)
         y = gammas
         print('Start delta learning...', flush = True)

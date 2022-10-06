@@ -44,6 +44,8 @@ class Engine(object):
     def __init__(self, mol = None, method = 'rks', basis = '6-31g', xc = None, **kwargs):
         self.options = locals()
         self.options.update(kwargs)
+        self.options.pop('self', None)
+        self.options.pop('kwargs', None)
         #-----------------------------------------------------------------------
         self._vext = None
         self._gamma = None

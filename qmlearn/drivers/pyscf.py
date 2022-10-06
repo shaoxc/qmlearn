@@ -4,7 +4,8 @@ from scipy.linalg import eig
 from scipy.spatial.transform import Rotation
 from ase import Atoms, io
 from pyscf.pbc.tools.pyscf_ase import atoms_from_ase
-from pyscf import gto, dft, scf, mp, fci, ci, cc, ao2mo
+from pyscf import gto, ao2mo
+from pyscf import dft, scf, mp, fci, ci, cc, mcscf
 from pyscf.symm import Dmatrix
 from functools import reduce
 
@@ -20,6 +21,8 @@ methods_pyscf = {
         'fci' : fci.FCI,
         'ccsd' : cc.CCSD,
         'ccsd(t)' : cc.CCSD,
+        'casci' : mcscf.CASCI,
+        'casscf' : mcscf.CASSCF,
         }
 
 class EnginePyscf(Engine):
@@ -82,7 +85,7 @@ class EnginePyscf(Engine):
         charge = self.options.get('charge', None)
         #
         if isinstance(self.method, str):
-            if self.method in ['mp2', 'cisd', 'fci', 'ccsd', 'ccsd(t)'] :
+            if self.method in ['mp2', 'cisd', 'fci', 'ccsd', 'ccsd(t)', 'casci', 'casscf'] :
                 self.method = 'rhf+' + self.method
         if self.method.count('+') > 1 :
             raise AttributeError("Sorry, only support two methods at the same time.")
@@ -156,35 +159,50 @@ class EnginePyscf(Engine):
             # (dft.uks.UKS, dft.rks.RKS, scf.uhf.UHF, scf.hf.RHF))
             self.mf.run()
             self.occs = self.mf.get_occ()
+            norb = self.occs.shape[0]
             #
             if '+' in self.method :
-                mf2 = methods_pyscf[self.method.split('+')[1]](self.mf)
-                mf2.verbose = self.mf.verbose
-                self.mf2 = mf2.run()
-                mf = self.mf2
+                method2 = self.method.split('+')[1]
+                if method2 == 'fci':
+                    mf2 = methods_pyscf[method2](self.mf)
+                    mf2.verbose = self.mf.verbose
+                    e, ci = mf2.kernel()
+                    if 'gammat' in properties :
+                        rdm_1, rdm_2 = mf2.make_rdm12(fcivec=ci, norb=norb, nelec=self.mol.nelec)
+                        self._gamma, self._gammat = fci.rdm.reorder_rdm(rdm1=rdm_1, rdm2=rdm_2) # Call reorder_rdm to transform to the normal rdm2a
+                    else :
+                        self._gamma = mf2.make_rdm1(fcivec=ci, norb=norb, nelec=self.mol.nelec)
+                    self._orb = self.mf.mo_coeff
+                    self._etotal = mf2.e_tot
+                elif method2 in ['casci', 'casscf']:
+                    ncas = self.options.get('ncas', None)
+                    nelecas = self.options.get('nelecas', None)
+                    if ncas is None : ncas = norb
+                    if nelecas is None : nelecas = self.mol.nelec
+                    mf2 = methods_pyscf[method2](self.mf, ncas, nelecas)
+                    mf2.verbose = self.mf.verbose
+                    # mf2.verbose = 9
+                    mf2.kernel()
+                    self._gamma = mf2.make_rdm1()
+                    self._orb = self.mf.mo_coeff
+                    self._etotal = mf2.e_tot
+                else :
+                    mf2 = methods_pyscf[method2](self.mf)
+                    mf2.verbose = self.mf.verbose
+                    mf2.run()
+                    self._orb = self.mf.mo_coeff
+                    self._gamma = mf2.make_rdm1(ao_repr = ao_repr, **kwargs)
+                    self._etotal = mf2.e_tot
+                    if method2 == 'ccsd(t)':
+                        ccsd_t = mf2.ccsd_t()
+                        # print('ccst(t)', self._etotal, ccsd_t)
+                        self._etotal = self._etotal + ccsd_t
+                self.mf2 = mf2
             else :
                 mf = self.mf
-
-            if '+' in self.method and self.method.split('+')[1] == 'fci':
-                cisolver = self.mf2
-                mf0 = self.mf
-                e, ci = cisolver.kernel()
-                norb = self.occs.shape[0]
-                if 'gammat' in properties :
-                    rdm_1, rdm_2 = cisolver.make_rdm12(fcivec=ci, norb=norb, nelec=self.mol.nelec)
-                    self._gamma, self._gammat = fci.rdm.reorder_rdm(rdm1=rdm_1, rdm2=rdm_2) # Call reorder_rdm to transform to the normal rdm2a
-                else :
-                    self._gamma = cisolver.make_rdm1(fcivec=ci, norb=norb, nelec=self.mol.nelec)
-                self._orb = mf0.mo_coeff
-                self._etotal = cisolver.e_tot
-            else :
                 self._orb = mf.mo_coeff
                 self._gamma = mf.make_rdm1(ao_repr = ao_repr, **kwargs)
                 self._etotal = mf.e_tot
-                if '+' in self.method and self.method.split('+')[1] == 'ccsd(t)':
-                    ccsd_t = self.mf2.ccsd_t()
-                    # print('ccst(t)', self._etotal, ccsd_t)
-                    self._etotal =self._etotal + ccsd_t
 
         if 'forces' in properties :
             self._forces = self.run_forces()
@@ -317,7 +335,7 @@ class EnginePyscf(Engine):
         forces : ndarray
            Total atomic forces. """
         if '+' in self.method :
-            if self.method.split('+')[1] == 'fci':  # With FCI method Forces can't be obtained from FCI object. I approximated using RHF object.
+            if self.method.split('+')[1] in ['fci']:  # With FCI method Forces can't be obtained from FCI object. I approximated using RHF object.
                 mf = self.mf
             else:
                 mf = self.mf2
@@ -326,7 +344,8 @@ class EnginePyscf(Engine):
 
         gf = mf.nuc_grad_method()
         gf.verbose = mf.verbose
-        gf.grid_response = True
+        if hasattr(gf, 'grid_response') :
+            gf.grid_response = True
         forces = -1.0 * gf.kernel()
         return forces
 

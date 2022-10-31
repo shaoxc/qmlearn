@@ -530,7 +530,6 @@ def rotation2rotmat(rotation, mol):
     -------
     rotmat : ndarray
         Rotated density matrix """
-    alpha, beta, gamma = Rotation.from_matrix(rotation).as_euler('zyz')*-1.0
     angl = []
     for ib in range(mol.nbas):
         l = mol.bas_angular(ib)
@@ -542,9 +541,13 @@ def rotation2rotmat(rotation, mol):
     aol[0] = 0
     dims.cumsum(dtype=np.int32, out=aol[1:])
     rotmat = np.eye(mol.nao)
-    for i in range(len(angl)):
-        r = Dmatrix.Dmatrix(angl[i], alpha, beta, gamma, reorder_p=True)
-        rotmat[aol[i]:aol[i+1],aol[i]:aol[i+1]]=r
+    if np.allclose(rotation, np.eye(len(rotation))) :
+        pass
+    else :
+        alpha, beta, gamma = Rotation.from_matrix(rotation).as_euler('zyz')*-1.0
+        for i in range(len(angl)):
+            r = Dmatrix.Dmatrix(angl[i], alpha, beta, gamma, reorder_p=True)
+            rotmat[aol[i]:aol[i+1],aol[i]:aol[i+1]]=r
     return rotmat
 
 def get_atom_naos(mol):

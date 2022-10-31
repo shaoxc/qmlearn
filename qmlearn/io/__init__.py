@@ -44,17 +44,18 @@ def read_db(filename, names = '*'):
             data[key] = db.read_images(names[key])
         elif key == 'properties' :
             data[key] = db.read_properties(names[key])
-        else :
+        elif not key.startswith('_') :
             raise ValueError(f'The key {key} can not read from the db')
+    data['_names'] = names.copy()
     db.close()
     return data
 
-def write_db(output, qmmol, images, properties, prefix = 'train', names = None):
+def write_db(output, qmmol, images, properties, prefix = 'train', names = None, **kwargs):
     if names is None or len(names) < 2 : names = [None, ]*3
-    db = DBHDF5(output, qmmol=qmmol)
-    db.write_qmmol(qmmol, name = names[0])
-    db.write_images(images, prefix=prefix, name = names[1])
-    db.write_properties(properties, prefix=prefix, name = names[1])
+    db = DBHDF5(output, qmmol=qmmol, **kwargs)
+    db.write_qmmol(qmmol, name = names[0], **kwargs)
+    db.write_images(images, prefix=prefix, name = names[1], **kwargs)
+    db.write_properties(properties, prefix=prefix, name = names[1], **kwargs)
     print(db.names, flush = True)
     db.close()
 

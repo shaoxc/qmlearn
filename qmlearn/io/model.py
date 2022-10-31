@@ -70,6 +70,7 @@ def db2qmmodel(filename, names = '*', mmodels = None, qmmol_options = None, puri
                 if model.purify_gamma :
                     gamma = model.qmmol.purify_gamma(gamma)
                 gammas.append(gamma)
+            properties['gamma_pp'] = gammas
         y = gammas
         print('Start delta learning...', flush = True)
         for k in mmodels :

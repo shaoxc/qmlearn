@@ -15,7 +15,7 @@ class DBHDF5(object):
         Filename of database.
     """
 
-    def __init__(self, filename, mode = 'a', qmmol = None):
+    def __init__(self, filename, mode = 'a', qmmol = None, track_order=True):
         r"""
         Attributes
         ----------
@@ -27,6 +27,7 @@ class DBHDF5(object):
         """
         import h5py
         self.h5py = h5py
+        self.h5py.get_config().track_order = track_order
         self.fh = self.h5py.File(filename, 'a')
         self._qmmol = qmmol
         self._group = None
@@ -108,7 +109,7 @@ class DBHDF5(object):
             name = [name]
         return name
 
-    def write_qmmol(self, qmmol = None, name = None, **kwargs):
+    def write_qmmol(self, qmmol = None, name = None, overwrite = False, **kwargs):
         r"""Write qmmol object in the database
 
         Attributes
@@ -128,9 +129,12 @@ class DBHDF5(object):
         #
         if name is None : name = qmmol.method+'/qmmol'
         if name in self.fh :
-            self.group = self.fh[name].parent
-            print(f"!WARN : '{name}' already in the database, so do nothing.")
-            return
+            if overwrite :
+                del self.fh[name]
+            else :
+                self.group = self.fh[name].parent
+                print(f"!WARN : '{name}' already in the database, so do nothing.")
+                return
         group = self.fh.create_group(name)
         for k, v in qmmol.init_kwargs.items():
             if k in ['self'] : continue

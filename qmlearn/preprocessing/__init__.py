@@ -1,4 +1,5 @@
 import numpy as np
+from scipy.interpolate import interp1d
 import ase.units as units
 from qmlearn.drivers.core import atoms_rmsd, atoms2bestplane
 from qmlearn.io import read_images
@@ -51,14 +52,14 @@ class AtomsCreater(object):
     def __init__(self, modes= None, frequencies=None, energies=None, atoms=None, temperature = 300, random_seed = None,
             maximum = 1E8, types = None):
         self.temperature = temperature*units.kB
-        self.modes = np.asarray(modes)
+        self.modes = modes
         self.maximum = maximum
         self.atoms = atoms
         self.random_seed = random_seed
         if energies is None:
             if frequencies is None:
                 raise ValueError("Please provide the vibrational frequencies or energies")
-            energies = frequencies*units.invcm
+            energies = np.asarray(frequencies)*units.invcm
         self.energies = energies
         self.types = types
         #
@@ -81,8 +82,8 @@ class AtomsCreater(object):
         elif len(self.modes) != d:
             if np.all(pos[:, 1] < 1E-8) and len(self.modes) == d - 1:
                 print("WARN: This is a linear molecule and missing one mode.")
-            else :
-                raise ValueError("The wrong number of normal modes.")
+            # else :
+                # raise ValueError("The wrong number of normal modes.")
         d = len(self.modes)
         #
         if self.types is None :
@@ -99,6 +100,11 @@ class AtomsCreater(object):
         self.sigma = sigma
         self.random = np.random.default_rng(self.random_seed)
         #
+        for i, t in enumerate(self.types):
+            if t == 2 :
+                self.modes[i] = interp1d(np.asarray(self.modes[i][0]), np.asarray(self.modes[i][1]), axis = 0)
+            else :
+                self.modes[i] = np.asarray(self.modes[i])
 
     def get_new_atoms(self, sigma = None):
         sigma = sigma or self.sigma
@@ -108,11 +114,18 @@ class AtomsCreater(object):
         for i, c in enumerate(coef):
             if self.types[i] == 0 :
                 c = c/self.energies[i]
+                m = c*self.modes[i]
             elif self.types[i] == 1 :
                 c = np.sign(c)*abs(c)**0.5/self.energies[i]**0.25
+                m = c*self.modes[i]
+            elif self.types[i] == 2 :
+                # For this mode, the range should [-1, 1], so set the sigma=1.0/3.0.
+                c = c/sigma*1.0/3.0
+                if abs(c) > 1.0 : c = 1.0*np.sign(c)
+                m = self.modes[i](c)
             else :
                 raise ValueError(f'{self.types[i]} type of mode not support yet')
-            atoms.positions += c*self.modes[i]
+            atoms.positions += m
         return atoms
 
     def __iter__(self):

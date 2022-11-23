@@ -1,6 +1,4 @@
 import numpy as np
-from ase.build.rotate import rotation_matrix_from_points
-from ase.geometry import get_distances
 from sklearn.decomposition import PCA
 from rmsd.calculate_rmsd import (
     kabsch,
@@ -557,32 +555,3 @@ def reorder_atoms_indices(target, atoms, reorder_method='hungarian'):
         indices = reorder_method(np.asarray(target.get_chemical_symbols()),
                 np.asarray(atoms.get_chemical_symbols()), target.positions, atoms.positions)
     return indices
-
-def _reorder_atoms_v0(target, atoms):
-    from scipy.optimize import linear_sum_assignment
-    symbols1 = np.asarray(target.get_chemical_symbols())
-    symbols2 = np.asarray(atoms.get_chemical_symbols())
-    slist = np.unique(symbols1)
-    indices = np.zeros_like(symbols1, dtype=int)
-    for s in slist :
-        i1 = symbols1 == s
-        i2 = symbols2 == s
-        j2 = np.where(i2)[0]
-        distances = get_distances(target[i1].positions, atoms[i2].positions)[1]
-        _, inds = linear_sum_assignment(distances)
-        indices[i1] = j2[inds]
-    return atoms[indices]
-
-def _minimize_rmsd_operation_v0(target, atoms):
-    pos_t = target.get_positions()
-    c_t = np.mean(pos_t, axis=0)
-    pos_t = pos_t - c_t
-
-    pos = atoms.get_positions()
-    c = np.mean(pos, axis=0)
-    pos = pos - c
-
-    rotate = rotation_matrix_from_points(pos.T, pos_t.T).T
-    translate = c_t - np.dot(c, rotate)
-    index = np.arange(len(pos))
-    return(rotate, translate, index)

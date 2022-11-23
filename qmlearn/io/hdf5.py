@@ -15,7 +15,7 @@ class DBHDF5(object):
         Filename of database.
     """
 
-    def __init__(self, filename, mode = 'a', qmmol = None, track_order=True):
+    def __init__(self, filename, mode = 'r', qmmol = None, track_order=True):
         r"""
         Attributes
         ----------
@@ -28,7 +28,7 @@ class DBHDF5(object):
         import h5py
         self.h5py = h5py
         self.h5py.get_config().track_order = track_order
-        self.fh = self.h5py.File(filename, 'a')
+        self.fh = self.h5py.File(filename, mode)
         self._qmmol = qmmol
         self._group = None
 

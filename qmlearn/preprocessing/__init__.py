@@ -119,8 +119,8 @@ class AtomsCreater(object):
                 c = np.sign(c)*abs(c)**0.5/self.energies[i]**0.25
                 m = c*self.modes[i]
             elif self.types[i] == 2 :
-                # For this mode, the range should [-1, 1], so set the sigma=1.0/3.0.
-                c = c/sigma*1.0/3.0
+                # For this mode, the range should [-1, 1], so set the sigma=1.0/2.0.
+                c = c/sigma*1.0/2.0
                 if abs(c) > 1.0 : c = 1.0*np.sign(c)
                 m = self.modes[i](c)
             else :

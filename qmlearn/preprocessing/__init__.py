@@ -4,6 +4,7 @@ import ase.units as units
 from qmlearn.drivers.core import atoms_rmsd, atoms2bestplane
 from qmlearn.io import read_images
 from qmlearn.utils import tenumerate
+from qmlearn.drivers.rotate import get_eckart_rotate
 from sklearn.decomposition import PCA
 
 def get_train_atoms(traj=None, nsamples=None, skip = 0, tol=0.01, direction = None, transform = True, refatoms = None):
@@ -139,7 +140,7 @@ class AtomsCreater(object):
         else:
             raise IndexError(f'Reaches the maximum : {self.maximum}')
 
-def build_train_atoms(images, nsamples = 30, tol = 0.01, use_reflection = False, rotate_method = 'kabsch', data = None, refatoms = None, **kwargs):
+def build_train_atoms(images, nsamples = 30, tol = 0.01, use_reflection = False, rotate_method = 'kabsch', reorder_method='none', data = None, refatoms = None, **kwargs):
     images = iter(images)
     if data is None :
         if refatoms is not None :
@@ -152,7 +153,7 @@ def build_train_atoms(images, nsamples = 30, tol = 0.01, use_reflection = False,
         print('istep', istep, len(data), end = '\r')
         for ia, a in enumerate(data):
             if ia == 0 :
-                rmsd, atoms = atoms_rmsd(a, atoms, rmsd_cut = tol, use_reflection = use_reflection, rotate_method = rotate_method, **kwargs)
+                rmsd, atoms = atoms_rmsd(a, atoms, rmsd_cut = tol, use_reflection = use_reflection, rotate_method = rotate_method, reorder_method = reorder_method, **kwargs)
             else :
                 rmsd, _ = atoms_rmsd(a, atoms, transform = False)
             if rmsd < tol : break
@@ -204,3 +205,20 @@ def append_properties(atoms, data = None, properties = None, refqmmol = None, qm
         else :
             raise ValueError(f'Sorry, not support the property {key} now')
     return data
+
+
+def get_frame_images(images, refatoms = None):
+    if refatoms is None :
+        refatoms = images[0]
+        images = images[1:]
+        new_images = [refatoms.copy()]
+    else :
+        new_images = []
+    #
+    for a in images :
+        rotmat = get_eckart_rotate(refatoms, a)
+        a = a.copy()
+        a.positions[:] = np.dot(a.positions, rotmat)
+        #
+        new_images.append(a)
+    return new_images

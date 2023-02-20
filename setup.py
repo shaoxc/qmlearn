@@ -21,28 +21,30 @@ with open('qmlearn/__init__.py') as fd :
 
 assert sys.version_info >= (3, 6)
 description = "QMLearn"
-long_description = """QMLearn"""
+
+with open('README.md') as fh :
+    long_description = fh.read()
 
 scripts=[]
 
 extras_require = {
         'all' : [
-            'h5py',
-            'pyscf',
+            'matplotlib',
             ],
         }
 
 setup(name='qmlearn',
       description=description,
       long_description=long_description,
-      url='https://gitlab.com/pavanello-research-group/qmlearn',
-      use_scm_version={'version_scheme': 'post-release'},
-      setup_requires=['setuptools_scm'],
+      url='http://qmlearn.rutgers.edu',
+      version=__version__,
+      # use_scm_version={'version_scheme': 'post-release'},
+      # setup_requires=['setuptools_scm'],
       author=__author__,
       author_email=__contact__,
       license=__license__,
       classifiers=[
-          'Development Status :: 1 - Beta',
+          'Development Status :: 3 - Alpha',
           'Intended Audience :: Science/Research',
           'License :: OSI Approved :: MIT License',
           'Programming Language :: Python :: 3',

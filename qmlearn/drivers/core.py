@@ -211,11 +211,29 @@ class Engine(object):
             g = (4*gamma@ovlp@gamma@ovlp@gamma -gamma@ovlp@gamma@ovlp@gamma@ovlp@gamma)/8
         return matrix_deviation(gamma, g)
 
+    def calc_occupations(self, gamma):
+        ovlp_x = self.ovlp_x
+        occs, orbs = np.linalg.eigh(ovlp_x@gamma@ovlp_x)
+        return occs[::-1], orbs[:,::-1]
+
     def init_ovlp_x(self, ovlp = None):
         ovlp = ovlp or self.ovlp
         svel, svec = np.linalg.eigh(ovlp)
         self._ovlp_x = np.einsum('ik,jk->ij', svec, svec*np.sqrt(svel))
         self._ovlp_x_inv = np.einsum('ik,jk->ij', svec, svec/np.sqrt(svel))
+
+    def purify_gamma(self, gamma, tol = 0.5):
+        ovlp_x_inv = self.ovlp_x_inv
+        occs, orbs = self.calc_occupations(gamma)
+        occs = np.abs(occs)
+        occs_i = np.rint(occs)
+        if np.all(np.abs(occs_i-occs) > tol):
+            if tol < 0.49 :
+                raise ValueError(f'The tol = {tol} is too small, try a bigger one.')
+            else :
+                raise ValueError('The density matrix is too bad.')
+        gamma = ovlp_x_inv@np.einsum('ik,jk->ij', orbs, orbs*occs_i)@ovlp_x_inv
+        return gamma
 
 def atoms_rmsd(target, atoms, transform = True, **kwargs) :
     r""" Function to return RMSD : Root mean square deviation between atoms and target:transform atom object. And the target atom coordinates.

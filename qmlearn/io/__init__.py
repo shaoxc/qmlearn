@@ -27,7 +27,7 @@ def read_images(traj, format=None, index=None):
     return images
 
 def read_db(filename, names = '*'):
-    db = DBHDF5(filename)
+    db = DBHDF5(filename, 'r')
     if names is None : names = '*'
     if isinstance(names, str):
         method = names
@@ -52,7 +52,7 @@ def read_db(filename, names = '*'):
 
 def write_db(output, qmmol, images, properties, prefix = 'train', names = None, **kwargs):
     if names is None or len(names) < 2 : names = [None, ]*3
-    db = DBHDF5(output, qmmol=qmmol, **kwargs)
+    db = DBHDF5(output, 'w', qmmol=qmmol, **kwargs)
     db.write_qmmol(qmmol, name = names[0], **kwargs)
     db.write_images(images, prefix=prefix, name = names[1], **kwargs)
     db.write_properties(properties, prefix=prefix, name = names[1], **kwargs)

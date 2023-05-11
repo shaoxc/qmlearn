@@ -4,7 +4,7 @@ from qmlearn.model.model import QMModel
 from qmlearn.io import read_db
 from qmlearn.utils import tenumerate
 
-def db2qmmodel(filename, names = '*', mmodels = None, qmmol_options = None, purify_gamma = True):
+def db2qmmodel(filename, names = '*', mmodels = None, qmmol_options = None, purify_gamma = True, predicted_gamma = True):
     r"""Train QMModel to learn :math:`{\gamma}` in terms of :math:`V_{ext}` from training data
     then an additional layer of training learn :math:`{\delta}E` and :math:`{\delta}{\gamma}`
     based on previously learned :math:`{\gamma}`.
@@ -61,7 +61,7 @@ def db2qmmodel(filename, names = '*', mmodels = None, qmmol_options = None, puri
     if delta_learn :
         print('Start predicting...', flush = True)
         shape = y[0].shape
-        if 'gamma_pp' in properties:
+        if 'gamma_pp' in properties and predicted_gamma:
             gammas = properties['gamma_pp']
         else :
             gammas = []

@@ -180,12 +180,12 @@ def append_properties(atoms, data = None, properties = None, refqmmol = None, qm
     #
     if isinstance(atoms, QMMol):
         qmmol = atoms
-    elif refqmmol is not None :
-        qmmol = refqmmol.duplicate(atoms, refatoms=atoms)
     else :
-        qmmol = QMMol(atoms = atoms, **qmmol_options)
-    #
-    qmmol.run()
+        if refqmmol is not None :
+            qmmol = refqmmol.duplicate(atoms, refatoms=atoms)
+        else :
+            qmmol = QMMol(atoms = atoms, **qmmol_options)
+        qmmol.run(**kwargs)
     #
     for key in properties :
         if key == 'vext' :

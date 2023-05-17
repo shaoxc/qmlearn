@@ -7,6 +7,7 @@ from pyscf.pbc.tools.pyscf_ase import atoms_from_ase
 from pyscf import gto, ao2mo
 from pyscf import dft, scf, mp, fci, ci, cc, mcscf
 from pyscf.symm import Dmatrix
+from pyscf.scf import addons
 from functools import reduce
 
 from qmlearn.drivers.core import Engine
@@ -473,6 +474,13 @@ class EnginePyscf(Engine):
     def get_atom_naos(self, mol = None):
         mol = mol or self.mol
         return get_atom_naos(mol)
+
+    def project_dm_nr2nr(self, gamma, mol2, mol = None):
+        mol = mol or self.mol
+        if hasattr(mol, 'mol'): mol = mol.mol
+        if hasattr(mol2, 'mol'): mol2 = mol2.mol
+        dm = addons.project_dm_nr2nr(mol, gamma, mol2)
+        return dm
 
 def gamma2gamma(*args, **kwargs):
     r""" Function two assure 1-RDM to be the predicted one.

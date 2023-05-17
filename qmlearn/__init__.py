@@ -1,8 +1,8 @@
 __author__ = "Pavanello Research Group"
 __contact__ = "m.pavanello@rutgers.edu"
 __license__ = "MIT"
-__version__ = "0.0.1rc0"
-__date__ = "2023-02-20"
+__version__ = "0.0.1rc1"
+__date__ = "2023-05-16"
 
 try:
     from importlib.metadata import version # python >= 3.8

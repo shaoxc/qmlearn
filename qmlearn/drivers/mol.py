@@ -94,9 +94,12 @@ class QMMol(object):
         self.init_kwargs.pop('kwargs', None)
         self.init_kwargs.update(kwargs)
         self.init()
-        #
-        for key in self.engine_calcs :
-            setattr(self, key, getattr(self.engine, key))
+
+    def __getattr__(self, attr):
+        if attr in self.engine_calcs :
+            return getattr(self.engine, attr)
+        else :
+            raise AttributeError("Wrong attribute ", attr)
 
     def init(self):
         # Draw the arguments

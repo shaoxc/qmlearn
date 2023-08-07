@@ -4,7 +4,7 @@ from qmlearn.model.model import QMModel
 from qmlearn.io import read_db
 from qmlearn.utils import tenumerate
 
-def db2qmmodel(filename, names = '*', mmodels = None, qmmol_options = None, purify_gamma = True, predicted_gamma = True):
+def db2qmmodel(filename, names = '*', mmodels = None, qmmol_options = None, purify_gamma = True, predicted_gamma = True, index = None):
     r"""Train QMModel to learn :math:`{\gamma}` in terms of :math:`V_{ext}` from training data
     then an additional layer of training learn :math:`{\delta}E` and :math:`{\delta}{\gamma}`
     based on previously learned :math:`{\gamma}`.
@@ -25,6 +25,7 @@ def db2qmmodel(filename, names = '*', mmodels = None, qmmol_options = None, puri
     model : obj
         trained model
     """
+    if index is None : index = slice(None)
     if isinstance(filename, dict):
         data = filename
     else :
@@ -34,11 +35,13 @@ def db2qmmodel(filename, names = '*', mmodels = None, qmmol_options = None, puri
         refqmmol.init_kwargs.update(qmmol_options)
         refqmmol = refqmmol.__class__(**refqmmol.init_kwargs)
         print("New options of QMMOL :\n", refqmmol.init_kwargs)
-    train_atoms = data['atoms']
+    train_atoms = data['atoms'][index]
     properties = data['properties']
+    if len(train_atoms) < len(data['atoms']):
+        print(f"Only use {len(train_atoms)}/{len(data['atoms'])} of training set.")
     #
-    X = properties['vext']
-    y = properties['gamma']
+    X = properties['vext'][index]
+    y = properties['gamma'][index]
     #
     if mmodels is None :
         mmodels={
@@ -62,7 +65,7 @@ def db2qmmodel(filename, names = '*', mmodels = None, qmmol_options = None, puri
         print('Start predicting...', flush = True)
         shape = y[0].shape
         if 'gamma_pp' in properties and predicted_gamma:
-            gammas = properties['gamma_pp']
+            gammas = properties['gamma_pp'][index]
         else :
             gammas = []
             for i, a in tenumerate(train_atoms):
@@ -78,6 +81,6 @@ def db2qmmodel(filename, names = '*', mmodels = None, qmmol_options = None, puri
             key = k[2:]
             if key not in properties :
                 print(f"!WARN : '{key}' not in the database", flush = True)
-            model.fit(y, properties[key], method = k)
+            model.fit(y, properties[key][index], method = k)
     print('Finish the reading.', flush = True)
     return model

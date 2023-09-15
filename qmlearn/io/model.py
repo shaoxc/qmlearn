@@ -14,11 +14,17 @@ def db2qmmodel(filename, names = '*', mmodels = None, qmmol_options = None, puri
     filename : str
         Name of database file
     names : str, optional
-        name of database, by default '*'
+        Name of database, by default '*'
     mmodels : dict, optional
-        set of machine learning models used for training , If not provided
+        Set of machine learning models used for training. If not provided
         by default KKR will be used to learn gamma and linear regression for
         delta learning
+    index : float, optional
+	Allows user to define how many training points to use for a given molecule. Preferred: index = slice(0, n_samples, selection)
+    predicted_gamma : bool, optional
+	If True, will use gamma values stored in QMLearn database. Else, will recalculate gamma.
+    purify_gamma : bool, optional
+	If True, will purify gamma by rotating and reordering
 
     Returns
     -------

@@ -143,6 +143,16 @@ class EnginePsi4(Engine):
         return np.sum(charges)
 
     def calc_gamma(self, orb=None, occs=None):
+	r"""Perform gamma calculation from PySCF
+
+	Parameters
+	----------
+	orb: None
+	   Default is to use value defined elsewhere in drivers
+	occs: None
+	   Default is to use value defined elsewhere in drivers
+	"""
+
         raise AttributeError("Sorry, not implemented yet.")
 
     @property

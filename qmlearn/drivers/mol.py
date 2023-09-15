@@ -247,7 +247,7 @@ class QMMol(object):
 
         Parameters
         ----------
-        pro : str
+        prop : str
             Options
 
             | 1-RDM : 'gamma'
@@ -255,6 +255,13 @@ class QMMol(object):
 
         y : ndarray
             Predicted gamma or forces matrix to be rotated.
+
+	rotate : bool
+	    If True, will rotate gamma or forces matrix
+
+	reorder : bool
+	    If True, will sort gamma so that chemical elements are in the 
+same sequence as the data.
 
         Returns
         -------

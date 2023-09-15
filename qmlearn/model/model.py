@@ -147,6 +147,13 @@ class QMModel(object):
     def convert_back(self, y, prop = 'gamma', qmmol = None, **kwargs):
         """Convert back the predicted properties to the original reference frame of the molecule
 
+	Parameters
+	----------
+	prop : str
+	    Define property to be converted back to original reference frame
+	qmmol : None
+	    Default is to refer to qmmol object previously defined
+
         Returns
         -------
         y : array

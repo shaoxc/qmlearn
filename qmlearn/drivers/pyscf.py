@@ -155,6 +155,10 @@ class EnginePyscf(Engine):
             | Occupation number : 'occs'
             | Molecular orbitals : 'orb'
 
+	ao_repr : bool
+	    If True, will use atomic orbitals for calculating electronic 
+properties
+
         """
         if 'energy' in properties or self._gamma is None :
             # (dft.uks.UKS, dft.rks.RKS, scf.uhf.UHF, scf.hf.RHF))
@@ -396,7 +400,7 @@ class EnginePyscf(Engine):
 
         Returns
         -------
-        quadrupol : ndarray
+        quadrupole : ndarray
            An array containing a quadruple per component."""
 
         # XX, XY, XZ, YY, YZ, ZZ

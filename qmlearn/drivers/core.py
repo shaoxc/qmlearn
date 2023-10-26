@@ -212,17 +212,60 @@ class Engine(object):
         return matrix_deviation(gamma, g)
 
     def calc_occupations(self, gamma):
+	r"""Calculate occupations for gamma
+	
+	Parameters
+	----------
+	gamma: ndarray
+	    1-RDM
+
+	Returns
+	-------
+	occs: ndarray
+	    Occupancy, all but last
+	orbs: ndarray
+	    Orbital coefficients, all but last. Each column is one orbital
+	"""
+
         ovlp_x = self.ovlp_x
         occs, orbs = np.linalg.eigh(ovlp_x@gamma@ovlp_x)
         return occs[::-1], orbs[:,::-1]
 
     def init_ovlp_x(self, ovlp = None):
+	r""" Initiate overlap calculation
+
+	Parameters
+	----------
+	ovlp: ndarray
+	   Overlap matrix
+
+	Returns
+	-------
+	einsum: float
+	   Sum of eigenvalues for overlap and inverted overlap matrices
+	"""
+
         ovlp = ovlp or self.ovlp
         svel, svec = np.linalg.eigh(ovlp)
         self._ovlp_x = np.einsum('ik,jk->ij', svec, svec*np.sqrt(svel))
         self._ovlp_x_inv = np.einsum('ik,jk->ij', svec, svec/np.sqrt(svel))
 
     def purify_gamma(self, gamma, tol = 0.5):
+	r"""Purifying 1-RDM from inverted overlap matrix
+
+	Parameters
+	----------
+	gamma: ndarray
+	    1-RDM
+	tol: float
+	    Defines allowable error in gamma
+
+	Returns
+	-------
+	gamma: ndarray
+	    Purified 1-RDM
+	"""
+
         ovlp_x_inv = self.ovlp_x_inv
         occs, orbs = self.calc_occupations(gamma)
         occs = np.abs(occs)

@@ -11,6 +11,7 @@ from rmsd.calculate_rmsd import (
 
 from qmlearn.utils.utils import matrix_deviation
 from qmlearn.data import REFLECTION
+from scipy import linalg
 
 class Engine(object):
     r"""Abstract Base class for the External calculator.
@@ -47,9 +48,16 @@ class Engine(object):
         #-----------------------------------------------------------------------
         self._vext = None
         self._gamma = None
-        self._gammat= None
+        self._gammat = None
+        self._gammatc = None
         self._etotal = None
         self._forces = None
+        self._occ = None
+        self._mo_energy = None
+        self._eig_gammat = None
+        self._eig_gammatc = None
+        self._delta_gamma = None
+        self._occ_dg = None
         #
         self._kop = None
         self._ovlp = None
@@ -69,6 +77,11 @@ class Engine(object):
     @property
     def gamma(self):
         r""" 1-body reduced density matrix (1-RDM). """
+        pass
+
+    @property
+    def gamma(self):
+        r"""Occupation from 1-RDM"""
         pass
 
     @property
@@ -211,24 +224,26 @@ class Engine(object):
             g = (4*gamma@ovlp@gamma@ovlp@gamma -gamma@ovlp@gamma@ovlp@gamma@ovlp@gamma)/8
         return matrix_deviation(gamma, g)
 
-    def calc_occupations(self, gamma):
-	r"""Calculate occupations for gamma
+    def calc_occupations(self, gamma,ovlp_x=None):
+	    r"""Calculate occupations for gamma
 	
-	Parameters
-	----------
-	gamma: ndarray
-	    1-RDM
+	    Parameters
+	    ----------
+	    gamma: ndarray
+	       1-RDM
 
-	Returns
-	-------
-	occs: ndarray
-	    Occupancy, all but last
-	orbs: ndarray
-	    Orbital coefficients, all but last. Each column is one orbital
-	"""
+	    Returns
+	    -------
+	    occs: ndarray
+	        Occupancy, all but last
+	    orbs: ndarray
+	        Orbital coefficients, all but last. Each column is one orbital
+	    """
 
-        ovlp_x = self.ovlp_x
+        if ovlp_x is None or ovlp_x.size == 0:
+            ovlp_x = self.ovlp_x
         occs, orbs = np.linalg.eigh(ovlp_x@gamma@ovlp_x)
+        #occs, orbs = np.linalg.eigh(np.einsum('ij,jk,kl->il', ovlp_x, gamma, ovlp_x))
         return occs[::-1], orbs[:,::-1]
 
     def init_ovlp_x(self, ovlp = None):
@@ -276,8 +291,42 @@ class Engine(object):
             else :
                 raise ValueError('The density matrix is too bad.')
         gamma = ovlp_x_inv@np.einsum('ik,jk->ij', orbs, orbs*occs_i)@ovlp_x_inv
+        #gamma = np.einsum('ij,jk,kl->il', ovlp_x_inv, np.einsum('ik,jk->ij', orbs, orbs * occs_i), ovlp_x_inv)
         return gamma
 
+    def purify_gamma2(self, gamma=None, occs=None,gammatc=None):
+        ovlp_x_inv = self.ovlp_x_inv
+        if gammatc is None:
+            occs_, orbs = self.calc_occupations(gamma)
+            gamma_ = ovlp_x_inv@np.einsum('ik,jk->ij', orbs, orbs*occs)@ovlp_x_inv
+        else:
+            eigv_, coeff = self.eigs_gamma2(gammatc)
+            eigv = occs 
+            gammat_ = np.einsum('ik,jk->ij', coeff, coeff*eigv)
+            shape = np.shape(gammatc)
+            gamma_ = np.transpose(gammat_.reshape(shape),[0, 2, 1, 3])
+            
+        return gamma_
+
+    def eigs_gamma2(self, gammatc):
+        shape = np.shape(gammatc)[0]
+        gammatc_reshape = np.transpose(gammatc,[0,2,1,3]).reshape((shape**2,shape**2))
+
+        eigv, coeff = np.linalg.eigh(gammatc_reshape)
+
+        if eigv.any() < 0:
+            print('2RDM is NOT positive semidefinite')
+        else:
+            print('2RDM is positive semidefinite')
+
+        trace_gammatc = np.einsum('mnst,mn,st',gammatc,self.ovlp,self.ovlp)
+
+        if not np.allclose(trace_gammatc, 0, atol=1e-3):
+            print ('2RDM trace is not ZERO -> N', trace_gammatc,'!=', 0)
+        else:
+            print ('2RDM trace is ZERO')
+        return eigv[::-1], coeff[:,::-1]
+        
 def atoms_rmsd(target, atoms, transform = True, **kwargs) :
     r""" Function to return RMSD : Root mean square deviation between atoms and target:transform atom object. And the target atom coordinates.
 

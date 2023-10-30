@@ -4,7 +4,7 @@ from qmlearn.model.model import QMModel
 from qmlearn.io import read_db
 from qmlearn.utils import tenumerate
 
-def db2qmmodel(filename, names = '*', mmodels = None, qmmol_options = None, purify_gamma = True, predicted_gamma = True, index = None):
+def db2qmmodel(filename, names = '*', mmodels = None, qmmol_options = None, purify_gamma = True, predicted_gamma = True, index =None, target='gamma', method='gamma'):
     r"""Train QMModel to learn :math:`{\gamma}` in terms of :math:`V_{ext}` from training data
     then an additional layer of training learn :math:`{\delta}E` and :math:`{\delta}{\gamma}`
     based on previously learned :math:`{\gamma}`.
@@ -47,17 +47,17 @@ def db2qmmodel(filename, names = '*', mmodels = None, qmmol_options = None, puri
         print(f"Only use {len(train_atoms)}/{len(data['atoms'])} of training set.")
     #
     X = properties['vext'][index]
-    y = properties['gamma'][index]
+    y = properties[target][index]
     #
     if mmodels is None :
         mmodels={
-            'gamma': KernelRidge(alpha=0.1,kernel='linear'),
+            target: KernelRidge(alpha=0.1,kernel='linear'),
             'd_gamma': LinearRegression(),
             'd_energy': LinearRegression(),
             'd_forces': LinearRegression(),
         }
         print(f'Guess mmodels: {mmodels}', flush = True)
-    model = QMModel(mmodels=mmodels, refqmmol = refqmmol, purify_gamma = purify_gamma)
+    model = QMModel(mmodels=mmodels, refqmmol = refqmmol, purify_gamma = purify_gamma, method=method)
     model.fit(X, y)
     #
     for k in mmodels :

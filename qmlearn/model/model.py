@@ -73,8 +73,8 @@ class QMModel(object):
 
     @property
     def method(self):
-        if self._method.lower() != 'gamma' :
-            raise AttributeError("Only support 'gamma' method now.")
+        if self._method.lower() not in {'gamma','gamma2c','gamma2','occ','eigs_gammat','eigs_gammatc','occ_dg','delta_gamma'} :
+            raise AttributeError("Only support 'gamma', 'gamma2c', 'gamma2', 'occ', 'eigs_gammat', 'eigs_gammatc', 'occ_dg' or 'delta_gamma' method now.")
         return self._method
 
     def fit(self, X, y, model = None, method = None):

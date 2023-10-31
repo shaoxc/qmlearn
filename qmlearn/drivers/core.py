@@ -294,10 +294,13 @@ class Engine(object):
             occs_i = np.rint(occs)
         elif method == 'smearing':
             mask = occs_g <= 0
+            mask2 = occs_g >= 2
             occs_g[mask] = 1.0
+            occs_g[mask2] = 1.0
             mo_energy = np.log(2/occs_g -1.0)
             mo_energy *= sigma
             mo_energy[mask] = 1E10
+            mo_energy[mask2] = -1E10
             fermi, occs_i = self.get_occupations(mo_energy, smearing=smearing, nelectron=nelectron, sigma=sigma, **kwargs)
             occs_i *= 2.0
         else:
@@ -339,11 +342,11 @@ class Engine(object):
             gamma_ = ovlp_x_inv@np.einsum('ik,jk->ij', orbs, orbs*occs)@ovlp_x_inv
         else:
             eigv_, coeff = self.eigs_gamma2(gammatc)
-            eigv = occs 
+            eigv = occs
             gammat_ = np.einsum('ik,jk->ij', coeff, coeff*eigv)
             shape = np.shape(gammatc)
             gamma_ = np.transpose(gammat_.reshape(shape),[0, 2, 1, 3])
-            
+
         return gamma_
 
     def eigs_gamma2(self, gammatc):

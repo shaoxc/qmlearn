@@ -1,4 +1,5 @@
 import os
+import itertools
 import numpy as np
 from scipy.linalg import eig
 from scipy.spatial.transform import Rotation
@@ -165,16 +166,34 @@ class EnginePyscf(Engine):
             if '+' in self.method :
                 method2 = self.method.split('+')[1]
                 if method2 == 'fci':
+                    nroots = self.options.get('nroots', 1)
                     mf2 = methods_pyscf[method2](self.mf)
                     mf2.verbose = self.mf.verbose
-                    e, ci = mf2.kernel()
+                    if nroots > 1:
+                        mf2.nroots = nroots
+                        es, cis = mf2.kernel()
+                        e, ci = es[0], cis[0]
+                        #
+                        if 'tgamma' in properties:
+                            self._tgamma = {}
+                            for i,j in itertools.combinations_with_replacement(range(nroots), 2):
+                                rdm = mf2.trans_rdm1(cis[i], cis[j], norb=norb, nelec=self.mol.nelec)
+                                if ao_repr:
+                                    rdm = self.gamma_mo2ao(rdm, mo_coeff=self.mf.mo_coeff)
+                                self._tgamma[(i,j)] = rdm
+                        #
+                    else:
+                        e, ci = mf2.kernel()
                     if 'gammat' in properties :
                         rdm_1, rdm_2 = mf2.make_rdm12(fcivec=ci, norb=norb, nelec=self.mol.nelec)
                         self._gamma, self._gammat = fci.rdm.reorder_rdm(rdm1=rdm_1, rdm2=rdm_2) # Call reorder_rdm to transform to the normal rdm2a
                     else :
-                        self._gamma = mf2.make_rdm1(fcivec=ci, norb=norb, nelec=self.mol.nelec)
+                        gamma = mf2.make_rdm1(fcivec=ci, norb=norb, nelec=self.mol.nelec)
+                        if ao_repr:
+                            gamma = self.gamma_mo2ao(gamma, mo_coeff=self.mf.mo_coeff)
+                        self._gamma = gamma
                     self._orb = self.mf.mo_coeff
-                    self._etotal = mf2.e_tot
+                    self._etotal = e
                 elif method2 in ['casci', 'casscf']:
                     ncas = self.options.get('ncas', None)
                     nelecas = self.options.get('nelecas', None)
@@ -207,6 +226,12 @@ class EnginePyscf(Engine):
 
         if 'forces' in properties :
             self._forces = self.run_forces()
+
+    @property
+    def tgamma(self):
+        if self._tgamma is None:
+            self.run(properties = ('energy', 'tgamma'))
+        return self._tgamma
 
     @property
     def gamma(self):
@@ -481,6 +506,17 @@ class EnginePyscf(Engine):
         if hasattr(mol2, 'mol'): mol2 = mol2.mol
         dm = addons.project_dm_nr2nr(mol, gamma, mol2)
         return dm
+
+    def gamma_mo2ao(self, gamma, mo_coeff=None):
+        if mo_coeff is None: mo_coeff = self.mf.mo_coeff
+        gamma_ao = np.einsum('pi,ij,qj->pq', mo_coeff, gamma, mo_coeff.conj())
+        return gamma_ao
+
+    def gamma_ao2mo(self, gamma, mo_coeff=None, ovlp=None):
+        if mo_coeff is None: mo_coeff = self.mf.mo_coeff
+        if ovlp is None: ovlp = self.ovlp
+        gamma_mo = np.einsum('ji,jl,lm,mn,np->ip', mo_coeff.conj(), ovlp, gamma, ovlp, mo_coeff)
+        return gamma_mo
 
 def gamma2gamma(*args, **kwargs):
     r""" Function two assure 1-RDM to be the predicted one.

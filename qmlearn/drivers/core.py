@@ -363,8 +363,11 @@ class Engine(object):
     def eigs_gamma2(self, gammatc):
         shape = np.shape(gammatc)[0]
         gammatc_reshape = np.transpose(gammatc,[0,2,1,3]).reshape((shape**2,shape**2))
+        ovlp_aug = np.einsum('vu,st->vust',self.ovlp,self.ovlp)
+        ovlp_aug_reshape = np.transpose(ovlp_aug,[0,2,1,3]).reshape((shape**2,shape**2))
 
-        eigv, coeff = np.linalg.eigh(gammatc_reshape)
+        from scipy import linalg
+        eigv, coeff = linalg.eigh(gammatc_reshape,ovlp_aug_reshape,type=2)
 
         if eigv.any() < 0:
             print('2RDM is NOT positive semidefinite')

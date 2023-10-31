@@ -226,13 +226,18 @@ class Engine(object):
             g = (4*gamma@ovlp@gamma@ovlp@gamma -gamma@ovlp@gamma@ovlp@gamma@ovlp@gamma)/8
         return matrix_deviation(gamma, g)
 
-    def calc_occupations(self, gamma,ovlp_x=None):
+    def calc_occupations(self, gamma, ovlp_x=None, ovlp=None, type=1):
         r"""Calculate occupations for gamma
 
         Parameters
         ----------
         gamma: ndarray
            1-RDM
+        type: int
+            It specifies the problem type to be solved::
+
+                1 => x@a@x@v = w@v => a = x^{-1}@(w@v@v.T)@x^{-1}
+                2 =>   a@p@v = w@v => a = w@v@v.T
 
         Returns
         -------
@@ -242,10 +247,13 @@ class Engine(object):
             Orbital coefficients, all but last. Each column is one orbital
         """
 
-        if ovlp_x is None or ovlp_x.size == 0:
-            ovlp_x = self.ovlp_x
-        occs, orbs = np.linalg.eigh(ovlp_x@gamma@ovlp_x)
-        #occs, orbs = np.linalg.eigh(np.einsum('ij,jk,kl->il', ovlp_x, gamma, ovlp_x))
+        if type==1:
+            if ovlp_x is None or ovlp_x.size == 0:
+                ovlp_x = self.ovlp_x
+            occs, orbs = np.linalg.eigh(ovlp_x@gamma@ovlp_x)
+        else:
+            if ovlp is None : ovlp = self.ovlp
+            occs, orbs = scipy.linalg.eigh(gamma, b=ovlp, type=2)
         return occs[::-1], orbs[:,::-1]
 
     def init_ovlp_x(self, ovlp = None):
@@ -267,7 +275,7 @@ class Engine(object):
         self._ovlp_x = np.einsum('ik,jk->ij', svec, svec*np.sqrt(svel))
         self._ovlp_x_inv = np.einsum('ik,jk->ij', svec, svec/np.sqrt(svel))
 
-    def purify_gamma(self, gamma, occs=None, nelectron=None, method='aufbau', smearing='fermi', sigma=0.1, **kwargs):
+    def purify_gamma(self, gamma, occs=None, nelectron=None, method='aufbau', smearing='fermi', sigma=0.1, type=1, **kwargs):
         """purify_gamma.
 
         Parameters
@@ -286,7 +294,7 @@ class Engine(object):
         """
         nelectron = nelectron or self.nelectron
         ovlp_x_inv = self.ovlp_x_inv
-        occs_g, orbs = self.calc_occupations(gamma)
+        occs_g, orbs = self.calc_occupations(gamma, type=type)
         if occs is not None:
             occs_i = occs
         elif method == 'aufbau':
@@ -307,7 +315,10 @@ class Engine(object):
             raise AttributeError("Please give occupations or a supported method.")
         if abs(occs_i.sum() - nelectron) > 1E-6:
             raise ValueError('The occupations is not match the number of electrons')
-        gamma = ovlp_x_inv@np.einsum('ik,jk->ij', orbs, orbs*occs_i)@ovlp_x_inv
+        if type == 1:
+            gamma = ovlp_x_inv@np.einsum('ik,jk->ij', orbs, orbs*occs_i)@ovlp_x_inv
+        else:
+            gamma = np.einsum('ik,jk->ij', orbs*occs_i, orbs)
         return gamma
 
     def get_occupations(self, mo_energy, smearing='fermi', nelectron=None, fermi=None, sigma=0.1):

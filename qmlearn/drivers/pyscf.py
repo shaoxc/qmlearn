@@ -1,10 +1,11 @@
 import os
+import itertools
 import numpy as np
 from scipy.linalg import eig
 from scipy.spatial.transform import Rotation
 from ase import Atoms, io
 from pyscf.pbc.tools.pyscf_ase import atoms_from_ase
-from pyscf import gto, ao2mo,lib
+from pyscf import gto, ao2mo
 from pyscf import dft, scf, mp, fci, ci, cc, mcscf
 from pyscf.symm import Dmatrix
 from pyscf.scf import addons
@@ -85,7 +86,7 @@ class EnginePyscf(Engine):
         self.method = self.options.get('method', 'rks').lower()
         charge = self.options.get('charge', None)
         symmetry = self.options.get('symmetry',False)
-        ao_repr = self.options.get('ao_repr', True)
+        # ao_repr = self.options.get('ao_repr', True)
         #
         if isinstance(self.method, str):
             if self.method in ['mp2', 'cisd', 'fci', 'ccsd', 'ccsd(t)', 'casci', 'casscf'] :
@@ -157,9 +158,8 @@ class EnginePyscf(Engine):
             | Occupation number : 'occs'
             | Molecular orbitals : 'orb'
 
-	ao_repr : bool
-	    If True, will use atomic orbitals for calculating electronic 
-properties
+        ao_repr : bool
+            If True, will use atomic orbitals for calculating electronic properties
 
         """
         if 'energy' in properties or self._gamma is None :
@@ -172,15 +172,33 @@ properties
             if '+' in self.method :
                 method2 = self.method.split('+')[1]
                 if method2 == 'fci':
+                    nroots = self.options.get('nroots', 1)
                     mf2 = methods_pyscf[method2](self.mf)
                     mf2.verbose = self.mf.verbose
-                    e, ci_ = mf2.kernel()
+                    #
+                    if nroots > 1:
+                        mf2.nroots = nroots
+                        es, cis = mf2.kernel()
+                        e, ci_ = es[0], cis[0]
+                        #
+                        if 'tgamma' in properties:
+                            self._tgamma = {}
+                            for i,j in itertools.combinations_with_replacement(range(nroots), 2):
+                                rdm = mf2.trans_rdm1(cis[i], cis[j], norb=norb, nelec=self.mol.nelec)
+                                if ao_repr:
+                                    rdm = self.gamma_mo2ao(rdm, mo_coeff=self.mf.mo_coeff)
+                                self._tgamma[(i,j)] = rdm
+                        #
+                    else:
+                        e, ci_ = mf2.kernel()
                     self._orb = self.mf.mo_coeff
+                    self._etotal = e
+                    #
                     if 'gamma2' in properties or 'gamma2c' in properties :
                         self._gamma, self._gammat = mf2.make_rdm12(fcivec=ci_, norb=norb, nelec=self.mol.nelec)
                         if ao_repr:
                            print('AO Representation')
-                           self._gamma = lib.einsum('pi,ij,qj->pq', self._orb, self._gamma, self._orb.conj())
+                           self._gamma = self.gamma_mo2ao(self._gamma, mo_coeff=self.mf.mo_coeff)
                            self._gammat = cc.ccsd_rdm._rdm2_mo2ao(self._gammat.transpose(1,0,3,2), self._orb)
                            if eig:
                               self._eig_gammat = self.eigs_gamma2(self._gammat)[0]
@@ -192,7 +210,7 @@ properties
                         self._gamma = mf2.make_rdm1(fcivec=ci_, norb=norb, nelec=self.mol.nelec)
                         self._occ = np.diagonal(self._gamma)
                         if ao_repr is True:
-                            self._gamma = lib.einsum('pi,ij,qj->pq', self._orb, self._gamma, self._orb.conj())
+                            self._gamma = self.gamma_mo2ao(self._gamma, mo_coeff=self.mf.mo_coeff)
                             self._occ = self.calc_occupations(self._gamma)[0]
 
                     if 'gamma2c' in properties:
@@ -205,8 +223,7 @@ properties
                          self._occ_dg = self.calc_occupations(self._delta_gamma)[0]
                          if eig:
                             self._eig_gammatc = self.eigs_gamma2(self._gammatc)[0]
-                    
-                    self._etotal = mf2.e_tot
+
                     print('FCI energy: ', self._etotal)
 
                 elif method2 == 'cisd':
@@ -252,11 +269,11 @@ properties
                     mf2.verbose = 3
                     mf2.kernel()
 
-                    self._gamma = mf2.make_rdm1() #AO basis
+                    self._gamma = mf2.make_rdm1() # AO basis
                     self._occ = self.calc_occupations(self._gamma)[0]
                     self.mf2 = mf2
 
-                    if 'gamma2' in properties and not 'gamma2c' in properties:
+                    if 'gamma2' in properties and 'gamma2c' not in properties:
                         self._gammat = self.calc_gamma2_cas(properties=properties,ao_repr=ao_repr,ncas=ncas,nelecas=nelecas)
                         if eig:
                             self._eig_gammat = self.eigs_gamma2(self._gammat)[0]
@@ -268,7 +285,7 @@ properties
                         if eig:
                             self._eig_gammat = self.eigs_gamma2(self._gammat)[0]
                             self._eig_gammatc = self.eigs_gamma2(self._gammatc)[0]
-                    elif 'gamma2c' in properties and not 'gamma2' in properties:
+                    elif 'gamma2c' in properties and 'gamma2' not in properties:
                         self._gammatc = self.calc_gamma2_cas(properties=properties,ao_repr=ao_repr,ncas=ncas,nelecas=nelecas)
                         self._delta_gamma = self._gamma - self.mf.make_rdm1(ao_repr = ao_repr)
                         self._occ_dg = self.calc_occupations(self._delta_gamma)[0]
@@ -304,10 +321,10 @@ properties
         ncas = self.mf2.ncas
         ci = self.mf2.ci
         mo_coeff = self.mf.mo_coeff
-        mocas = mo_coeff[:,ncore:ncore+ncas]
-        amo_s = mocas.shape[1]
-        casdm2 = self.mf2.fcisolver.make_rdm2(ci, ncas, nelecas) #MO basis
-        casdm1 = self.mf2.fcisolver.make_rdm1(ci, ncas, nelecas) #MO basis
+        # mocas = mo_coeff[:,ncore:ncore+ncas]
+        # amo_s = mocas.shape[1]
+        casdm2 = self.mf2.fcisolver.make_rdm2(ci, ncas, nelecas) # MO basis
+        casdm1 = self.mf2.fcisolver.make_rdm1(ci, ncas, nelecas) # MO basis
 
         if 'gamma2' in properties:
             rdm2_hfc = np.zeros_like(mo_coeff)
@@ -326,42 +343,48 @@ properties
                 mo_ = mo_coeff
                 dm2 = np.einsum('ijkl,pi,qj,rk,sl->pqrs', rdm2_hf_mo,
                                mo_, mo_,
-                               mo_, mo_) #AO basis
+                               mo_, mo_) # AO basis
         if 'gamma2c' in properties:
 
-            inv= np.linalg.inv(mo_coeff)                                                         
-            gamma_hf = np.einsum('pi,ij,qj->pq', inv, self.mf.make_rdm1(), inv.conj()) #MO basis 
-            gamma_a = np.einsum('pq,rs->pqrs',gamma_hf,gamma_hf)                                 
-            gamma_b = np.einsum('pq,rs->prqs',gamma_hf,gamma_hf)                                 
-            rdm2_hf_mo = .5*(2*gamma_a-gamma_b)                                                  
+            inv= np.linalg.inv(mo_coeff)
+            gamma_hf = np.einsum('pi,ij,qj->pq', inv, self.mf.make_rdm1(), inv.conj()) # MO basis
+            gamma_a = np.einsum('pq,rs->pqrs',gamma_hf,gamma_hf)
+            gamma_b = np.einsum('pq,rs->prqs',gamma_hf,gamma_hf)
+            rdm2_hf_mo = .5*(2*gamma_a-gamma_b)
 
-            dm1_mo = np.zeros_like(mo_coeff)                                                                         
-            for i in range(ncore):                                                                                   
-                dm1_mo[i,i] = 2                                                                                      
+            dm1_mo = np.zeros_like(mo_coeff)
+            for i in range(ncore):
+                dm1_mo[i,i] = 2
             dm1_mo[ncore:ncore+ncas,ncore:ncore+ncas] = casdm1
-            gamma_a = np.einsum('pq,rs->pqrs',dm1_mo,dm1_mo)                                                         
-            gamma_b = np.einsum('pq,rs->prqs',dm1_mo,dm1_mo)                                                         
-            rdm2_cas_mo = .5*(2*gamma_a-gamma_b)                                                                     
-                                                                                                                     
-            gamma_2c = rdm2_cas_mo - rdm2_hf_mo                                                                      
-            rdm2_hf_valance = rdm2_hf_mo[ncore:ncore+ncas,ncore:ncore+ncas,ncore:ncore+ncas,ncore:ncore+ncas]                    
-            gamma_2c[ncore:ncore+ncas,ncore:ncore+ncas,ncore:ncore+ncas,ncore:ncore+ncas] = casdm2 - rdm2_hf_valance     
-            dm2_cas = gamma_2c[:ncore+ncas,:ncore+ncas,:ncore+ncas,:ncore+ncas]                                                  
+            gamma_a = np.einsum('pq,rs->pqrs',dm1_mo,dm1_mo)
+            gamma_b = np.einsum('pq,rs->prqs',dm1_mo,dm1_mo)
+            rdm2_cas_mo = .5*(2*gamma_a-gamma_b)
+
+            gamma_2c = rdm2_cas_mo - rdm2_hf_mo
+            rdm2_hf_valance = rdm2_hf_mo[ncore:ncore+ncas,ncore:ncore+ncas,ncore:ncore+ncas,ncore:ncore+ncas]
+            gamma_2c[ncore:ncore+ncas,ncore:ncore+ncas,ncore:ncore+ncas,ncore:ncore+ncas] = casdm2 - rdm2_hf_valance
+            dm2_cas = gamma_2c[:ncore+ncas,:ncore+ncas,:ncore+ncas,:ncore+ncas]
             dm2c = dm2_cas
 
             if ao_repr:
                 mo_ = mo_coeff[:,:ncore+ncas]
-                dm2c = np.einsum('ijkl,pi,qj,rk,sl->pqrs', dm2_cas, 
-                                    mo_, mo_,                              
-                                    mo_, mo_) #AO basis                    
+                dm2c = np.einsum('ijkl,pi,qj,rk,sl->pqrs', dm2_cas,
+                                    mo_, mo_,
+                                    mo_, mo_) # AO basis
         if 'gamma2c' in properties and 'gamma2' in properties:
             results = dm2,dm2c
-        elif 'gamma2c' in properties and not 'gamma2' in properties:
+        elif 'gamma2c' in properties and 'gamma2' not in properties:
             results = dm2c
-        elif 'gamma2' in properties and not 'gamma2c' in properties:
+        elif 'gamma2' in properties and 'gamma2c' not in properties:
             results = dm2
-         
+
         return results
+
+    @property
+    def tgamma(self):
+        if self._tgamma is None:
+            self.run(properties = ('energy', 'tgamma'))
+        return self._tgamma
 
     @property
     def gamma(self):
@@ -380,17 +403,18 @@ properties
         if self._gammatc is None:
             self.run(properties = ('energy','gamma2c'))
         return self._gammatc
+
     @property
     def eig_gammatc(self):
         if self._eig_gammatc is None:
             self.run(properties = ('energy','gamma2c'))
         return self._eig_gammatc
 
-    @property                                           
-    def eig_gammat(self):                                  
-        if self._eig_gammat is None:                    
-            self.run(properties = ('energy','gamma2')) 
-        return self._eig_gammat                          
+    @property
+    def eig_gammat(self):
+        if self._eig_gammat is None:
+            self.run(properties = ('energy','gamma2'))
+        return self._eig_gammat
 
     @property
     def delta_gamma(self):
@@ -445,6 +469,7 @@ properties
         if self._occ is None:
             self.run(properties = ('energy','gamma2c'))
         return self._occ
+
     @property
     def mo_energy(self):
         if self._mo_energy is None:
@@ -480,7 +505,7 @@ properties
         -------
         etotal : float
             Total electronic energy. """
-        etotal = self.mf.energy_tot(gamma, **kwargs)  #nuc + energy_elec(e1+coul)
+        etotal = self.mf.energy_tot(gamma, **kwargs)  # nuc + energy_elec(e1+coul)
         return etotal
 
     def calc_etotal2(self,gammat=None,gamma1=None,ao_repr=None,hf_core=False,g_c=False, delta_g=None , **kwargs):
@@ -520,9 +545,9 @@ properties
         occs = self.mf.get_occ()
         nmo = len(occs)
         h_core=self.mf.get_hcore()
-        ove=self.mf.get_ovlp() 
+        ove=self.mf.get_ovlp()
 
-        if not ao_repr: #MO representation
+        if not ao_repr: # MO representation
             h1e = reduce(np.dot,(orb.T, h_core,orb))
             h2e = ao2mo.kernel(self.mol.intor('int2e'),orb)
             h2e = ao2mo.restore(1, h2e, nmo)
@@ -546,15 +571,14 @@ properties
                 print('Taking predicted Gamma_C!')
                 gammac = gammat
 
-
             if not np.allclose(np.einsum('mnst,mn,st',gammac,ove,ove), 0, atol=1e-10):
-                print ('2RDM-correlated trace is not ZERO -> N', np.einsum('mnst,mn,st',gammac,ove,ove),'!=', 0)
+                print('2RDM-correlated trace is not ZERO -> N', np.einsum('mnst,mn,st',gammac,ove,ove),'!=', 0)
             else:
-                print ('2RDM-correlated trace is ZERO')
+                print('2RDM-correlated trace is ZERO')
 
             h1_c=np.einsum('ij,ji', h1e, delta_gamma)
             h2_c=np.einsum('ijkl,ijkl', h2e, gammac) * .5
-            etotal = self.mf.e_tot + h1_c + h2_c 
+            etotal = self.mf.e_tot + h1_c + h2_c
             print('HF:', self.mf.e_tot,' ','Con_H1: ', h1_c, 'Con_H2: ', h2_c)
 
         else:
@@ -733,6 +757,17 @@ properties
         if hasattr(mol2, 'mol'): mol2 = mol2.mol
         dm = addons.project_dm_nr2nr(mol, gamma, mol2)
         return dm
+
+    def gamma_mo2ao(self, gamma, mo_coeff=None):
+        if mo_coeff is None: mo_coeff = self.mf.mo_coeff
+        gamma_ao = np.einsum('pi,ij,qj->pq', mo_coeff, gamma, mo_coeff.conj())
+        return gamma_ao
+
+    def gamma_ao2mo(self, gamma, mo_coeff=None, ovlp=None):
+        if mo_coeff is None: mo_coeff = self.mf.mo_coeff
+        if ovlp is None: ovlp = self.ovlp
+        gamma_mo = np.einsum('ji,jl,lm,mn,np->ip', mo_coeff.conj(), ovlp, gamma, ovlp, mo_coeff)
+        return gamma_mo
 
 def gamma2gamma(*args, **kwargs):
     r""" Function two assure 1-RDM to be the predicted one.

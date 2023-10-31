@@ -1,4 +1,5 @@
 import fnmatch
+import ast
 import numpy as np
 from ase import Atoms
 
@@ -284,6 +285,7 @@ class DBHDF5(object):
     def _write_dict(self, g, d):
         for k, v in d.items() :
             if v is None : continue
+            if isinstance(k, tuple): k = str(k)
             if hasattr(v, 'keys') :
                 g1 = g.create_group(k)
                 self._write_dict(g1, v)
@@ -295,6 +297,7 @@ class DBHDF5(object):
     def _read_dict(self, g, d=None):
         if d is None : d = {}
         for k, v in g.items() :
+            if k[0]=='(' : k = ast.literal_eval(k)
             if hasattr(v, 'keys') :
                 d[k] = {}
                 self._read_dict(v, d[k])

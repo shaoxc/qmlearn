@@ -1,4 +1,5 @@
 import numpy as np
+import scipy
 from sklearn.decomposition import PCA
 from rmsd.calculate_rmsd import (
     kabsch,
@@ -11,7 +12,7 @@ from rmsd.calculate_rmsd import (
 
 from qmlearn.utils.utils import matrix_deviation
 from qmlearn.data import REFLECTION
-from scipy import linalg
+
 
 class Engine(object):
     r"""Abstract Base class for the External calculator.
@@ -48,6 +49,7 @@ class Engine(object):
         #-----------------------------------------------------------------------
         self._vext = None
         self._gamma = None
+        self._tgamma = None
         self._gammat = None
         self._gammatc = None
         self._etotal = None
@@ -80,13 +82,13 @@ class Engine(object):
         pass
 
     @property
-    def gamma(self):
-        r"""Occupation from 1-RDM"""
+    def gammat(self):
+        r""" 2-body reduced density matrix (2-RDM). """
         pass
 
     @property
-    def gammat(self):
-        r""" 2-body reduced density matrix (2-RDM). """
+    def tgamma(self):
+        r""" 1-body transition density matrix. """
         pass
 
     @property
@@ -225,20 +227,20 @@ class Engine(object):
         return matrix_deviation(gamma, g)
 
     def calc_occupations(self, gamma,ovlp_x=None):
-	    r"""Calculate occupations for gamma
-	
-	    Parameters
-	    ----------
-	    gamma: ndarray
-	       1-RDM
+        r"""Calculate occupations for gamma
 
-	    Returns
-	    -------
-	    occs: ndarray
-	        Occupancy, all but last
-	    orbs: ndarray
-	        Orbital coefficients, all but last. Each column is one orbital
-	    """
+        Parameters
+        ----------
+        gamma: ndarray
+           1-RDM
+
+        Returns
+        -------
+        occs: ndarray
+            Occupancy, all but last
+        orbs: ndarray
+            Orbital coefficients, all but last. Each column is one orbital
+        """
 
         if ovlp_x is None or ovlp_x.size == 0:
             ovlp_x = self.ovlp_x
@@ -247,52 +249,88 @@ class Engine(object):
         return occs[::-1], orbs[:,::-1]
 
     def init_ovlp_x(self, ovlp = None):
-	r""" Initiate overlap calculation
+        r""" Initiate overlap calculation
 
-	Parameters
-	----------
-	ovlp: ndarray
-	   Overlap matrix
+        Parameters
+        ----------
+        ovlp: ndarray
+           Overlap matrix
 
-	Returns
-	-------
-	einsum: float
-	   Sum of eigenvalues for overlap and inverted overlap matrices
-	"""
+        Returns
+        -------
+        einsum: float
+           Sum of eigenvalues for overlap and inverted overlap matrices
+        """
 
         ovlp = ovlp or self.ovlp
         svel, svec = np.linalg.eigh(ovlp)
         self._ovlp_x = np.einsum('ik,jk->ij', svec, svec*np.sqrt(svel))
         self._ovlp_x_inv = np.einsum('ik,jk->ij', svec, svec/np.sqrt(svel))
 
-    def purify_gamma(self, gamma, tol = 0.5):
-	r"""Purifying 1-RDM from inverted overlap matrix
+    def purify_gamma(self, gamma, occs=None, nelectron=None, method='aufbau', smearing='fermi', sigma=0.1, **kwargs):
+        """purify_gamma.
 
-	Parameters
-	----------
-	gamma: ndarray
-	    1-RDM
-	tol: float
-	    Defines allowable error in gamma
+        Parameters
+        ----------
+        gamma : ndarray
+            1-body reduced density matrix (1-RDM).
+        occs : ndarray
+            Occupation numbers
+        nelectron : int
+            Total number of electrons
+        method : str
+            method for purification, options are
 
-	Returns
-	-------
-	gamma: ndarray
-	    Purified 1-RDM
-	"""
-
+                | aufbau : Aufbau
+                | scale : negative to zero, max to one, and scale to nelectron
+        """
+        nelectron = nelectron or self.nelectron
         ovlp_x_inv = self.ovlp_x_inv
-        occs, orbs = self.calc_occupations(gamma)
-        occs = np.abs(occs)
-        occs_i = np.rint(occs)
-        if np.all(np.abs(occs_i-occs) > tol):
-            if tol < 0.49 :
-                raise ValueError(f'The tol = {tol} is too small, try a bigger one.')
-            else :
-                raise ValueError('The density matrix is too bad.')
+        occs_g, orbs = self.calc_occupations(gamma)
+        if occs is not None:
+            occs_i = occs
+        elif method == 'aufbau':
+            occs = np.abs(occs_g)
+            occs_i = np.rint(occs)
+        elif method == 'smearing':
+            mask = occs_g <= 0
+            occs_g[mask] = 1.0
+            mo_energy = np.log(2/occs_g -1.0)
+            mo_energy *= sigma
+            mo_energy[mask] = 1E10
+            fermi, occs_i = self.get_occupations(mo_energy, smearing=smearing, nelectron=nelectron, sigma=sigma, **kwargs)
+            occs_i *= 2.0
+        else:
+            raise AttributeError("Please give occupations or a supported method.")
+        if abs(occs_i.sum() - nelectron) > 1E-6:
+            raise ValueError('The occupations is not match the number of electrons')
         gamma = ovlp_x_inv@np.einsum('ik,jk->ij', orbs, orbs*occs_i)@ovlp_x_inv
-        #gamma = np.einsum('ij,jk,kl->il', ovlp_x_inv, np.einsum('ik,jk->ij', orbs, orbs * occs_i), ovlp_x_inv)
         return gamma
+
+    def get_occupations(self, mo_energy, smearing='fermi', nelectron=None, fermi=None, sigma=0.1):
+        nelectron = nelectron or self.nelectron
+        nocc = nelectron/2
+        if fermi is None: fermi = mo_energy[max(0, int(nocc-1))]
+        if hasattr(smearing, '__call__'):
+            fs = smearing
+        elif smearing=='fermi':
+            def fs(mu, mo_energy, sigma):
+                occ = np.zeros_like(mo_energy)
+                de = (mo_energy - mu) / sigma
+                occ[de<40] = 1.0/(np.exp(de[de<40])+1.0)
+                return occ
+        else:
+            raise AttributeError(f"{smearing} not supported")
+
+        def func(mu, mo_energy, sigma, nocc):
+            ne = fs(mu, mo_energy, sigma).sum()
+            return (ne-nocc)**2
+
+        res = scipy.optimize.minimize(func, fermi, args=(mo_energy, sigma, nocc), method='Powell',
+                options={'xtol': 1e-5, 'ftol': 1e-5, 'maxiter': 10000})
+        fermi = res.x
+        mo_occs = fs(fermi, mo_energy, sigma)
+        return fermi, mo_occs
 
     def purify_gamma2(self, gamma=None, occs=None,gammatc=None):
         ovlp_x_inv = self.ovlp_x_inv
@@ -322,11 +360,11 @@ class Engine(object):
         trace_gammatc = np.einsum('mnst,mn,st',gammatc,self.ovlp,self.ovlp)
 
         if not np.allclose(trace_gammatc, 0, atol=1e-3):
-            print ('2RDM trace is not ZERO -> N', trace_gammatc,'!=', 0)
+            print('2RDM trace is not ZERO -> N', trace_gammatc,'!=', 0)
         else:
-            print ('2RDM trace is ZERO')
+            print('2RDM trace is ZERO')
         return eigv[::-1], coeff[:,::-1]
-        
+
 def atoms_rmsd(target, atoms, transform = True, **kwargs) :
     r""" Function to return RMSD : Root mean square deviation between atoms and target:transform atom object. And the target atom coordinates.
 

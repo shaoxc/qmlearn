@@ -332,8 +332,8 @@ class EnginePyscf(Engine):
                 rdm2_hfc[i,i] = 2
             rdm2_hfc[ncore:ncore+ncas,ncore:ncore+ncas] = casdm1
 
-            gamma_a = np.einsum('pq,rs->pqrs',rdm2_hfc,rdm2_hfc)
-            gamma_b = np.einsum('pq,rs->prqs',rdm2_hfc,rdm2_hfc)
+            gamma_a = np.einsum('pq,rs->pqrs',rdm2_hfc,rdm2_hfc,optimize=True)
+            gamma_b = np.einsum('pq,rs->prqs',rdm2_hfc,rdm2_hfc,optimize=True)
             dm2_non_int = .5*(2*gamma_a-gamma_b)
 
             dm2 = dm2_non_int
@@ -343,21 +343,21 @@ class EnginePyscf(Engine):
                 mo_ = mo_coeff
                 dm2 = np.einsum('ijkl,pi,qj,rk,sl->pqrs', rdm2_hf_mo,
                                mo_, mo_,
-                               mo_, mo_) # AO basis
+                               mo_, mo_,optimize=True) # AO basis
         if 'gamma2c' in properties:
 
             inv= np.linalg.inv(mo_coeff)
-            gamma_hf = np.einsum('pi,ij,qj->pq', inv, self.mf.make_rdm1(), inv.conj()) # MO basis
-            gamma_a = np.einsum('pq,rs->pqrs',gamma_hf,gamma_hf)
-            gamma_b = np.einsum('pq,rs->prqs',gamma_hf,gamma_hf)
+            gamma_hf = np.einsum('pi,ij,qj->pq', inv, self.mf.make_rdm1(), inv.conj(),optimize=True) # MO basis
+            gamma_a = np.einsum('pq,rs->pqrs',gamma_hf,gamma_hf,optimize=True)
+            gamma_b = np.einsum('pq,rs->prqs',gamma_hf,gamma_hf,optimize=True)
             rdm2_hf_mo = .5*(2*gamma_a-gamma_b)
 
             dm1_mo = np.zeros_like(mo_coeff)
             for i in range(ncore):
                 dm1_mo[i,i] = 2
             dm1_mo[ncore:ncore+ncas,ncore:ncore+ncas] = casdm1
-            gamma_a = np.einsum('pq,rs->pqrs',dm1_mo,dm1_mo)
-            gamma_b = np.einsum('pq,rs->prqs',dm1_mo,dm1_mo)
+            gamma_a = np.einsum('pq,rs->pqrs',dm1_mo,dm1_mo,optimize=True)
+            gamma_b = np.einsum('pq,rs->prqs',dm1_mo,dm1_mo,optimize=True)
             rdm2_cas_mo = .5*(2*gamma_a-gamma_b)
 
             gamma_2c = rdm2_cas_mo - rdm2_hf_mo
@@ -370,7 +370,7 @@ class EnginePyscf(Engine):
                 mo_ = mo_coeff[:,:ncore+ncas]
                 dm2c = np.einsum('ijkl,pi,qj,rk,sl->pqrs', dm2_cas,
                                     mo_, mo_,
-                                    mo_, mo_) # AO basis
+                                    mo_, mo_,optimize=True) # AO basis
         if 'gamma2c' in properties and 'gamma2' in properties:
             results = dm2,dm2c
         elif 'gamma2c' in properties and 'gamma2' not in properties:
@@ -582,8 +582,11 @@ class EnginePyscf(Engine):
             print('HF:', self.mf.e_tot,' ','Con_H1: ', h1_c, 'Con_H2: ', h2_c)
 
         else:
-            etotal = (np.einsum('ij,ji', h1e, gamma1) + np.einsum('ijkl,ijkl', h2e, gammat) * .5)
+            h1_c=np.einsum('ij,ji', h1e, gamma1)
+            h2_c=np.einsum('ijkl,ijkl', h2e, gammat) * .5
+            etotal = h1_c + h2_c
             etotal += self.mol.energy_nuc()
+            print('Con_H1: ', h1_c, 'Con_H2: ', h2_c)
 
         print('Total Energy: ',etotal)
 

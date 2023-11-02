@@ -314,7 +314,7 @@ class Engine(object):
         else:
             raise AttributeError("Please give occupations or a supported method.")
         if abs(occs_i.sum() - nelectron) > 1E-6:
-            raise ValueError('The occupations is not match the number of electrons')
+            raise ValueError('The occupations does not match the number of electrons')
         if type == 1:
             gamma = ovlp_x_inv@np.einsum('ik,jk->ij', orbs, orbs*occs_i)@ovlp_x_inv
         else:

@@ -25,7 +25,7 @@ class Engine(object):
         External Potential.
     gamma : ndarray
         1-body reduced density matrix (1-RDM).
-    gammat : ndarray
+    gamma2 : ndarray
         2-body reduced density matrix (2-RDM).
     etotal : float
         Total electronic energy
@@ -50,14 +50,14 @@ class Engine(object):
         self._vext = None
         self._gamma = None
         self._tgamma = None
-        self._gammat = None
-        self._gammatc = None
+        self._gamma2 = None
+        self._gamma2c = None
         self._etotal = None
         self._forces = None
         self._occ = None
         self._mo_energy = None
-        self._eig_gammat = None
-        self._eig_gammatc = None
+        self._eig_gamma2 = None
+        self._eig_gamma2c = None
         self._delta_gamma = None
         self._occ_dg = None
         #
@@ -82,7 +82,7 @@ class Engine(object):
         pass
 
     @property
-    def gammat(self):
+    def gamma2(self):
         r""" 2-body reduced density matrix (2-RDM). """
         pass
 
@@ -346,38 +346,38 @@ class Engine(object):
         mo_occs = fs(fermi, mo_energy, sigma)
         return fermi, mo_occs
 
-    def purify_gamma2(self, gamma=None, occs=None,gammatc=None):
+    def purify_gamma2(self, gamma=None, occs=None,gamma2c=None):
         ovlp_x_inv = self.ovlp_x_inv
-        if gammatc is None:
+        if gamma2c is None:
             occs_, orbs = self.calc_occupations(gamma)
             gamma_ = ovlp_x_inv@np.einsum('ik,jk->ij', orbs, orbs*occs)@ovlp_x_inv
         else:
-            eigv_, coeff = self.eigs_gamma2(gammatc)
+            eigv_, coeff = self.eigs_gamma2(gamma2c)
             eigv = occs
-            gammat_ = np.einsum('ik,jk->ij', coeff, coeff*eigv)
-            shape = np.shape(gammatc)
-            gamma_ = np.transpose(gammat_.reshape(shape),[0, 2, 1, 3])
+            gamma2_ = np.einsum('ik,jk->ij', coeff, coeff*eigv)
+            shape = np.shape(gamma2c)
+            gamma_ = np.transpose(gamma2_.reshape(shape),[0, 2, 1, 3])
 
         return gamma_
 
-    def eigs_gamma2(self, gammatc):
-        shape = np.shape(gammatc)[0]
-        gammatc_reshape = np.transpose(gammatc,[0,2,1,3]).reshape((shape**2,shape**2))
+    def eigs_gamma2(self, gamma2c):
+        shape = np.shape(gamma2c)[0]
+        gamma2c_reshape = np.transpose(gamma2c,[0,2,1,3]).reshape((shape**2,shape**2))
         ovlp_aug = np.einsum('vu,st->vust',self.ovlp,self.ovlp)
         ovlp_aug_reshape = np.transpose(ovlp_aug,[0,2,1,3]).reshape((shape**2,shape**2))
 
         from scipy import linalg
-        eigv, coeff = linalg.eigh(gammatc_reshape,ovlp_aug_reshape,type=2)
+        eigv, coeff = linalg.eigh(gamma2c_reshape,ovlp_aug_reshape,type=2)
 
         if eigv.any() < 0:
             print('2RDM is NOT positive semidefinite')
         else:
             print('2RDM is positive semidefinite')
 
-        trace_gammatc = np.einsum('mnst,mn,st',gammatc,self.ovlp,self.ovlp)
+        trace_gamma2c = np.einsum('mnst,mn,st',gamma2c,self.ovlp,self.ovlp)
 
-        if not np.allclose(trace_gammatc, 0, atol=1e-3):
-            print('2RDM trace is not ZERO -> N', trace_gammatc,'!=', 0)
+        if not np.allclose(trace_gamma2c, 0, atol=1e-3):
+            print('2RDM trace is not ZERO -> N', trace_gamma2c,'!=', 0)
         else:
             print('2RDM trace is ZERO')
         return eigv[::-1], coeff[:,::-1]

@@ -37,7 +37,7 @@ class EnginePyscf(Engine):
         External Potential.
     gamma : ndarray
         1-body reduced density matrix (1-RDM).
-    gammat : ndarray
+    gamma2 : ndarray
         2-body reduced density matrix (2-RDM).
     etotal : float
         Total electronic energy (Atomic Units a.u.)
@@ -154,7 +154,7 @@ class EnginePyscf(Engine):
         If 'energy' is choosen the following properties are also calculated:
 
             | 1-RDM (1-body reduced density matrix) : 'gamma'
-            | 2-RDM (2-body reduced density matrix) : 'gammat'
+            | 2-RDM (2-body reduced density matrix) : 'gamma2'
             | Occupation number : 'occs'
             | Molecular orbitals : 'orb'
 
@@ -195,13 +195,13 @@ class EnginePyscf(Engine):
                     self._etotal = e
                     #
                     if 'gamma2' in properties or 'gamma2c' in properties :
-                        self._gamma, self._gammat = mf2.make_rdm12(fcivec=ci_, norb=norb, nelec=self.mol.nelec)
+                        self._gamma, self._gamma2 = mf2.make_rdm12(fcivec=ci_, norb=norb, nelec=self.mol.nelec)
                         if ao_repr:
                            print('AO Representation')
                            self._gamma = self.gamma_mo2ao(self._gamma, mo_coeff=self.mf.mo_coeff)
-                           self._gammat = cc.ccsd_rdm._rdm2_mo2ao(self._gammat.transpose(1,0,3,2), self._orb)
+                           self._gamma2 = cc.ccsd_rdm._rdm2_mo2ao(self._gamma2.transpose(1,0,3,2), self._orb)
                            if eig:
-                              self._eig_gammat = self.eigs_gamma2(self._gammat)[0]
+                              self._eig_gamma2 = self.eigs_gamma2(self._gamma2)[0]
                         else:
                            print('MO Representation')
                         self._occ = self.calc_occupations(self._gamma)[0]
@@ -217,12 +217,12 @@ class EnginePyscf(Engine):
                          print('Correlated Gamma2')
                          gamma_hf = self.mf.make_rdm1(ao_repr = ao_repr)
                          gamma_a = np.einsum('pq,rs->pqrs',gamma_hf,gamma_hf)
-                         gamma_b = np.einsum('pq,rs->prqs',gamma_hf,gamma_hf)
-                         self._gammatc = self._gammat - .5*(2*gamma_a-gamma_b)
+                         gamma_b = np.einsum('pq,rs->psrq',gamma_hf,gamma_hf)
+                         self._gamma2c = self._gamma2 - .5*(2*gamma_a-gamma_b)
                          self._delta_gamma = self._gamma - self.mf.make_rdm1(ao_repr = ao_repr)
                          self._occ_dg = self.calc_occupations(self._delta_gamma)[0]
                          if eig:
-                            self._eig_gammatc = self.eigs_gamma2(self._gammatc)[0]
+                            self._eig_gamma2c = self.eigs_gamma2(self._gamma2c)[0]
 
                     print('FCI energy: ', self._etotal)
 
@@ -234,9 +234,9 @@ class EnginePyscf(Engine):
 
                     if 'gamma2' in properties or 'gamma2c' in properties:
                          self._gamma = mf2.make_rdm1(civec,ao_repr=ao_repr)
-                         self._gammat = mf2.make_rdm2(civec,ao_repr=ao_repr)
+                         self._gamma2 = mf2.make_rdm2(civec,ao_repr=ao_repr)
                          if eig:
-                            self._eig_gammat = self.eigs_gamma2(self._gammat)[0]
+                            self._eig_gamma2 = self.eigs_gamma2(self._gamma2)[0]
                          if ao_repr:
                             print('AO Representation')
                          else:
@@ -248,12 +248,12 @@ class EnginePyscf(Engine):
                          print('Correlated Gamma2')
                          gamma_hf = self.mf.make_rdm1(ao_repr = ao_repr)
                          gamma_a = np.einsum('pq,rs->pqrs',gamma_hf,gamma_hf)
-                         gamma_b = np.einsum('pq,rs->prqs',gamma_hf,gamma_hf)
-                         self._gammatc = self._gammat - .5*(2*gamma_a-gamma_b)
+                         gamma_b = np.einsum('pq,rs->psrq',gamma_hf,gamma_hf)
+                         self._gamma2c = self._gamma2 - .5*(2*gamma_a-gamma_b)
                          self._delta_gamma = self._gamma - self.mf.make_rdm1(ao_repr = ao_repr)
                          self._occ_dg = self.calc_occupations(self._delta_gamma)[0]
                          if eig:
-                            self._eig_gammatc = self.eigs_gamma2(self._gammatc)[0]
+                            self._eig_gamma2c = self.eigs_gamma2(self._gamma2c)[0]
 
                     self._occ = self.calc_occupations(self._gamma)[0]
                     self._etotal = mf2.e_tot
@@ -267,6 +267,7 @@ class EnginePyscf(Engine):
                     mf2 = methods_pyscf[method2](self.mf, ncas, nelecas)
                     #mf2.verbose = self.mf.verbose
                     mf2.verbose = 3
+                    mf2.sorting_mo_energy = True
                     mf2.kernel()
 
                     self._gamma = mf2.make_rdm1() # AO basis
@@ -274,23 +275,23 @@ class EnginePyscf(Engine):
                     self.mf2 = mf2
 
                     if 'gamma2' in properties and 'gamma2c' not in properties:
-                        self._gammat = self.calc_gamma2_cas(properties=properties,ao_repr=ao_repr,ncas=ncas,nelecas=nelecas)
+                        self._gamma2 = self.calc_gamma2_cas(properties=properties,ao_repr=ao_repr,ncas=ncas,nelecas=nelecas)
                         if eig:
-                            self._eig_gammat = self.eigs_gamma2(self._gammat)[0]
+                            self._eig_gamma2 = self.eigs_gamma2(self._gamma2)[0]
 
                     elif 'gamma2' in properties and 'gamma2c' in properties:
-                        self._gammat,self._gammatc = self.calc_gamma2_cas(properties=properties,ao_repr=ao_repr,ncas=ncas,nelecas=nelecas)
+                        self._gamma2,self._gamma2c = self.calc_gamma2_cas(properties=properties,ao_repr=ao_repr,ncas=ncas,nelecas=nelecas)
                         self._delta_gamma = self._gamma - self.mf.make_rdm1(ao_repr = ao_repr)
                         self._occ_dg = self.calc_occupations(self._delta_gamma)[0]
                         if eig:
-                            self._eig_gammat = self.eigs_gamma2(self._gammat)[0]
-                            self._eig_gammatc = self.eigs_gamma2(self._gammatc)[0]
+                            self._eig_gamma2 = self.eigs_gamma2(self._gamma2)[0]
+                            self._eig_gamma2c = self.eigs_gamma2(self._gamma2c)[0]
                     elif 'gamma2c' in properties and 'gamma2' not in properties:
-                        self._gammatc = self.calc_gamma2_cas(properties=properties,ao_repr=ao_repr,ncas=ncas,nelecas=nelecas)
+                        self._gamma2c = self.calc_gamma2_cas(properties=properties,ao_repr=ao_repr,ncas=ncas,nelecas=nelecas)
                         self._delta_gamma = self._gamma - self.mf.make_rdm1(ao_repr = ao_repr)
                         self._occ_dg = self.calc_occupations(self._delta_gamma)[0]
                         if eig:
-                            self._eig_gammatc = self.eigs_gamma2(self._gammatc)[0]
+                            self._eig_gamma2c = self.eigs_gamma2(self._gamma2c)[0]
 
                     self._orb = self.mf.mo_coeff
                     self._etotal = mf2.e_tot
@@ -333,7 +334,7 @@ class EnginePyscf(Engine):
             rdm2_hfc[ncore:ncore+ncas,ncore:ncore+ncas] = casdm1
 
             gamma_a = np.einsum('pq,rs->pqrs',rdm2_hfc,rdm2_hfc,optimize=True)
-            gamma_b = np.einsum('pq,rs->prqs',rdm2_hfc,rdm2_hfc,optimize=True)
+            gamma_b = np.einsum('pq,rs->psrq',rdm2_hfc,rdm2_hfc,optimize=True)
             dm2_non_int = .5*(2*gamma_a-gamma_b)
 
             dm2 = dm2_non_int
@@ -349,7 +350,7 @@ class EnginePyscf(Engine):
             inv= np.linalg.inv(mo_coeff)
             gamma_hf = np.einsum('pi,ij,qj->pq', inv, self.mf.make_rdm1(), inv.conj(),optimize=True) # MO basis
             gamma_a = np.einsum('pq,rs->pqrs',gamma_hf,gamma_hf,optimize=True)
-            gamma_b = np.einsum('pq,rs->prqs',gamma_hf,gamma_hf,optimize=True)
+            gamma_b = np.einsum('pq,rs->psrq',gamma_hf,gamma_hf,optimize=True)
             rdm2_hf_mo = .5*(2*gamma_a-gamma_b)
 
             dm1_mo = np.zeros_like(mo_coeff)
@@ -357,7 +358,7 @@ class EnginePyscf(Engine):
                 dm1_mo[i,i] = 2
             dm1_mo[ncore:ncore+ncas,ncore:ncore+ncas] = casdm1
             gamma_a = np.einsum('pq,rs->pqrs',dm1_mo,dm1_mo,optimize=True)
-            gamma_b = np.einsum('pq,rs->prqs',dm1_mo,dm1_mo,optimize=True)
+            gamma_b = np.einsum('pq,rs->psrq',dm1_mo,dm1_mo,optimize=True)
             rdm2_cas_mo = .5*(2*gamma_a-gamma_b)
 
             gamma_2c = rdm2_cas_mo - rdm2_hf_mo
@@ -393,28 +394,28 @@ class EnginePyscf(Engine):
         return self._gamma
 
     @property
-    def gammat(self):
-        if self._gammat is None:
+    def gamma2(self):
+        if self._gamma2 is None:
             self.run(properties = ('energy','gamma2'))
-        return self._gammat
+        return self._gamma2
 
     @property
-    def gammatc(self):
-        if self._gammatc is None:
+    def gamma2c(self):
+        if self._gamma2c is None:
             self.run(properties = ('energy','gamma2c'))
-        return self._gammatc
+        return self._gamma2c
 
     @property
-    def eig_gammatc(self):
-        if self._eig_gammatc is None:
+    def eig_gamma2c(self):
+        if self._eig_gamma2c is None:
             self.run(properties = ('energy','gamma2c'))
-        return self._eig_gammatc
+        return self._eig_gamma2c
 
     @property
-    def eig_gammat(self):
-        if self._eig_gammat is None:
+    def eig_gamma2(self):
+        if self._eig_gamma2 is None:
             self.run(properties = ('energy','gamma2'))
-        return self._eig_gammat
+        return self._eig_gamma2
 
     @property
     def delta_gamma(self):
@@ -424,9 +425,9 @@ class EnginePyscf(Engine):
 
     @property
     def all_gammas(self):
-        if self._gammat is None:
+        if self._gamma2 is None:
             self.run(properties = ('energy','gamma2','gamma2c'))
-        return self._gamma,self._gammat,self._gammatc,self._eig_gammat,self._eig_gammatc,self._delta_gamma,self._occ_dg,self._occ
+        return self._gamma,self._gamma2,self._gamma2c,self._eig_gamma2,self._eig_gamma2c,self._delta_gamma,self._occ_dg,self._occ
 
     @property
     def occ_dg(self):
@@ -508,14 +509,14 @@ class EnginePyscf(Engine):
         etotal = self.mf.energy_tot(gamma, **kwargs)  # nuc + energy_elec(e1+coul)
         return etotal
 
-    def calc_etotal2(self,gammat=None,gamma1=None,ao_repr=None,hf_core=False,g_c=False, delta_g=None , **kwargs):
+    def calc_etotal2(self,gamma2=None,gamma1=None,ao_repr=None,hf_core=False,g_c=False, delta_g=None , **kwargs):
         r""" Get the total electronic energy based on 2-RDM.
 
         Parameters
         ----------
         gamma : ndarray
             1-RDM
-        gammat : ndarray
+        gamma2 : ndarray
             2-RDM
         ao_repr : bool
             False : Both 1-RDM and 2-RDM in the MO basis
@@ -527,13 +528,13 @@ class EnginePyscf(Engine):
         etotal : float
             Total electronic energy. """
 
-        if gammat is None and gamma1 is None:
+        if gamma2 is None and gamma1 is None:
             self.run(properties = ('energy','gamma2'),ao_repr=ao_repr,eig=False)
-            gammat=self._gammat
+            gamma2=self._gamma2
             gamma1=self._gamma
-        elif gammat is None:
+        elif gamma2 is None:
             self.run(properties = ('energy','gamma2'),ao_repr=ao_repr,eig=False)
-            gammat=self._gammat
+            gamma2=self._gamma2
         elif gamma1 is None and delta_g is None:
             self.run(properties = ('energy'),ao_repr=ao_repr,eig=False)
             gamma1=self._gamma
@@ -563,13 +564,13 @@ class EnginePyscf(Engine):
                 delta_gamma = delta_g
                 print('Taking predicted delta_gamma')
 
-            if self._gammat is not None and g_c is False:
+            if self._gamma2 is not None and g_c is False:
                 gamma_a = np.einsum('pq,rs->pqrs',gamma_hf,gamma_hf)
-                gamma_b = np.einsum('pq,rs->prqs',gamma_hf,gamma_hf)
-                gammac = gammat - .5*(2*gamma_a-gamma_b)
+                gamma_b = np.einsum('pq,rs->psrq',gamma_hf,gamma_hf)
+                gammac = gamma2 - .5*(2*gamma_a-gamma_b)
             else:
                 print('Taking predicted Gamma_C!')
-                gammac = gammat
+                gammac = gamma2
 
             if not np.allclose(np.einsum('mnst,mn,st',gammac,ove,ove), 0, atol=1e-10):
                 print('2RDM-correlated trace is not ZERO -> N', np.einsum('mnst,mn,st',gammac,ove,ove),'!=', 0)
@@ -583,7 +584,7 @@ class EnginePyscf(Engine):
 
         else:
             h1_c=np.einsum('ij,ji', h1e, gamma1)
-            h2_c=np.einsum('ijkl,ijkl', h2e, gammat) * .5
+            h2_c=np.einsum('ijkl,ijkl', h2e, gamma2) * .5
             etotal = h1_c + h2_c
             etotal += self.mol.energy_nuc()
             print('Con_H1: ', h1_c, 'Con_H2: ', h2_c)
@@ -763,13 +764,13 @@ class EnginePyscf(Engine):
 
     def gamma_mo2ao(self, gamma, mo_coeff=None):
         if mo_coeff is None: mo_coeff = self.mf.mo_coeff
-        gamma_ao = np.einsum('pi,ij,qj->pq', mo_coeff, gamma, mo_coeff.conj())
+        gamma_ao = np.einsum('pi,ij,qj->pq', mo_coeff, gamma, mo_coeff.conj(),optimize=True)
         return gamma_ao
 
     def gamma_ao2mo(self, gamma, mo_coeff=None, ovlp=None):
         if mo_coeff is None: mo_coeff = self.mf.mo_coeff
         if ovlp is None: ovlp = self.ovlp
-        gamma_mo = np.einsum('ji,jl,lm,mn,np->ip', mo_coeff.conj(), ovlp, gamma, ovlp, mo_coeff)
+        gamma_mo = np.einsum('ji,jl,lm,mn,np->ip', mo_coeff.conj(), ovlp, gamma, ovlp, mo_coeff,optimize=True)
         return gamma_mo
 
 def gamma2gamma(*args, **kwargs):

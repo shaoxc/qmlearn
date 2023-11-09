@@ -129,7 +129,7 @@ def total_scater_factor(atoms,gamma2,limit=50,level=4,space=0.5,basis='6-31g*'):
           b=fft_gamma2(q,mol,gamma2,r12,ao_value,width,auxmol)
           q=np.array([h,0.0,0.0])
           c=fft_gamma2(q,mol,gamma2,r12,ao_value,width,auxmol)
-          fft.append((a+b+c)/3+2.0)
+          fft.append((a+b+c)/3+mol.nelectron)
           h_.append(h)
     return np.array(h_),np.real(np.array(fft))
 

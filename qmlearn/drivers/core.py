@@ -10,7 +10,7 @@ from rmsd.calculate_rmsd import (
     reorder_inertia_hungarian,
     )
 
-from qmlearn.utils.utils import matrix_deviation
+from qmlearn.utils.utils import matrix_deviation, unitary_decompose
 from qmlearn.data import REFLECTION
 
 
@@ -290,7 +290,7 @@ class Engine(object):
             method for purification, options are
 
                 | aufbau : Aufbau
-                | scale : negative to zero, max to one, and scale to nelectron
+                | smearing : Fermi-Dirac distribution
         """
         nelectron = nelectron or self.nelectron
         ovlp_x_inv = self.ovlp_x_inv
@@ -301,16 +301,8 @@ class Engine(object):
             occs = np.abs(occs_g)
             occs_i = np.rint(occs)
         elif method == 'smearing':
-            mask = occs_g <= 0
-            mask2 = occs_g >= 2
-            occs_g[mask] = 1.0
-            occs_g[mask2] = 1.0
-            mo_energy = np.log(2/occs_g -1.0)
-            mo_energy *= sigma
-            mo_energy[mask] = 1E10
-            mo_energy[mask2] = -1E10
+            mo_energy = self.calc_delta_mo_energy(occs_g, sigma=sigma)
             fermi, occs_i = self.get_occupations(mo_energy, smearing=smearing, nelectron=nelectron, sigma=sigma, **kwargs)
-            occs_i *= 2.0
         else:
             raise AttributeError("Please give occupations or a supported method.")
         if abs(occs_i.sum() - nelectron) > 1E-6:
@@ -320,6 +312,18 @@ class Engine(object):
         else:
             gamma = np.einsum('ik,jk->ij', orbs*occs_i, orbs)
         return gamma
+
+    @staticmethod
+    def calc_delta_mo_energy(occs, sigma=0.1):
+        mask = occs <= 0
+        mask2 = occs >= 2
+        occs[mask] = 1.0
+        occs[mask2] = 1.0
+        mo_energy = np.log(2/occs -1.0)
+        mo_energy *= sigma
+        mo_energy[mask] = 1E10
+        mo_energy[mask2] = -1E10
+        return mo_energy
 
     def get_occupations(self, mo_energy, smearing='fermi', nelectron=None, fermi=None, sigma=0.1):
         nelectron = nelectron or self.nelectron
@@ -343,41 +347,51 @@ class Engine(object):
         res = scipy.optimize.minimize(func, fermi, args=(mo_energy, sigma, nocc), method='Powell',
                 options={'xtol': 1e-5, 'ftol': 1e-5, 'maxiter': 10000})
         fermi = res.x
-        mo_occs = fs(fermi, mo_energy, sigma)
+        mo_occs = fs(fermi, mo_energy, sigma)*2.0
         return fermi, mo_occs
 
-    def purify_gamma2(self, gamma=None, occs=None,gamma2c=None):
-        ovlp_x_inv = self.ovlp_x_inv
-        if gamma2c is None:
-            occs_, orbs = self.calc_occupations(gamma)
-            gamma_ = ovlp_x_inv@np.einsum('ik,jk->ij', orbs, orbs*occs)@ovlp_x_inv
-        else:
-            eigv_, coeff = self.eigs_gamma2(gamma2c)
-            eigv = occs
-            gamma2_ = np.einsum('ik,jk->ij', coeff, coeff*eigv)
-            shape = np.shape(gamma2c)
-            gamma_ = np.transpose(gamma2_.reshape(shape),[0, 2, 1, 3])
+    def purify_gamma2(self, gamma2=None, occs=None, gamma2c=None):
+        if gamma2 is None: gamma2 = gamma2c
+        eigv_, coeff = self.eigs_gamma2(gamma2)
+        eigv = occs
+        gamma2_ = np.einsum('ik,jk->ij', coeff, coeff*eigv)
+        shape = np.shape(gamma2)
+        gamma2_p = np.transpose(gamma2_.reshape(shape),[0, 2, 1, 3])
 
-        return gamma_
+        return gamma2_p
 
-    def eigs_gamma2(self, gamma2c):
-        shape = np.shape(gamma2c)[0]
-        gamma2c_reshape = np.transpose(gamma2c,[0,2,1,3]).reshape((shape**2,shape**2))
+    def update_gamma2(self, gamma2, gamma=None, trace=None, ao_repr=True, nelectron=None, identity=None):
+        nelectron = nelectron or self.nelectron
+        if gamma is not None: gamma = gamma * (nelectron-1)
+        if ao_repr :
+            if gamma is not None :
+                gamma = self.gamma_ao2mo(gamma)
+            gamma2 = self.gamma2_ao2mo(gamma2)
+
+        A0, A1, A2 = unitary_decompose(gamma2)
+        A0m, A1m, A2m = unitary_decompose(gamma2, a = gamma, trace=trace, identity=identity)
+        gamma2_m = A0m + A1m + A2
+        gamma2_m = self.gamma2_mo2ao(gamma2_m)
+        return gamma2_m
+
+    def eigs_gamma2(self, gamma2):
+        shape = np.shape(gamma2)[0]
+        gamma2_reshape = np.transpose(gamma2,[0,2,1,3]).reshape((shape**2,shape**2))
         ovlp_aug = np.einsum('vu,st->vust',self.ovlp,self.ovlp)
         ovlp_aug_reshape = np.transpose(ovlp_aug,[0,2,1,3]).reshape((shape**2,shape**2))
 
         from scipy import linalg
-        eigv, coeff = linalg.eigh(gamma2c_reshape,ovlp_aug_reshape,type=2)
+        eigv, coeff = linalg.eigh(gamma2_reshape,ovlp_aug_reshape,type=2)
 
         if eigv.any() < 0:
             print('2RDM is NOT positive semidefinite')
         else:
             print('2RDM is positive semidefinite')
 
-        trace_gamma2c = np.einsum('mnst,mn,st',gamma2c,self.ovlp,self.ovlp)
+        trace_gamma2 = np.einsum('mnst,mn,st',gamma2,self.ovlp,self.ovlp)
 
-        if not np.allclose(trace_gamma2c, 0, atol=1e-3):
-            print('2RDM trace is not ZERO -> N', trace_gamma2c,'!=', 0)
+        if not np.allclose(trace_gamma2, 0, atol=1e-3):
+            print('2RDM trace is not ZERO -> N', trace_gamma2,'!=', 0)
         else:
             print('2RDM trace is ZERO')
         return eigv[::-1], coeff[:,::-1]

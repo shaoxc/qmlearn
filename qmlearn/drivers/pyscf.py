@@ -509,7 +509,7 @@ class EnginePyscf(Engine):
         etotal = self.mf.energy_tot(gamma, **kwargs)  # nuc + energy_elec(e1+coul)
         return etotal
 
-    def calc_etotal2(self,gamma2=None,gamma1=None,ao_repr=None,hf_core=False,g_c=False, delta_g=None , **kwargs):
+    def calc_etotal2(self,gamma2=None,gamma=None,ao_repr=None,hf_core=False,g_c=False, delta_g=None , **kwargs):
         r""" Get the total electronic energy based on 2-RDM.
 
         Parameters
@@ -528,16 +528,16 @@ class EnginePyscf(Engine):
         etotal : float
             Total electronic energy. """
 
-        if gamma2 is None and gamma1 is None:
+        if gamma2 is None and gamma is None:
             self.run(properties = ('energy','gamma2'),ao_repr=ao_repr,eig=False)
             gamma2=self._gamma2
-            gamma1=self._gamma
+            gamma=self._gamma
         elif gamma2 is None:
             self.run(properties = ('energy','gamma2'),ao_repr=ao_repr,eig=False)
             gamma2=self._gamma2
-        elif gamma1 is None and delta_g is None:
+        elif gamma is None and delta_g is None:
             self.run(properties = ('energy'),ao_repr=ao_repr,eig=False)
-            gamma1=self._gamma
+            gamma=self._gamma
         else:
             None
 
@@ -559,7 +559,7 @@ class EnginePyscf(Engine):
         if hf_core:
             if delta_g is None:
                 gamma_hf = self.mf.make_rdm1(ao_repr = ao_repr)
-                delta_gamma = gamma1-gamma_hf
+                delta_gamma = gamma-gamma_hf
             else:
                 delta_gamma = delta_g
                 print('Taking predicted delta_gamma')
@@ -583,7 +583,7 @@ class EnginePyscf(Engine):
             print('HF:', self.mf.e_tot,' ','Con_H1: ', h1_c, 'Con_H2: ', h2_c)
 
         else:
-            h1_c=np.einsum('ij,ji', h1e, gamma1)
+            h1_c=np.einsum('ij,ji', h1e, gamma)
             h2_c=np.einsum('ijkl,ijkl', h2e, gamma2) * .5
             etotal = h1_c + h2_c
             etotal += self.mol.energy_nuc()
@@ -650,8 +650,8 @@ class EnginePyscf(Engine):
         gf.verbose = self.mf.verbose
         gf.grid_response = True
         # Just a trick to skip the make_rdm1 and make_rdm1e without change the kernel
-        save_make_rdm1, self.mf.make_rdm1 = self.mf.make_rdm1, gamma2gamma
-        save_make_rdm1e, gf.make_rdm1e = gf.make_rdm1e, gamma2rdm1e
+        save_make_rdm1, self.mf.make_rdm1 = self.mf.make_rdm1, gamma_to_gamma
+        save_make_rdm1e, gf.make_rdm1e = gf.make_rdm1e, gamma_to_rdm1e
         forces = -1.0 * gf.kernel(mo_energy=self.mf, mo_coeff=gamma, mo_occ=gamma)
         self.mf.make_rdm1 = save_make_rdm1
         gf.make_rdm1e = save_make_rdm1e
@@ -770,10 +770,40 @@ class EnginePyscf(Engine):
     def gamma_ao2mo(self, gamma, mo_coeff=None, ovlp=None):
         if mo_coeff is None: mo_coeff = self.mf.mo_coeff
         if ovlp is None: ovlp = self.ovlp
-        gamma_mo = np.einsum('ji,jl,lm,mn,np->ip', mo_coeff.conj(), ovlp, gamma, ovlp, mo_coeff,optimize=True)
+        gamma_mo = np.einsum('ji,jl,lm,mn,np->ip', mo_coeff.conj(), ovlp, gamma, ovlp, mo_coeff, optimize=True)
         return gamma_mo
 
-def gamma2gamma(*args, **kwargs):
+    def gamma2_mo2ao(self, gamma2, mo_coeff=None):
+        if mo_coeff is None: mo_coeff = self.mf.mo_coeff
+        mo = mo_coeff
+        mo_c = mo.conj()
+        gamma2_ao = np.einsum('ijkl,pi,qj,rk,sl->pqrs', gamma2,
+            mo, mo_c, mo, mo_c, optimize=True)
+        return gamma2_ao
+
+    def gamma2_ao2mo(self, gamma2, mo_coeff=None, ovlp=None):
+        if mo_coeff is None: mo_coeff = self.mf.mo_coeff
+        if ovlp is None: ovlp = self.ovlp
+        invmo = np.einsum('ji, jl->il', mo_coeff, ovlp)
+        invmo_c = invmo.conj()
+        gamma2_ao = np.einsum('ijkl,pi,qj,rk,sl->pqrs', gamma2,
+            invmo_c, invmo, invmo_c, invmo, optimize=True)
+        return gamma2_ao
+
+    @staticmethod
+    def gamma2_to_2d(gamma2):
+        r = gamma2.shape[0]
+        gamma2_2d = np.transpose(gamma2,[0,2,1,3]).reshape((-1,r**2))
+        return gamma2_2d
+
+    @staticmethod
+    def gamma2_to_4d(gamma2):
+        r = int(np.sqrt(gamma2.shape[0]))
+        gamma2_4d = np.transpose(gamma2.reshape((r,r,r,r)),[0,2,1,3])
+        return gamma2_4d
+
+
+def gamma_to_gamma(*args, **kwargs):
     r""" Function two assure 1-RDM to be the predicted one.
 
     Returns
@@ -794,7 +824,7 @@ def gamma2gamma(*args, **kwargs):
         raise AttributeError("Please give one numpy.ndarray for gamma.")
     return gamma
 
-def gamma2rdm1e(mf, *args, **kwargs):
+def gamma_to_rdm1e(mf, *args, **kwargs):
     r""" Function to calculate the energy density matrix (1-RDMe).
 
     .. math::
@@ -810,7 +840,7 @@ def gamma2rdm1e(mf, *args, **kwargs):
     -------
     dm1e : ndarray
         Energy density matrix """
-    gamma = gamma2gamma(*args, **kwargs)
+    gamma = gamma_to_gamma(*args, **kwargs)
     s = mf.get_ovlp()
     sinv = np.linalg.inv(s)
     f = mf.get_fock(dm = gamma)

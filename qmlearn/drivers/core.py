@@ -298,8 +298,10 @@ class Engine(object):
         if occs is not None:
             occs_i = occs
         elif method == 'aufbau':
-            occs = np.abs(occs_g)
-            occs_i = np.rint(occs)
+            occs = occs_g/2.0
+            occs_i = np.rint(occs)*2.0
+            occs_i[occs_i<0.0] = 0.0
+            occs_i[occs_i>2.0] = 2.0
         elif method == 'smearing':
             mo_energy = self.calc_delta_mo_energy(occs_g, sigma=sigma)
             fermi, occs_i = self.get_occupations(mo_energy, smearing=smearing, nelectron=nelectron, sigma=sigma, **kwargs)

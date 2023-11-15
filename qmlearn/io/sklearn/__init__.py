@@ -22,13 +22,16 @@ def model_to_dict(model, props=None):
     module = inspect.getmodule(model)
     p = import_module(module.__name__.partition('.')[0])
     version = getattr(p, '__version__', None)
+    name = model.__class__.__name__
     values = {
         '__version__': p.__name__+','+version,
         '__module__': module.__name__,
-        '__name__': model.__class__.__name__,
+        '__name__': name,
         'params': model.get_params()
     }
     if props is None:
+        if name not in SKLEARN_PROPS :
+            raise AttributeError(f'The "{name}" is not supported yet.')
         props = SKLEARN_PROPS.get(values['__name__'], [])
     for k in props:
         values[k] = getattr(model, k, None)

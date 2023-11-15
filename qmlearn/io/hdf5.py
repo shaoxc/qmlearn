@@ -1,9 +1,32 @@
 import fnmatch
 import ast
+import logging
+from functools import wraps
 import numpy as np
 from ase import Atoms
 
 from qmlearn.drivers.mol import QMMol
+from qmlearn.model import QMModel
+from qmlearn.io.sklearn import model_to_dict, dict_to_model
+
+def check_name(fh = None):
+    def decorator(function):
+        @wraps(function)
+        def wrapper(self, **kwargs):
+            fobj = fh
+            name = kwargs.get('name', '*')
+            if fobj is None : fobj = self.fh
+            names = self.get_names(name)
+            if len(names) > 0:
+                kwargs['name'] = names[0]
+            else:
+                self.close()
+                raise AttributeError(f"There is no '{name}' in the file.")
+            results = function(self, **kwargs)
+            return results
+        return wrapper
+    return decorator
+
 
 class DBHDF5(object):
     r"""
@@ -32,6 +55,7 @@ class DBHDF5(object):
         self.fh = self.h5py.File(filename, mode)
         self._qmmol = qmmol
         self._group = None
+        self.qmmol_group = None
 
     @property
     def qmmol(self):
@@ -133,6 +157,7 @@ class DBHDF5(object):
             if overwrite :
                 del self.fh[name]
             else :
+                self.qmmol_group = self.fh[name]
                 self.group = self.fh[name].parent
                 print(f"!WARN : '{name}' already in the database, so do nothing.")
                 return
@@ -148,9 +173,11 @@ class DBHDF5(object):
                 self._write_dict(g, v)
             else :
                 group[k] = v
+        self.qmmol_group = self.fh[name]
         self.group = group.parent
 
-    def read_qmmol(self, name, **kwargs):
+    @check_name()
+    def read_qmmol(self, name = None, **kwargs):
         r"""read qmmol object from the database
 
         Attributes
@@ -176,7 +203,9 @@ class DBHDF5(object):
                 dicts[k] = self._encode(v)
         try:
             qmmol = QMMol(**dicts)
+            self.qmmol = qmmol
         except Exception :
+            logging.warning('Something wrong happened in instance QMMol, so return the dictionary.')
             qmmol = dicts
         return qmmol
 
@@ -218,7 +247,8 @@ class DBHDF5(object):
                 del self.fh[sname]
         self._write_dict(group, properties)
 
-    def read_properties(self, name, **kwargs):
+    @check_name()
+    def read_properties(self, name = None, **kwargs):
         r"""read properties from database file
 
         Attributes
@@ -259,6 +289,7 @@ class DBHDF5(object):
             g = group.create_group(str(i))
             self._write_atoms(g, atoms)
 
+    @check_name()
     def read_images(self, name = None, **kwargs):
         r""" Read atomic structure from the database
 
@@ -281,6 +312,56 @@ class DBHDF5(object):
         inds = np.argsort(np.array(ids, dtype=int))
         images = [images[x] for x in inds]
         return images
+
+    def write_model(self, model = None, name = None, **kwargs):
+        r""" Write the model in the database
+
+        Attributes
+        ----------
+        model : object
+            The trained model
+
+        name : str
+            name of the database file
+        """
+        if name is None :
+            if self.group is None : self.write_qmmol(qmmol=model.refqmmol, **kwargs)
+            name = self.group.name + '/model_KernelRidge'
+
+        model_kwargs = model.init_kwargs
+        model_kwargs['mmodels'] = {}
+        for k, v in model.mmodels.items():
+            model_kwargs['mmodels'][k] = model_to_dict(v)
+        model_kwargs['refqmmol'] = self.qmmol_group.name
+        self.write_properties(model_kwargs, name = name, **kwargs)
+
+    @check_name()
+    def read_model(self, name = None, **kwargs):
+        r""" Read the model from the database
+
+        Attributes
+        ----------
+        name : str
+            name of the database file
+
+        Returns
+        -------
+        model : object
+            Saved model
+        """
+        dicts = self.read_properties(name = name, **kwargs)
+        for k, v in dicts['mmodels'].items():
+            dicts['mmodels'][k] = dict_to_model(v)
+        if self.qmmol is None :
+            self.read_qmmol(name = dicts['refqmmol'])
+        dicts['refqmmol'] = self.qmmol
+        dicts.update(kwargs)
+        try:
+            model = QMModel(**dicts)
+        except Exception:
+            logging.warning('Something wrong happened in instance QMModel, so return the dictionary.')
+            model = dicts
+        return model
 
     def _write_dict(self, g, d):
         for k, v in d.items() :
@@ -330,6 +411,7 @@ class DBHDF5(object):
         return v
 
     def close(self):
+        self.fh.flush()
         self.fh.close()
 
     def __enter__(self):

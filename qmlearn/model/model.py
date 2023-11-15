@@ -34,6 +34,11 @@ class QMModel(object):
     """
     def __init__(self, mmodels = None, method='gamma', ncharge=None, nspin = 1, occs = None,
             refqmmol = None, purify_gamma = True, **kwargs):
+        self.init_kwargs = locals()
+        self.init_kwargs.pop('self', None)
+        self.init_kwargs.pop('kwargs', None)
+        self.init_kwargs.update(kwargs)
+
         self._method = method
         self.mmodels = mmodels or {}
         self.purify_gamma = purify_gamma
@@ -147,12 +152,12 @@ class QMModel(object):
     def convert_back(self, y, prop = 'gamma', qmmol = None, **kwargs):
         """Convert back the predicted properties to the original reference frame of the molecule
 
-	Parameters
-	----------
-	prop : str
-	    Define property to be converted back to original reference frame
-	qmmol : None
-	    Default is to refer to qmmol object previously defined
+        Parameters
+        ----------
+        prop : str
+            Define property to be converted back to original reference frame
+        qmmol : None
+            Default is to refer to qmmol object previously defined
 
         Returns
         -------
@@ -189,6 +194,10 @@ class QMModel(object):
         oorb = np.einsum('ij,mj->mi',s_moh,orb)
         s_new = np.einsum('mi,nj,mn->ij', oorb, oorb, s)
         return oorb
+
+    def write(self, output, mode='w', **kwargs):
+        from qmlearn.io import write_model
+        write_model(output, model=self, mode=mode, **kwargs)
 
 
 class MQMModel(QMModel):

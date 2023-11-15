@@ -4,7 +4,8 @@ from qmlearn.model.model import QMModel
 from qmlearn.io import read_db
 from qmlearn.utils import tenumerate
 
-def db2qmmodel(filename, names = '*', mmodels = None, qmmol_options = None, purify_gamma = True, predicted_gamma = True, index =None, target='gamma', method='gamma'):
+def db2qmmodel(filename, names = '*', mmodels = None, qmmol_options = None, purify_gamma = True,
+        predicted_gamma = True, index =None, target='gamma', method='gamma'):
     r"""Train QMModel to learn :math:`{\gamma}` in terms of :math:`V_{ext}` from training data
     then an additional layer of training learn :math:`{\delta}E` and :math:`{\delta}{\gamma}`
     based on previously learned :math:`{\gamma}`.
@@ -20,11 +21,11 @@ def db2qmmodel(filename, names = '*', mmodels = None, qmmol_options = None, puri
         by default KKR will be used to learn gamma and linear regression for
         delta learning
     index : float, optional
-	Allows user to define how many training points to use for a given molecule. Preferred: index = slice(0, n_samples, selection)
+        Allows user to define how many training points to use for a given molecule. Preferred: index = slice(0, n_samples, selection)
     predicted_gamma : bool, optional
-	If True, will use gamma values stored in QMLearn database. Else, will recalculate gamma.
+        If True, will use gamma values stored in QMLearn database. Else, will recalculate gamma.
     purify_gamma : bool, optional
-	If True, will purify gamma by rotating and reordering
+        If True, will purify gamma by rotating and reordering
 
     Returns
     -------

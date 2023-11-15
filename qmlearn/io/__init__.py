@@ -28,35 +28,51 @@ def read_images(traj, format=None, index=None):
 
 def read_db(filename, names = '*'):
     db = DBHDF5(filename, 'r')
-    if names is None : names = '*'
     if isinstance(names, str):
         method = names
-        names = dict.fromkeys(['qmmol', 'atoms', 'properties'])
-        names['qmmol'] = db.get_names(method + '/qmmol*')[0]
-        names['atoms'] = db.get_names(method + '/train_atoms*')[0]
-        names['properties'] = db.get_names(method + '/train_prop*')[0]
+        names = {}
+        l = db.get_names(method + '/qmmol*')
+        if len(l)>0 : names['qmmol'] = l[0]
+        l = db.get_names(method + '/train_atoms*')
+        if len(l)>0 : names['atoms'] = l[0]
+        l = db.get_names(method + '/train_prop*')
+        if len(l)>0 : names['properties'] = l[0]
+        l = db.get_names(method + '/model*')
+        if len(l)>0 : names['model'] = l[0]
         print(f'Guess DB names : {names}', flush = True)
     data = {}
-    for key in names :
+    for key, v in names.items() :
         if key == 'qmmol' :
-            data[key] = db.read_qmmol(names[key])
+            data[key] = db.read_qmmol(name = v)
         elif key == 'atoms' :
-            data[key] = db.read_images(names[key])
+            data[key] = db.read_images(name = v)
         elif key == 'properties' :
-            data[key] = db.read_properties(names[key])
+            data[key] = db.read_properties(name = v)
+        elif key == 'model' :
+            data[key] = db.read_model(name = v)
         elif not key.startswith('_') :
             raise ValueError(f'The key {key} can not read from the db')
     data['_names'] = names.copy()
     db.close()
     return data
 
-def write_db(output, qmmol, images, properties, prefix = 'train', names = None, **kwargs):
-    if names is None or len(names) < 2 : names = [None, ]*3
-    db = DBHDF5(output, 'w', qmmol=qmmol, **kwargs)
-    db.write_qmmol(qmmol, name = names[0], **kwargs)
-    db.write_images(images, prefix=prefix, name = names[1], **kwargs)
-    db.write_properties(properties, prefix=prefix, name = names[1], **kwargs)
-    print(db.names, flush = True)
+def write_db(output, qmmol=None, images=None, properties=None, model=None, prefix = 'train', names = None, mode='w', **kwargs):
+    default_names = dict.fromkeys(['qmmol', 'atoms', 'properties', 'model'])
+    if names is None:
+        names = default_names
+    else:
+        default_names.update(names)
+    db = DBHDF5(output, mode, qmmol=qmmol, **kwargs)
+    if qmmol is None and model is not None: qmmol = model.refqmmol
+    if qmmol :
+        db.write_qmmol(qmmol, name = names['qmmol'], **kwargs)
+    if images:
+        db.write_images(images, prefix=prefix, name = names['atoms'], **kwargs)
+    if properties:
+        db.write_properties(properties, prefix=prefix, name = names['properties'], **kwargs)
+    if model:
+        db.write_model(model, prefix=prefix, name = names['model'], **kwargs)
+    print('Names in database: ', db.names, flush = True)
     db.close()
 
 def merge_db(filenames, names = '*', output = None):
@@ -87,3 +103,10 @@ def merge_db(filenames, names = '*', output = None):
     if output is not None :
         write_db(output, qmmol, images, properties, names = names)
     return data
+
+def read_model(filename, name='*/model*'):
+    data = read_db(filename, names={'model':name})
+    return data['model']
+
+def write_model(output, model=None, mode='w', **kwargs):
+    write_db(output, model=model, mode=mode, **kwargs)

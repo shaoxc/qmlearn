@@ -202,6 +202,16 @@ def append_properties(atoms, data = None, properties = None, refqmmol = None, qm
             data[key].append(qmmol.calc_ke(qmmol.engine.gamma))
         elif key == 'ovlp' :
             data[key].append(qmmol.engine.ovlp)
+        elif key == 'gamma2':
+            data[key].append(qmmol.engine.gamma2)
+        elif key == 'gamma2c':
+            data[key].append(qmmol.engine.gamma2c)
+        elif key == 'delta_gamma':
+            data[key].append(qmmol.engine.delta_gamma)
+        elif key == 'occ_dg':
+            data[key].append(qmmol.engine.occ_df)
+        elif key == 'occ':
+            data[key].append(qmmol.engine.occ)
         else :
             raise ValueError(f'Sorry, not support the property {key} now')
     return data

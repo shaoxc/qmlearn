@@ -209,7 +209,7 @@ def append_properties(atoms, data = None, properties = None, refqmmol = None, qm
         elif key == 'delta_gamma':
             data[key].append(qmmol.engine.delta_gamma)
         elif key == 'occ_dg':
-            data[key].append(qmmol.engine.occ_df)
+            data[key].append(qmmol.engine.occ_dg)
         elif key == 'occ':
             data[key].append(qmmol.engine.occ)
         else :

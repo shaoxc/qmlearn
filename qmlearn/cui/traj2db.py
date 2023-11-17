@@ -7,6 +7,7 @@ from qmlearn.drivers.mol import QMMol
 from qmlearn.io import read_images, write_db, merge_db
 from qmlearn.preprocessing import append_properties
 from qmlearn.utils import tenumerate
+from qmlearn.io.hdf5 import DBHDF5
 
 def get_args():
     parser = argparse.ArgumentParser(
@@ -72,7 +73,15 @@ def run(args):
             'charge' : charge,
             }
 
-    train_atoms=read_images(trajs[0], index=index)
+    format = os.path.splitext(trajs[0])[-1][1:]
+    if format == 'traj' :
+       train_atoms=read_mages(trajs[0], index=index)
+    elif format == 'hdf5' :
+       db = DBHDF5(trajs[0])
+       refqmmol_ao = db.read_qmmol(name=db.get_names('*/qmmol')[0])
+       atoms_positions = db.read_images(name=db.get_names('*/train_atoms_*')[0])
+       train_atoms=atoms_positions[istart:iend]
+
     data= {k: [] for k in properties}
     for i, atoms in tenumerate(train_atoms):
         qmmol = QMMol(atoms = atoms, **qmmol_options)

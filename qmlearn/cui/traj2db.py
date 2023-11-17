@@ -38,6 +38,10 @@ def get_args():
             '"ke",  "ovlp"')
     parser.add_argument('--merge', dest='merge', action='store_true',
             help='If the input files are database, can merge them to one output file.')
+    parser.add_argument('--ncas', dest='ncas', type=int, action='store',
+                        default=2, help='N Active Space')
+    parser.add_argument('--nelecas', dest='nelecas', type=int, action='store',
+                        default=2, help='N Electrons')
     args = parser.parse_args()
     return args
 
@@ -54,6 +58,8 @@ def run(args):
     istart = args.istart
     iend = args.iend
     merge = args.merge
+    ncas = args.ncas
+    nelecas = args.nelecas
     #-----------------------------------------------------------------------
     trajs = list(OrderedDict.fromkeys(trajs))
     print(f'Input files are : {trajs}')
@@ -71,6 +77,8 @@ def run(args):
             'xc' : xc,
             'method' : method,
             'charge' : charge,
+            'ncas' : ncas,
+            'nelecas' : nelecas,
             }
 
     format = os.path.splitext(trajs[0])[-1][1:]

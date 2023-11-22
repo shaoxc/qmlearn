@@ -97,7 +97,7 @@ def fft_gamma2(q,mol,gamma2,r12,ao_value,width,auxmol):
     iqr=np.exp(1j*np.einsum('i,jki->jk',q,r12*b_2_a,optimize=True))
     return np.einsum('rs,AB,rA,sB->',iqr,g2_df,ao_value,ao_value,optimize=True)*width**3*width**3
 
-def total_scater_factor(atoms,gamma2,limit=50,level=4,space=0.5,basis='6-31g*'):
+def total_scater_factor(atoms,gamma2,limit=50,level=4,space=0.5,basis='6-31g*',auxbasis='cc-pvdz-jkfit'):
     b_2_a=0.529177
     mol = gto.Mole()
     mol.atom = ase_2_pyscf(atoms)
@@ -111,7 +111,6 @@ def total_scater_factor(atoms,gamma2,limit=50,level=4,space=0.5,basis='6-31g*'):
               for iz in np.arange(-size, size, width):
                   coords.append((ix,iy,iz))
     coords = np.array(coords)
-    auxbasis = 'aug-ccpv5z-jk-fit'
     auxmol = df.addons.make_auxmol(mol, auxbasis)
     ao_value = numint.eval_ao(auxmol, coords)
     shape=ao_value.shape[0]

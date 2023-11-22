@@ -364,6 +364,9 @@ class Engine(object):
 
     def update_gamma2(self, gamma2, gamma=None, trace=None, ao_repr=True, nelectron=None, identity=None):
         nelectron = nelectron or self.nelectron
+        if trace is None:
+            trace = nelectron * (nelectron-1)
+        nelectron = nelectron or self.nelectron
         if gamma is not None: gamma = gamma * (nelectron-1)
         if ao_repr :
             if gamma is not None :

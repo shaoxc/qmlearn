@@ -407,6 +407,7 @@ class Engine(object):
 
         """
         if gamma_hf is None:
+           self.mf.run()
            gamma_hf = self.mf.make_rdm1()
         ove = self.ovlp
         
@@ -418,6 +419,7 @@ class Engine(object):
 
     def purify_gamma2c(self,gamma=None,gamma2c=None,gamma_hf=None):
         if gamma_hf is None:
+           self.mf.run()
            gamma_hf = self.mf.make_rdm1()
 
         a = np.einsum('pq,rs->pqrs',gamma_hf,gamma_hf)

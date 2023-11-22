@@ -27,13 +27,14 @@ class QMLCalculator(Calculator):
         | 'gamma' : 1-RDM
 
     """
-    implemented_properties = ['energy', 'forces', 'dipole', 'stress', 'gamma']
+    implemented_properties = ['energy', 'forces', 'dipole', 'stress', 'gamma', 'gamma2']
 
-    def __init__(self, qmmodel = None, second_learn = {}, method = 'gamma',
+    def __init__(self, qmmodel = None, qmmodel2=None, second_learn = {}, method = 'gamma',
             label='QMLearn', atoms=None, directory='.', refqmmol = None, properties = ('energy', ),
             **kwargs):
         Calculator.__init__(self, label = label, atoms = atoms, directory = directory, **kwargs)
         self.qmmodel = qmmodel
+        self.qmmodel2 = qmmodel2
         self.second_learn = second_learn
         self.method = method
         self._refqmmol = refqmmol
@@ -88,10 +89,16 @@ class QMLCalculator(Calculator):
         if self.method == 'engine' :
             qmmol = self.refqmmol.duplicate(atoms, refatoms=atoms)
             self.calc_with_engine(qmmol, properties=properties)
+        elif self.method == 'engine2' :
+            qmmol = self.refqmmol.duplicate(atoms, refatoms=atoms)
+            self.calc_with_engine2(qmmol,properties=properties)
         else :
             if self.method == 'gamma' :
                 qmmol = self.refqmmol.duplicate(atoms.copy())
                 self.calc_with_gamma(qmmol, properties=properties)
+            elif self.method == 'gamma2':
+                qmmol = self.refqmmol.duplicate(atoms.copy())
+                self.calc_with_gamma2(qmmol, properties=properties)
             else :
                 raise AttributeError(f"Sorry, not support '{self.method}' now.")
 
@@ -158,6 +165,56 @@ class QMLCalculator(Calculator):
             gamma = self.qmmodel.convert_back(gamma2, prop='gamma')
             self.results['gamma'] = gamma
 
+    def calc_with_gamma2(self,qmmol, properties = ('energy')):
+        r""" Function to calculate the desire properties using QMLearn learning process with gamma2.
+                                                                                 
+        Parameters                                                                       
+        ----------                                                                       
+        properties : list:str                                                            
+            Options                                                                      
+                                                                                 
+            | Energy : 'energy'                                                          
+            | Forces : 'forces'                                                          
+            | 1-RDM : 'gamma'                                                            
+            | 2-RDM : 'gamma2'
+            | \delta_1RDM : 'delta_gamma'
+            | Correlated 2-RDM: 'gamma2c'
+
+        """                  
+        shape = self.qmmodel.refqmmol.vext.shape
+        shape2 = (shape[0],) * 4
+        gamma_d_ = self.qmmodel.predict(qmmol,               
+                       model=self.qmmodel.mmodels['delta_gamma']).reshape(shape) 
+        gamma_fp, gamma_d = qmmol.engine.purify_d_gamma(gamma_d=gamma_d_)
+                                                                                         
+        gamma2c_ = self.qmmodel2.predict(qmmol,
+                                 model=self.qmmodel2.mmodels['gamma2c']).reshape(shape2)
+        gamma2 , gamma2c = qmmol.engine.purify_gamma2c(gamma=gamma_fp,gamma2c=gamma2c_) 
+
+        if 'gamma2' in properties:
+            self.results['gamma'] = gamma_fp
+        if 'gamma2c' in properties:
+            self.results['gamma2c'] = gamma2c
+        if 'delta_gamma' in properties:
+            self.results['delta_gamma'] = gamma_d
+        if 'gamma' in properties:
+            self.results['gamma2'] = gamma2
+
+        if 'forces' in properties:
+            if qmmol.method == 'fci':
+                forces = qmmol.engine.get_forces_fci(gamma=gamma_fp,gamma2=gamma2)
+            elif qmmol.method == 'casci':
+                ncas = self.qmmodel.refqmmol.engine_options['ncas']
+                nelecas = self.qmmodel.refqmmol.engine_options['nelecas']
+                forces = qmmol.engine.get_forces_fci(gamma=gamma_fp,gamma2=gamma2,
+                                                    ncas=ncas,nelecas=nelecas,fci=False)
+            self.results['forces'] = forces* Ha/Bohr
+
+        if 'energy' in properties:  
+            energy = qmmol.engine.calc_etotal2(gamma2=gamma2c, delta_g=gamma_d,
+                                       ao_repr=True,hf_core=True,g_c=True)
+            self.results['energy'] = energy * Ha
+
     def calc_with_engine(self, qmmol, properties = ('energy')):
         r""" Function to calculate the desire properties using PySCF engine.
 
@@ -186,3 +243,39 @@ class QMLCalculator(Calculator):
             self.results['dipole'] = dipole * Bohr
         if 'gamma' in properties :
             self.results['gamma'] = qmmol.engine.gamma
+
+    def calc_with_engine2(self, qmmol, properties = ('energy')):
+        r""" Function to calculate the desire properties using PySCF engine from 1RDM and 2RDM.
+                                                                   
+        Parameters
+        ----------
+        properties : list:str   
+            Options         
+
+            | Energy : 'energy'                          
+            | Forces : 'forces'                                                           
+            | 1-RDM : 'gamma'                                                             
+            | 2-RDM : 'gamma2'                                                            
+            | \delta_1RDM : 'delta_gamma'                                                 
+            | Correlated 2-RDM: 'gamma2c'                                                 
+        """                                     
+        qmmol.engine.run(properties = properties)
+
+        if 'delta_gamma' in properties or 'gamma2' in properties or 'gamma2c' in properties or 'gamma' in properties: 
+            gamma, gamma2, gamma2c, delta_gamma = qmmol.engine.all_gammas
+            if 'delta_gamma' in properties :
+                self.results['delta_gamma'] = delta_gamma
+            if 'gamma2' in properties :
+                self.results['gamma2'] = gamma2
+            if 'gamma2c' in properties :
+                self.results['gamma2c'] = gamma2c
+            if 'gamma' in properties:
+                self.results['gamma'] = gamma
+
+        if 'energy' in properties:
+            energy = qmmol.engine.etotal
+            self.results['energy'] = energy * Ha
+
+        if 'forces' in properties:
+            forces = qmmol.engine.run_forces()
+            self.results['forces'] = forces * Ha/Bohr

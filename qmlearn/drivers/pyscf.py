@@ -429,7 +429,7 @@ class EnginePyscf(Engine):
     def all_gammas(self):
         if self._gamma2 is None:
             self.run(properties = ('energy','gamma2','gamma2c'), eig=False)
-        return self._gamma,self._gamma2,self._gamma2c,self._delta_gamma,self._occ_dg,self._occ
+        return self._gamma,self._gamma2,self._gamma2c,self._delta_gamma
 
     @property
     def occ_dg(self):

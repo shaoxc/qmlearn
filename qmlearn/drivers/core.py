@@ -398,6 +398,39 @@ class Engine(object):
             print('2RDM trace is ZERO')
         return eigv[::-1], coeff[:,::-1]
 
+    def purify_d_gamma(self, gamma_d=None, gamma_hf=None):
+
+        r""" Function to Purify \delta gamma1 = gamma^1_{FCI} - gamma^1_{HF}
+
+        Returns:
+        \delta gamma1 and gamma^1_{FCI}
+
+        """
+        if gamma_hf is None:
+           gamma_hf = self.mf.make_rdm1()
+        ove = self.ovlp
+        
+        gamma_full = gamma_hf + gamma_d
+        gamma_f_p = self.purify_gamma(gamma_full,method='smearing')
+        gamma_d = gamma_f_p - gamma_hf
+
+        return gamma_f_p, gamma_d
+
+    def purify_gamma2c(self,gamma=None,gamma2c=None,gamma_hf=None):
+        if gamma_hf is None:
+           gamma_hf = self.mf.make_rdm1()
+
+        a = np.einsum('pq,rs->pqrs',gamma_hf,gamma_hf)
+        b = np.einsum('pq,rs->psrq',gamma_hf,gamma_hf)
+        gamma2_r = gamma2c + .5*(2*a-b)
+        
+        trace = self.nelectron * (self.nelectron-1)
+        gamma2_f_p = self.update_gamma2(gamma2_r, gamma=gamma, trace = trace)
+        
+        gamma2c_p = gamma2_f_p - .5*(2*a-b)
+
+        return gamma2_f_p, gamma2c_p
+
 def atoms_rmsd(target, atoms, transform = True, **kwargs) :
     r""" Function to return RMSD : Root mean square deviation between atoms and target:transform atom object. And the target atom coordinates.
 

@@ -101,7 +101,8 @@ def merge_db(filenames, names = '*', output = None):
             'properties' : properties,
             }
     if output is not None :
-        write_db(output, qmmol, images, properties, names = names)
+        #write_db(output, qmmol, images, properties, names = names)
+        write_db(output, qmmol, images, properties)
     return data
 
 def read_model(filename, name='*/model*'):

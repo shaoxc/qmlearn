@@ -191,22 +191,29 @@ class QMLCalculator(Calculator):
                                  model=self.qmmodel2.mmodels['gamma2c']).reshape(shape2)
         gamma2 , gamma2c = qmmol.engine.purify_gamma2c(gamma=gamma_fp,gamma2c=gamma2c_) 
 
-        if 'gamma2' in properties:
+        if 'gamma' in properties:
             self.results['gamma'] = gamma_fp
         if 'gamma2c' in properties:
             self.results['gamma2c'] = gamma2c
         if 'delta_gamma' in properties:
             self.results['delta_gamma'] = gamma_d
-        if 'gamma' in properties:
+        if 'gamma2' in properties:
             self.results['gamma2'] = gamma2
 
         if 'forces' in properties:
-            if qmmol.method == 'fci':
-                forces = qmmol.engine.get_forces_fci(gamma=gamma_fp,gamma2=gamma2)
-            elif qmmol.method == 'casci':
-                ncas = self.qmmodel.refqmmol.engine_options['ncas']
-                nelecas = self.qmmodel.refqmmol.engine_options['nelecas']
-                forces = qmmol.engine.get_forces_fci(gamma=gamma_fp,gamma2=gamma2,
+            m2 = self.second_learn.get('forces', None)
+            print(m2)
+            if m2 :
+                forces = self.qmmodel.predict(gamma_d,method=m2,
+                                              model=self.qmmodel.mmodels['d_forces'])
+                forces = self.qmmodel.convert_back(forces, prop='forces')
+            else:
+                if qmmol.method == 'fci':
+                    forces = qmmol.engine.get_forces_fci(gamma=gamma_fp,gamma2=gamma2)
+                elif qmmol.method == 'casci':
+                    ncas = self.qmmodel.refqmmol.engine_options['ncas']
+                    nelecas = self.qmmodel.refqmmol.engine_options['nelecas']
+                    forces = qmmol.engine.get_forces_fci(gamma=gamma_fp,gamma2=gamma2,
                                                     ncas=ncas,nelecas=nelecas,fci=False)
             self.results['forces'] = forces* Ha/Bohr
 

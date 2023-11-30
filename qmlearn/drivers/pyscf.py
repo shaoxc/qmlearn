@@ -919,10 +919,6 @@ class EnginePyscf(Engine):
         aoslices = mol.aoslice_by_atom()
         de = np.zeros((len(atmlst),3))
      
-        max_memory = mc_grad.max_memory - lib.current_memory()[0]
-        blksize = int(max_memory*.9e6/8 / ((aoslices[:,3]-aoslices[:,2]).max()*nao_pair))
-        blksize = min(nao, max(2, blksize))
-     
         for k, ia in enumerate(atmlst):
             shl0, shl1, p0, p1 = aoslices[ia]
             h1ao = hcore_deriv(ia)
@@ -930,7 +926,7 @@ class EnginePyscf(Engine):
             de[k] += np.einsum('xij,ij->x', h1ao, zvec_ao)
      
             q1 = 0
-            for b0, b1, nf in _shell_prange(mol, 0, mol.nbas, blksize):
+            for b0, b1, nf in _shell_prange(mol, 0, mol.nbas, nao):
                 q0, q1 = q1, q1 + nf
                 dm2_ao = lib.einsum('ijw,pi,qj->pqw', dm2buf, mo_cas[p0:p1], mo_cas[q0:q1])
                 shls_slice = (shl0,shl1,b0,b1,0,mol.nbas,0,mol.nbas)
@@ -941,25 +937,33 @@ class EnginePyscf(Engine):
                 for i in range(3):
                     eri1tmp = lib.unpack_tril(eri1[i].reshape((p1-p0)*nf,-1))
                     eri1tmp = eri1tmp.reshape(p1-p0,nf,nao,nao)
-                    de[k,i] -= np.einsum('ijkl,ij,kl', eri1tmp, hf_dm1[p0:p1,q0:q1], zvec_ao) * 2
-                    de[k,i] -= np.einsum('ijkl,kl,ij', eri1tmp, hf_dm1, zvec_ao[p0:p1,q0:q1]) * 2
-                    de[k,i] += np.einsum('ijkl,il,kj', eri1tmp, hf_dm1[p0:p1], zvec_ao[q0:q1])
-                    de[k,i] += np.einsum('ijkl,jk,il', eri1tmp, hf_dm1[q0:q1], zvec_ao[p0:p1])
+                    de[k,i] -= np.einsum('ijkl,ij,kl', eri1tmp, hf_dm1[p0:p1,q0:q1],
+                                         zvec_ao,optimize=True) * 2
+                    de[k,i] -= np.einsum('ijkl,kl,ij', eri1tmp, hf_dm1,
+                                         zvec_ao[p0:p1,q0:q1],optimize=True) * 2
+                    de[k,i] += np.einsum('ijkl,il,kj', eri1tmp, hf_dm1[p0:p1],
+                                         zvec_ao[q0:q1],optimize=True)
+                    de[k,i] += np.einsum('ijkl,jk,il', eri1tmp, hf_dm1[q0:q1],
+                                         zvec_ao[p0:p1],optimize=True)
                     
-                    de[k,i] -= np.einsum('ijkl,lk,ij', eri1tmp, dm_core[q0:q1], casci_dm1[p0:p1]) * 2
-                    de[k,i] += np.einsum('ijkl,jk,il', eri1tmp, dm_core[q0:q1], casci_dm1[p0:p1])
-                    de[k,i] -= np.einsum('ijkl,lk,ij', eri1tmp, dm_cas[q0:q1], dm_core[p0:p1]) * 2
-                    de[k,i] += np.einsum('ijkl,jk,il', eri1tmp, dm_cas[q0:q1], dm_core[p0:p1])
+                    de[k,i] -= np.einsum('ijkl,lk,ij', eri1tmp, dm_core[q0:q1],
+                                         casci_dm1[p0:p1],optimize=True) * 2
+                    de[k,i] += np.einsum('ijkl,jk,il', eri1tmp, dm_core[q0:q1],
+                                         casci_dm1[p0:p1],optimize=True)
+                    de[k,i] -= np.einsum('ijkl,lk,ij', eri1tmp, dm_cas[q0:q1],
+                                         dm_core[p0:p1],optimize=True) * 2
+                    de[k,i] += np.einsum('ijkl,jk,il', eri1tmp, dm_cas[q0:q1],
+                                         dm_core[p0:p1],optimize=True)
                 eri1 = eri1tmp = None
      
-            de[k] -= np.einsum('xij,ij->x', s1[:,p0:p1], im1[p0:p1])
-            de[k] -= np.einsum('xij,ji->x', s1[:,p0:p1], im1[:,p0:p1])
+            de[k] -= np.einsum('xij,ij->x', s1[:,p0:p1], im1[p0:p1],optimize=True)
+            de[k] -= np.einsum('xij,ji->x', s1[:,p0:p1], im1[:,p0:p1],optimize=True)
      
-            de[k] -= np.einsum('xij,ij->x', s1[:,p0:p1], zeta[p0:p1]) * 2
-            de[k] -= np.einsum('xij,ji->x', s1[:,p0:p1], zeta[:,p0:p1]) * 2
+            de[k] -= np.einsum('xij,ij->x', s1[:,p0:p1], zeta[p0:p1],optimize=True) * 2
+            de[k] -= np.einsum('xij,ji->x', s1[:,p0:p1], zeta[:,p0:p1],optimize=True) * 2
      
-            de[k] -= np.einsum('xij,ij->x', s1[:,p0:p1], vhf_s1occ[p0:p1]) * 2
-            de[k] -= np.einsum('xij,ji->x', s1[:,p0:p1], vhf_s1occ[:,p0:p1]) * 2
+            de[k] -= np.einsum('xij,ij->x', s1[:,p0:p1], vhf_s1occ[p0:p1],optimize=True) * 2
+            de[k] -= np.einsum('xij,ji->x', s1[:,p0:p1], vhf_s1occ[:,p0:p1],optimize=True) * 2
      
         return de
      

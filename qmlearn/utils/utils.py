@@ -121,7 +121,7 @@ def total_scater_factor(atoms,gamma2,limit=50,level=4,space=0.5,basis='6-31g*',a
     h_ = []
     for iz in range(limit):
           h=0.3*iz*b_2_a
-          print(h)
+          #print(h)
           q=np.array([0.0,0.0,h])
           a=fft_gamma2(q,mol,gamma2,r12,ao_value,width,auxmol)
           q=np.array([0.0,h,0.0])
@@ -154,7 +154,7 @@ def elastic_scater_factor(atoms,gamma,limit=50,level=4,basis='6-31g*'):
     h_ = []
     for iz in range(limit):
           h=0.3*iz*b_2_a
-          print(h)
+          #print(h)
           q=np.array([0.0,0.0,h])
           a=fft_gamma(q,gamma,r,w,ao_value)
           q=np.array([0.0,h,0.0])

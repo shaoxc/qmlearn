@@ -215,7 +215,9 @@ class QMLCalculator(Calculator):
                     nelecas = self.qmmodel.refqmmol.engine_options['nelecas']
                     forces = qmmol.engine.get_forces_fci(gamma=gamma_fp,gamma2=gamma2,
                                                     ncas=ncas,nelecas=nelecas,fci=False)
+                forces = self.qmmodel.convert_back(forces, prop='forces')
             self.results['forces'] = forces* Ha/Bohr
+            print('Forces: ',forces* Ha/Bohr)
 
         if 'energy' in properties:  
             energy = qmmol.engine.calc_etotal2(gamma2=gamma2c, delta_g=gamma_d,

@@ -91,45 +91,52 @@ def density_fitting_g2(mol,gamma2,auxmol):
     gamma2_df = np.einsum('mnst,mnQ,QA,stP,PB->AB', gamma2, ints_3c1e,invsaux,ints_3c1e,invsaux,optimize=True)
     return gamma2_df
 
-def fft_gamma2(q,mol,gamma2,r12,ao_value,width,auxmol):
+def fft_gamma2(q,mol,gamma2,r12,ao_value,auxmol,w,g2_df):
     b_2_a=0.529177
-    g2_df = density_fitting_g2(mol,gamma2,auxmol)
     iqr=np.exp(1j*np.einsum('i,jki->jk',q,r12*b_2_a,optimize=True))
-    return np.einsum('rs,AB,rA,sB->',iqr,g2_df,ao_value,ao_value,optimize=True)*width**3*width**3
+    return np.einsum('rs,AB,rA,sB->',iqr*w,g2_df,ao_value,ao_value,optimize=True)
 
-def total_scater_factor(atoms,gamma2,limit=50,level=4,space=0.5,basis='6-31g*',auxbasis='cc-pvdz-jkfit'):
+def total_scater_factor(atoms,gamma2,limit=50,level=3,
+                        basis='6-31g*',
+                        auxbasis='cc-pvdz-jkfit',radial=10,angular=50):
     b_2_a=0.529177
     mol = gto.Mole()
     mol.atom = ase_2_pyscf(atoms)
     mol.basis = basis
     mol.build()
-    size=level
-    width = space
-    coords = []
-    for ix in np.arange(-size, size, width):
-          for iy in np.arange(-size, size, width):
-              for iz in np.arange(-size, size, width):
-                  coords.append((ix,iy,iz))
-    coords = np.array(coords)
+
+    grids = dft.gen_grid.Grids(mol)
+    grids.level = level
+    grids.atom_grid  = {'H': (radial,angular),'O': (radial,angular),
+                        'C': (radial,angular),'N': (radial,angular),}
+
+    grids.build()
+    r = grids.coords
+    w = grids.weights
+    
     auxmol = df.addons.make_auxmol(mol, auxbasis)
-    ao_value = numint.eval_ao(auxmol, coords)
+    ao_value = numint.eval_ao(auxmol, r)
+    
     shape=ao_value.shape[0]
     r12=np.zeros((shape,shape,3))
+    w12=np.zeros((shape,shape))
     for p in np.arange(shape):
-          r12[:,p]=coords-coords[p]
+        r12[:,p]=r-r[p]
+        w12[:,p]=w*w[p]
+
+    g2_df = density_fitting_g2(mol,gamma2,auxmol)
     fft = []
     h_ = []
     for iz in range(limit):
-          h=0.3*iz*b_2_a
-          #print(h)
-          q=np.array([0.0,0.0,h])
-          a=fft_gamma2(q,mol,gamma2,r12,ao_value,width,auxmol)
-          q=np.array([0.0,h,0.0])
-          b=fft_gamma2(q,mol,gamma2,r12,ao_value,width,auxmol)
-          q=np.array([h,0.0,0.0])
-          c=fft_gamma2(q,mol,gamma2,r12,ao_value,width,auxmol)
-          fft.append((a+b+c)/3+mol.nelectron)
-          h_.append(h)
+        h=0.3*iz*b_2_a
+        q=np.array([0.0,0.0,h])
+        a=fft_gamma2(q,mol,gamma2,r12,ao_value,auxmol,w12,g2_df)
+        q=np.array([0.0,h,0.0])
+        b=fft_gamma2(q,mol,gamma2,r12,ao_value,auxmol,w12,g2_df)
+        q=np.array([h,0.0,0.0])
+        c=fft_gamma2(q,mol,gamma2,r12,ao_value,auxmol,w12,g2_df)
+        fft.append((a+b+c)/3+mol.nelectron)
+        h_.append(h)
     return np.array(h_),np.real(np.array(fft))
 
 def fft_gamma(q,gamma,r,w,ao_value):

@@ -73,6 +73,13 @@ def db2qmmodel(filename, names = '*', mmodels = None, qmmol_options = None, puri
         shape = y[0].shape
         if 'gamma_pp' in properties and predicted_gamma:
             gammas = properties['gamma_pp'][index]
+        elif model.mmodels['delta_gamma']:
+            gammas = []
+            for i, a in tenumerate(train_atoms):
+                gamma_d_ = model.predict(a, refatoms=a, model=model.mmodels['delta_gamma']).reshape(shape)
+                gamma, gamma_d = model.qmmol.engine.purify_d_gamma(gamma_d=gamma_d_)
+                gammas.append(gamma)
+            properties['gamma_pp'] = gammas
         else :
             gammas = []
             for i, a in tenumerate(train_atoms):

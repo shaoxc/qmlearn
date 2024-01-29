@@ -117,11 +117,17 @@ class QMLCalculator(Calculator):
             | 1-RDM : 'gamma'
         """
         shape = self.qmmodel.refqmmol.vext.shape
-        gamma = self.qmmodel.predict(qmmol).reshape(shape)
+        if self.qmmodel.method == 'delta_gamma':
+            gamma_d_ = self.qmmodel.predict(qmmol,model=self.qmmodel.mmodels['delta_gamma']).reshape(shape)
+            gamma, gamma_d = qmmol.engine.purify_d_gamma(gamma_d=gamma_d_)
+        else:
+            gamma = self.qmmodel.predict(qmmol).reshape(shape)
+
         if self.qmmodel.purify_gamma :
             gamma = qmmol.purify_gamma(gamma)
+
         m2 = self.second_learn.get('gamma', None)
-        if m2 :
+        if m2 and not self.qmmodel.method == 'delta_gamma':
             gamma2 = self.qmmodel.predict(gamma, method = m2).reshape(shape)
             if self.qmmodel.purify_gamma :
                 gamma2 = qmmol.purify_gamma(gamma2)
@@ -162,7 +168,10 @@ class QMLCalculator(Calculator):
             self.results['stress'] = np.zeros(6)
 
         if 'gamma' in properties :
-            gamma = self.qmmodel.convert_back(gamma2, prop='gamma')
+            if self.qmmodel.method == 'delta_gamma':
+                gamma = gamma2 
+            else:
+                gamma = self.qmmodel.convert_back(gamma2, prop='gamma')
             self.results['gamma'] = gamma
 
     def calc_with_gamma2(self,qmmol, properties = ('energy')):
@@ -186,6 +195,8 @@ class QMLCalculator(Calculator):
         gamma_d_ = self.qmmodel.predict(qmmol,               
                        model=self.qmmodel.mmodels['delta_gamma']).reshape(shape) 
         gamma_fp, gamma_d = qmmol.engine.purify_d_gamma(gamma_d=gamma_d_)
+#        gamma_fp = self.qmmodel.convert_back(gamma_fp_, prop='gamma')
+#        gamma_d = self.qmmodel.convert_back(gamma_d__, prop='gamma')
                                                                                          
         gamma2c_ = self.qmmodel2.predict(qmmol,
                                  model=self.qmmodel2.mmodels['gamma2c']).reshape(shape2)
@@ -220,8 +231,8 @@ class QMLCalculator(Calculator):
             print('Forces: ',forces* Ha/Bohr)
 
         if 'energy' in properties:  
-            energy = qmmol.engine.calc_etotal2(gamma2=gamma2c, delta_g=gamma_d,
-                                       ao_repr=True,hf_core=True,g_c=True)
+            energy = qmmol.engine.calc_etotal2(gamma=gamma_fp, gamma2=gamma2,
+                                       ao_repr=True)
             self.results['energy'] = energy * Ha
 
     def calc_with_engine(self, qmmol, properties = ('energy')):

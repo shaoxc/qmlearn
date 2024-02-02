@@ -2,7 +2,7 @@ import numpy as np
 from ase import Atoms, io
 
 from qmlearn.drivers.core import minimize_rmsd_operation
-from qmlearn.utils import array2blocks, blocks2array
+from qmlearn.utils import array2blocks, blocks2array, array2blocks_g2, blocks2array_g2
 
 qm_engines = {
         'pyscf' : None
@@ -234,11 +234,11 @@ class QMMol(object):
         r"""Function to run the External Calculator."""
         self.engine.run(**kwargs)
 
-    @property
-    def rotmat(self):
+    def rotmat(self, factor=None, **kwargs):
         r""" Rotated density matrix """
         if self._rotmat is None :
-            self._rotmat = self.rotation2rotmat(self.op_rotate)
+            factor = factor if factor is not None else 1.0
+            self._rotmat = self.rotation2rotmat(self.op_rotate,factor=factor, **kwargs)
         return self._rotmat
 
     @property
@@ -249,7 +249,7 @@ class QMMol(object):
             self._atom_naos = self.get_atom_naos()
         return self._atom_naos
 
-    def convert_back(self, y, prop = 'gamma', rotate = True, reorder = True, **kwargs):
+    def convert_back(self, y, prop = 'gamma', rotate = True, reorder = True, factor=1.0, **kwargs):
         r""" Function to rotate gamma or forces base on initial coordinates.
 
         Parameters
@@ -277,6 +277,7 @@ same sequence as the data.
 
         """
         nao = self.nao
+        rotmat = self.rotmat(factor=factor)
         #
         if np.allclose(self.op_rotate, self.op_rotate_inv) : rotate = False
         if np.all(self.op_indices[:-1] < self.op_indices[1:]) : reorder = False
@@ -284,11 +285,19 @@ same sequence as the data.
         # print('rotate', rotate, reorder)
         if 'gamma' in prop :
             if y.ndim == 1 : y = y.reshape((nao, nao))
-            if rotate : y = self.rotmat.T@y@self.rotmat
+            if rotate : y = rotmat.T@y@rotmat
             if reorder :
                 naos = self.atom_naos
                 blocks = array2blocks(y, sections = naos)
                 y = blocks2array(blocks, indices = self.op_indices_inv)
+        elif 'gamma2' in prop :
+            if y.ndim == 1 : y = y.reshape((nao, nao, nao ,nao))
+            if rotate : y = np.einsum('mi,nj,mnst,sk,tl -> ijkl',rotmat, rotmat,
+                                       y, rotmat, rotmat, optimize=True)
+            if reorder : 
+                naos = self.atom_naos
+                blocks = array2blocks_g2(y, sections = naos)
+                y = blocks2array_g2(blocks, indices = self.op_indices_inv)
         elif 'forces' in prop :
             if y.ndim == 1 : y = y.reshape((-1, 3))
             if rotate : y = np.dot(y, self.op_rotate_inv)

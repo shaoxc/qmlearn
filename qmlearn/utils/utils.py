@@ -56,6 +56,43 @@ def blocks2array(blocks, indices):
     arr = np.block(new_blocks)
     return arr
 
+def array2blocks_g2(arr, sections):
+    blocks={}
+    iw=0
+    ns=len(sections) #Number of Atoms!!! 
+    for i in range(ns): 
+        ix=0
+        for j in range(ns):
+            iy=0
+            for k in range(ns):
+                iz=0
+                for l in range(ns):
+                    indices = np.s_[iw:iw+sections[i],ix:ix+sections[j],iy:iy+sections[k],iz:iz+sections[l]]
+                    blocks[(i,j,k,l)] = arr[indices]
+                    # print(i,j,k,l,indices)
+                    iz=iz+sections[l]
+                iy=iy+sections[k]
+            ix=ix+sections[j]
+        iw=iw+sections[i]
+    return blocks
+    
+def blocks2array_g2(blocks, indices):
+    new_blocks=[]
+    for i in indices:
+        ka = []
+        for j in indices:
+            ma = []
+            for k in indices:
+                la = []
+                for l in indices:
+                    print(np.shape(blocks[(i,j,k,l)]))
+                    la.append(blocks[(i,j,k,l)])
+                ma.append(la)
+            ka.append(ma)            
+        new_blocks.append(ka)
+    arr = np.block(new_blocks)
+    return arr
+
 def wedge(a, b=None):
     if b is None: b = a
     ab1 = np.einsum('pq,rs->pqrs',a,b) + np.einsum('pq,rs->rspq',a,b)

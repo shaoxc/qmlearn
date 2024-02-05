@@ -735,7 +735,7 @@ class EnginePyscf(Engine):
         mo = self.mf.mo_coeff[:,:nocc] @ vr.T
         return mo
 
-    def rotation2rotmat(self, rotation, mol = None, factor=-1.0):
+    def rotation2rotmat(self, rotation, mol = None, factor=1.0, angle = 'ZYZ'):
         r""" Function to rotate the density matrix.
 
         Parameters
@@ -751,7 +751,7 @@ class EnginePyscf(Engine):
         Rotated density matrix """
 
         mol = mol or self.mol
-        return rotation2rotmat(rotation, mol, factor)
+        return rotation2rotmat(rotation, mol, factor, angle)
 
     def get_atom_naos(self, mol = None):
         mol = mol or self.mol
@@ -1020,7 +1020,7 @@ def gamma_to_rdm1e(mf, *args, **kwargs):
     dm1e = sinv@f@gamma
     return dm1e
 
-def rotation2rotmat(rotation, mol, factor=1.0):
+def rotation2rotmat(rotation, mol, factor=1.0, angle='ZYZ'):
     r""" Function to rotate the density matrix.
 
     Parameters
@@ -1046,7 +1046,7 @@ def rotation2rotmat(rotation, mol, factor=1.0):
     if np.allclose(rotation, np.eye(len(rotation))) :
         pass
     else :
-        alpha, beta, gamma = Rotation.from_matrix(rotation).as_euler('zyz')*factor
+        alpha, beta, gamma = Rotation.from_matrix(rotation).as_euler(angle)*factor
         for i in range(len(angl)):
             r = Dmatrix.Dmatrix(angl[i], alpha, beta, gamma, reorder_p=True)
             rotmat[aol[i]:aol[i+1],aol[i]:aol[i+1]]=r

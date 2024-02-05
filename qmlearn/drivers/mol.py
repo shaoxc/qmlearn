@@ -234,11 +234,12 @@ class QMMol(object):
         r"""Function to run the External Calculator."""
         self.engine.run(**kwargs)
 
-    def rotmat(self, factor=None, **kwargs):
+    def rotmat(self, factor=None, angle=None, **kwargs):
         r""" Rotated density matrix """
         if self._rotmat is None :
             factor = factor if factor is not None else 1.0
-            self._rotmat = self.rotation2rotmat(self.op_rotate,factor=factor, **kwargs)
+            angle = angle if angle is not None else 'ZYZ'
+            self._rotmat = self.rotation2rotmat(self.op_rotate,factor=factor,angle=angle, **kwargs)
         return self._rotmat
 
     @property
@@ -249,7 +250,7 @@ class QMMol(object):
             self._atom_naos = self.get_atom_naos()
         return self._atom_naos
 
-    def convert_back(self, y, prop = 'gamma', rotate = True, reorder = True, factor=1.0, **kwargs):
+    def convert_back(self, y, prop = 'gamma', rotate = True, reorder = True, factor=1.0, angle= 'ZYZ', **kwargs):
         r""" Function to rotate gamma or forces base on initial coordinates.
 
         Parameters
@@ -277,7 +278,7 @@ same sequence as the data.
 
         """
         nao = self.nao
-        rotmat = self.rotmat(factor=factor)
+        rotmat = self.rotmat(factor=factor, angle=angle)
         #
         if np.allclose(self.op_rotate, self.op_rotate_inv) : rotate = False
         if np.all(self.op_indices[:-1] < self.op_indices[1:]) : reorder = False

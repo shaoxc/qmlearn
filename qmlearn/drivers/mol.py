@@ -237,8 +237,8 @@ class QMMol(object):
     def rotmat(self, factor=None, angle=None, **kwargs):
         r""" Rotated density matrix """
         if self._rotmat is None :
-            factor = factor if factor is not None else 1.0
-            angle = angle if angle is not None else 'ZYZ'
+            factor = factor if factor is not None else -1.0
+            angle = angle if angle is not None else 'zyz'
             self._rotmat = self.rotation2rotmat(self.op_rotate,factor=factor,angle=angle, **kwargs)
         return self._rotmat
 
@@ -250,7 +250,7 @@ class QMMol(object):
             self._atom_naos = self.get_atom_naos()
         return self._atom_naos
 
-    def convert_back(self, y, prop = 'gamma', rotate = True, reorder = True, factor=1.0, angle= 'ZYZ', **kwargs):
+    def convert_back(self, y, prop = 'gamma', rotate = True, reorder = True, factor=-1.0, angle= 'zyz', **kwargs):
         r""" Function to rotate gamma or forces base on initial coordinates.
 
         Parameters

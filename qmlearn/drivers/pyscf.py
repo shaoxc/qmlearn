@@ -304,6 +304,8 @@ class EnginePyscf(Engine):
                     mf2.run()
                     self._orb = self.mf.mo_coeff
                     self._gamma = mf2.make_rdm1(ao_repr = ao_repr, **kwargs)
+                    print('METHOD: ',method2)
+                    self._gamma2 = mf2.make_rdm2(ao_repr = ao_repr, **kwargs)
                     self._etotal = mf2.e_tot
                     if method2 == 'ccsd(t)':
                         ccsd_t = mf2.ccsd_t()
@@ -735,7 +737,7 @@ class EnginePyscf(Engine):
         mo = self.mf.mo_coeff[:,:nocc] @ vr.T
         return mo
 
-    def rotation2rotmat(self, rotation, mol = None, factor=1.0, angle = 'ZYZ'):
+    def rotation2rotmat(self, rotation, mol = None, factor=-1.0, angle = 'zyz'):
         r""" Function to rotate the density matrix.
 
         Parameters

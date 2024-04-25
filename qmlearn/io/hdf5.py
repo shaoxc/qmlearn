@@ -12,9 +12,14 @@ from qmlearn.io.sklearn import model_to_dict, dict_to_model
 def check_name(fh = None):
     def decorator(function):
         @wraps(function)
-        def wrapper(self, **kwargs):
+        def wrapper(self, *args, **kwargs):
             fobj = fh
-            name = kwargs.get('name', '*')
+            #
+            if len(args)>0:
+                name, args = args[0], args[1:]
+            else:
+                name = kwargs.get('name', '*')
+            #
             if fobj is None : fobj = self.fh
             names = self.get_names(name)
             if len(names) > 0:
@@ -22,7 +27,7 @@ def check_name(fh = None):
             else:
                 self.close()
                 raise AttributeError(f"There is no '{name}' in the file.")
-            results = function(self, **kwargs)
+            results = function(self, *args, **kwargs)
             return results
         return wrapper
     return decorator

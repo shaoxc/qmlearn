@@ -321,14 +321,14 @@ class EnginePyscf(Engine):
         if 'forces' in properties :
             self._forces = self.run_forces()
 
-    def calc_gamma2_cas(self, properties, ao_repr=True,ncas=None,nelecas=None,*kwargs):
+    def calc_gamma2_cas(self, properties, ao_repr=True,ncas=None,nelecas=None,reorder=True,*kwargs):
         ncore = self.mf2.ncore
         ncas = self.mf2.ncas
         ci = self.mf2.ci
         mo_coeff = self.mf.mo_coeff
         # mocas = mo_coeff[:,ncore:ncore+ncas]
         # amo_s = mocas.shape[1]
-        casdm2 = self.mf2.fcisolver.make_rdm2(ci, ncas, nelecas) # MO basis
+        casdm2 = self.mf2.fcisolver.make_rdm2(ci, ncas, nelecas, reorder=reorder) # MO basis
         casdm1 = self.mf2.fcisolver.make_rdm1(ci, ncas, nelecas) # MO basis
 
         if 'gamma2' in properties:
@@ -737,7 +737,7 @@ class EnginePyscf(Engine):
         mo = self.mf.mo_coeff[:,:nocc] @ vr.T
         return mo
 
-    def rotation2rotmat(self, rotation, mol = None, factor=-1.0, angle = 'zyz'):
+    def rotation2rotmat(self, rotation, mol = None, factor=1.0, angle = 'zyz'):
         r""" Function to rotate the density matrix.
 
         Parameters

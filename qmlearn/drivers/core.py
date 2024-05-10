@@ -10,7 +10,7 @@ from rmsd.calculate_rmsd import (
     reorder_inertia_hungarian,
     )
 
-from qmlearn.utils.utils import matrix_deviation, unitary_decompose
+from qmlearn.utils.utils import matrix_deviation, unitary_decompose, wedge
 from qmlearn.data import REFLECTION
 
 
@@ -379,28 +379,50 @@ class Engine(object):
         gamma2_m = self.gamma2_mo2ao(gamma2_m)
         return gamma2_m
 
-    def eigs_gamma2(self, gamma2):
-        shape = np.shape(gamma2)[0]
-        gamma2_reshape = np.transpose(gamma2,[0,2,1,3]).reshape((shape**2,shape**2))
-        ovlp_aug = np.einsum('vu,st->vust',self.ovlp,self.ovlp)
-        ovlp_aug_reshape = np.transpose(ovlp_aug,[0,2,1,3]).reshape((shape**2,shape**2))
-
+    def eigs_gamma2(self, gamma2, ao_repr=True):
         from scipy import linalg
-        eigv, coeff = linalg.eigh(gamma2_reshape,ovlp_aug_reshape,type=2)
+        if ao_repr:
+            shape = np.shape(gamma2)[0]
+            gamma2_reshape = np.transpose(gamma2,[0,2,1,3]).reshape((shape**2,shape**2))
+            ovlp_aug = np.einsum('vu,st->vust',self.ovlp,self.ovlp)
+            ovlp_aug_reshape = np.transpose(ovlp_aug,[0,2,1,3]).reshape((shape**2,shape**2))
 
-        if eigv.any() < 0:
+            eigv, coeff = linalg.eigh(gamma2_reshape,ovlp_aug_reshape,type=2)
+            trace_gamma2 = np.einsum('mnst,mn,st',gamma2,self.ovlp,self.ovlp)
+        else:
+            shape = np.shape(gamma2)[0]
+            gamma2_reshape = gamma2.reshape((shape**2,shape**2))
+            eigv, coeff = linalg.eigh(gamma2_reshape,type=2)
+            trace_gamma2 = np.einsum('mnnm',gamma2)
+         
+        if np.any(np.round(eigv,10)<0):
             print('2RDM is NOT positive semidefinite')
         else:
             print('2RDM is positive semidefinite')
-
-        trace_gamma2 = np.einsum('mnst,mn,st',gamma2,self.ovlp,self.ovlp)
-
+         
         if not np.allclose(trace_gamma2, 0, atol=1e-3):
             print('2RDM trace is not ZERO -> N', trace_gamma2,'!=', 0)
         else:
             print('2RDM trace is ZERO')
+
         return eigv[::-1], coeff[:,::-1]
 
+    def eigs_gamma1(self,gamma1):
+        ovlp = self.ovlp
+        from scipy import linalg
+        eigv, coeff = linalg.eigh(gamma1,ovlp,type=2)
+        if np.any(np.round(eigv,10)<0):
+          print('1RDM is NOT positive semidefinite')
+        else:
+          print('1RDM is positive semidefinite')
+
+        trace_gamma1 = np.trace(gamma1@ovlp)
+        if not np.allclose(trace_gamma1, 0, atol=1e-3):
+           print('1RDM trace is not ZERO -> N', trace_gamma1,'!=', 0)
+        else:
+           print('1RDM trace is ZERO')
+        return eigv[::-1], coeff[:,::-1]
+        
     def purify_d_gamma(self, gamma_d=None, gamma_hf=None):
 
         r""" Function to Purify \delta gamma1 = gamma^1_{FCI} - gamma^1_{HF}
@@ -425,8 +447,8 @@ class Engine(object):
            self.mf.run()
            gamma_hf = self.mf.make_rdm1()
 
-        a = np.einsum('pq,rs->pqrs',gamma_hf,gamma_hf)
-        b = np.einsum('pq,rs->psrq',gamma_hf,gamma_hf)
+        a = np.einsum('pq,rs->pqrs',gamma_hf,gamma_hf,optimize=True)
+        b = np.einsum('pq,rs->psrq',gamma_hf,gamma_hf,optimize=True)
         gamma2_r = gamma2c + .5*(2*a-b)
         
         trace = self.nelectron * (self.nelectron-1)
@@ -435,6 +457,53 @@ class Engine(object):
         gamma2c_p = gamma2_f_p - .5*(2*a-b)
 
         return gamma2_f_p, gamma2c_p
+
+    def gamma1_f_gamma2(self,gamma2, gamma1=None):
+        gamma_f = np.einsum('mnst,st->mn',gamma2,self.ovlp,optimize=True)/(self.nelectron-1)
+        if gamma1.any():
+          print('Check gamma1 from gamma2 == given gamma1: ', np.allclose(gamma1,gamma_f))
+        return gamma_f
+
+    def particle_hole_duality(self,gamma1=None,gamma2=None,r=None,identity=None, ao_repr=True,
+                              a=None,type_rdm='q'):
+        if ao_repr :
+            if gamma1 is not None :
+                gamma1 = self.gamma_ao2mo(gamma1)
+            gamma2 = self.gamma2_ao2mo(gamma2)
+
+        if r is None: r = gamma2.shape[0]
+        if identity is None: identity = np.eye(r)
+        if a is None: a = np.einsum('iljj->il',gamma2,optimize=True)/(self.nelectron-1)
+        N = self.nelectron
+        n_d = N*(N-1)
+        n_q = (r-N)*(r-N-1)
+        n_g = N*(r-N+1)
+        delta = np.eye(r)
+        print('n_d: ',n_d,'\n','n_q: ',n_q,'\n','n_g: ',n_g)
+
+        if type_rdm == 'g':
+           g = np.einsum('il,jk->ijkl', a, delta) - gamma2.transpose([0,2,3,1])
+           mat_f = g                                           
+         
+        if type_rdm == 'q':
+           g =  np.einsum('il,jk->ijkl', a, delta) - gamma2.transpose([0,2,3,1])
+           d_ki_g_lj = np.einsum('ki,lj ->ijkl',a, delta) 
+           d_ik_g_lj = np.einsum('ik,lj ->ijkl',delta, a)  
+           d_ik_d_lj = np.einsum('ik,lj ->ijkl',delta, delta) 
+           d_jk_g_li = np.einsum('jk,li ->ijkl',delta, a) 
+           d_jk_d_il = np.einsum('jk,il ->ijkl',delta, delta) 
+           q = -g + d_ki_g_lj + d_ik_g_lj - d_ik_d_lj - d_jk_g_li + d_jk_d_il
+           mat_f = q
+        return mat_f
+
+    def particle_df(self,gamma1,gamma2, type_rdm ='q'):
+        if type_rdm =='q':
+          q = self.particle_hole_duality(gamma1 = gamma1,gamma2 = gamma2, type_rdm='q')
+          results = q
+        else:
+          g = self.particle_hole_duality(gamma1 = gamma1,gamma2 = gamma2, type_rdm='g')
+          results = g
+        return results
 
 def atoms_rmsd(target, atoms, transform = True, **kwargs) :
     r""" Function to return RMSD : Root mean square deviation between atoms and target:transform atom object. And the target atom coordinates.

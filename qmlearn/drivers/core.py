@@ -392,10 +392,10 @@ class Engine(object):
         else:
             shape = np.shape(gamma2)[0]
             gamma2_reshape = gamma2.reshape((shape**2,shape**2))
-            eigv, coeff = linalg.eigh(gamma2_reshape,type=2)
-            trace_gamma2 = np.einsum('mnnm',gamma2)
+            eigv, coeff = linalg.eigh(gamma2_reshape)
+            trace_gamma2 = np.einsum('mnmn->',gamma2)
          
-        if np.any(np.round(eigv,10)<0):
+        if np.any(np.round(eigv,3)<0): #round 3 round e-4
             print('2RDM is NOT positive semidefinite')
         else:
             print('2RDM is positive semidefinite')
@@ -411,7 +411,7 @@ class Engine(object):
         ovlp = self.ovlp
         from scipy import linalg
         eigv, coeff = linalg.eigh(gamma1,ovlp,type=2)
-        if np.any(np.round(eigv,10)<0):
+        if np.any(np.round(eigv,6)<0):
           print('1RDM is NOT positive semidefinite')
         else:
           print('1RDM is positive semidefinite')
@@ -471,28 +471,30 @@ class Engine(object):
                 gamma1 = self.gamma_ao2mo(gamma1)
             gamma2 = self.gamma2_ao2mo(gamma2)
 
+        gamma2_t = gamma2.transpose([0,2,1,3])
+
         if r is None: r = gamma2.shape[0]
         if identity is None: identity = np.eye(r)
-        if a is None: a = np.einsum('iljj->il',gamma2,optimize=True)/(self.nelectron-1)
+        if a is None: a = np.einsum('ikjk->ij', gamma2_t, optimize=True)/(self.nelectron-1)
         N = self.nelectron
         n_d = N*(N-1)
-        n_q = (r-N)*(r-N-1)
-        n_g = N*(r-N+1)
-        delta = np.eye(r)
+        n_q = (2*r-N)*(2*r-N-1) #for close-shell
+        n_g = N*(2*r-N+1)  #for close-shell
+        delta = identity
         print('n_d: ',n_d,'\n','n_q: ',n_q,'\n','n_g: ',n_g)
 
         if type_rdm == 'g':
-           g = np.einsum('il,jk->ijkl', a, delta) - gamma2.transpose([0,2,3,1])
+           g = np.einsum('jl,ik->ijkl',delta,a)*2 - gamma2_t.transpose([0,3,2,1])
            mat_f = g                                           
          
         if type_rdm == 'q':
-           g =  np.einsum('il,jk->ijkl', a, delta) - gamma2.transpose([0,2,3,1])
-           d_ki_g_lj = np.einsum('ki,lj ->ijkl',a, delta) 
-           d_ik_g_lj = np.einsum('ik,lj ->ijkl',delta, a)  
-           d_ik_d_lj = np.einsum('ik,lj ->ijkl',delta, delta) 
-           d_jk_g_li = np.einsum('jk,li ->ijkl',delta, a) 
-           d_jk_d_il = np.einsum('jk,il ->ijkl',delta, delta) 
-           q = -g + d_ki_g_lj + d_ik_g_lj - d_ik_d_lj - d_jk_g_li + d_jk_d_il
+           d_jl_d_ik = 4*np.einsum('jl,ik->ijkl',delta,delta)
+           d_il_d_jk = 2*np.einsum('il,jk->ijkl',delta,delta)
+           d_jl_g_ik = 2*np.einsum('jl,ik->ijkl',delta, a)
+           d_il_g_jk = np.einsum('il,jk->ijkl',delta, a)
+           d_jk_g_il = np.einsum('jk,il->ijkl',delta,a)
+           d_ik_g_jl = 2*np.einsum('ik,jl->ijkl',delta,a)
+           q = gamma2_t + d_jl_d_ik - d_il_d_jk - d_jl_g_ik + d_il_g_jk + d_jk_g_il - d_ik_g_jl
            mat_f = q
         return mat_f
 
